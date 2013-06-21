@@ -33,7 +33,7 @@ using Mono.Addins;
 [assembly: AddinDescription("Provides access to Yahoo Market Data.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Fairmat SRL")]
-[assembly: AssemblyProduct("Point Function 2D")]
+[assembly: AssemblyProduct("Yahoo Finance Integration")]
 [assembly: AssemblyCopyright("Copyright © Fairmat SRL 2013")]
 [assembly: AssemblyTrademark("Fairmat")]
 [assembly: AssemblyCulture("")]
