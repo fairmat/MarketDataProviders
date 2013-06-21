@@ -1,4 +1,4 @@
-﻿/* Copyright (C) 2012 Fairmat SRL (info@fairmat.com, http://www.fairmat.com/)
+﻿/* Copyright (C) 2013 Fairmat SRL (info@fairmat.com, http://www.fairmat.com/)
  * Author(s): Stefano Angeleri (stefano.angeleri@fairmat.com)
  *
  * This program is free software: you can redistribute it and/or modify
