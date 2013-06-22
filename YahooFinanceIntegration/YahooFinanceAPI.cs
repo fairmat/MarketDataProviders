@@ -32,7 +32,7 @@ namespace YahooFinanceIntegration
     /// This API is detailed here:
     /// http://code.google.com/p/yahoo-finance-managed/wiki/csvHistQuotesDownload.
     /// </remarks>
-    class YahooFinanceAPI
+    internal static class YahooFinanceAPI
     {
         /// <summary>
         /// Gets a List of <see cref="YahooHistoricalQuote"/> containing the requested data.
