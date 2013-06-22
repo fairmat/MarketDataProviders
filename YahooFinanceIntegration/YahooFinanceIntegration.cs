@@ -30,9 +30,10 @@ namespace YahooFinanceIntegration
     /// This Data Market Provider supports only Scalar requests.
     /// </remarks>
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
-    public class YahooFinanceIntegration : IMarketDataProvider
+    public class YahooFinanceIntegration : IMarketDataProvider, IDescription
     {
         #region IMarketDataProvider Implementation
+
         /// <summary>
         /// Sets the credentials to use to access this Market Data Provider.
         /// </summary>
@@ -255,5 +256,17 @@ namespace YahooFinanceIntegration
         }
 
         #endregion IMarketDataProvider Implementation
+
+        #region IDescription Implementation
+
+        public string Description
+        {
+            get
+            {
+                return "Yahoo! Finance";
+            }
+        }
+
+        #endregion IDescription Implementation
     }
 }
