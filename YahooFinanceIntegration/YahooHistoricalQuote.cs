@@ -16,25 +16,49 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Globalization;
 using System.IO;
 
 namespace YahooFinanceIntegration
 {
     /// <summary>
-    /// Represents a single historical quote from Yahoo Finance.
+    /// Represents a single historical quote from Yahoo! Finance.
     /// </summary>
-    public class YahooHistoricalQuote
+    internal class YahooHistoricalQuote
     {
+        /// <summary>
+        /// The date of this quote.
+        /// </summary>
         public DateTime Date { get; private set; }
+
+        /// <summary>
+        /// The stock market opening price.
+        /// </summary>
         public double Open { get; private set; }
+
+        /// <summary>
+        /// The stock market highest price.
+        /// </summary>
         public double High { get; private set; }
+
+        /// <summary>
+        /// The stock market lowest price.
+        /// </summary>
         public double Low { get; private set; }
+
+        /// <summary>
+        /// The stock market close price.
+        /// </summary>
         public double Close { get; private set; }
+
+        /// <summary>
+        /// The volume of exchanges.
+        /// </summary>
         public int Volume { get; private set; }
+
+        /// <summary>
+        /// The stock market adjusted close price.
+        /// </summary>
         public double AdjClose { get; private set; }
 
         /// <summary>
@@ -52,21 +76,21 @@ namespace YahooFinanceIntegration
         }
 
         /// <summary>
-        /// Constructs a new instance starting from the provided line from a Yahoo Finance csv.
+        /// Constructs a new instance starting from the provided line from a Yahoo! Finance csv.
         /// </summary>
-        /// <param name="csvLine">A line from a Yahoo Finance csv.</param>
+        /// <param name="csvLine">A line from a Yahoo! Finance csv.</param>
         public YahooHistoricalQuote(string csvLine)
         {
             ParseCSVLine(csvLine);
         }
 
         /// <summary>
-        /// Populates the data starting from a provided line from a Yahoo Finance csv.
+        /// Populates the data starting from a provided line from a Yahoo! Finance csv.
         /// </summary>
-        /// <param name="csvLine">The line from a Yahoo Finance csv to parse.</param>
+        /// <param name="csvLine">The line from a Yahoo! Finance csv to parse.</param>
         public void ParseCSVLine(string csvLine)
         {
-            // We take for granted the yahoo format doesn't change and so
+            // We take for granted the Yahoo! format doesn't change and so
             // the data is listed in this way: Date,Open,High,Low,Close,Volume,Adj Close.
             // This means rows must be of 7 elements.
             string[] rows = csvLine.Split(',');
@@ -77,12 +101,12 @@ namespace YahooFinanceIntegration
                 throw new InvalidDataException("The csv line has a wrong number of items");
             }
 
-            // Format used by Yahoo for dates
+            // Format used by Yahoo! for dates
             DateTimeFormatInfo dateFormat = new DateTimeFormatInfo();
             dateFormat.ShortDatePattern = "yyyy-MM-dd";
             dateFormat.DateSeparator = "-";
 
-            // Format used by Yahoo for doubles.
+            // Format used by Yahoo! for doubles.
             NumberFormatInfo doubleFormat = new NumberFormatInfo();
             doubleFormat.NumberDecimalSeparator = ".";
             doubleFormat.NumberGroupSeparator = ",";

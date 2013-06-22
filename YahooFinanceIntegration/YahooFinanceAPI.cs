@@ -59,7 +59,7 @@ namespace YahooFinanceIntegration
         /// An InvalidDataException might be parsed if the CSV
         /// has different fields than expected.
         /// </exception>
-        public static List<YahooHistoricalQuote> GetHistoricalQuotes(string ticker, DateTime startDate, DateTime endDate)
+        internal static List<YahooHistoricalQuote> GetHistoricalQuotes(string ticker, DateTime startDate, DateTime endDate)
         {
             List<YahooHistoricalQuote> quotes = new List<YahooHistoricalQuote>();
 
