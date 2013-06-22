@@ -229,10 +229,10 @@ namespace YahooFinanceIntegration
             try
             {
                 // Try simply requesting a single data series known to exist
-                // and to produce 1 result (we use GOOG at 31 jan 2010).
+                // and to produce 1 result (we use GOOG at 31 jan 2011).
                 List<YahooHistoricalQuote> quotes = YahooFinanceAPI.GetHistoricalQuotes("GOOG",
-                                                                                        new DateTime(2010, 1, 31),
-                                                                                        new DateTime(2010, 1, 31));
+                                                                                        new DateTime(2011, 1, 31),
+                                                                                        new DateTime(2011, 1, 31));
 
                 if(quotes.Count != 1)
                 {
