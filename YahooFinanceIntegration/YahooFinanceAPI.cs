@@ -28,7 +28,7 @@ namespace YahooFinanceIntegration
     /// http://code.google.com/p/yahoo-finance-managed/wiki/YahooFinanceAPIs.
     /// </summary>
     /// <remarks>
-    /// The class implements the CSV API using the Historical Quotes Download functionality.
+    /// The class implements the CSV API using the historical quotes download functionality.
     /// This API is detailed here:
     /// http://code.google.com/p/yahoo-finance-managed/wiki/csvHistQuotesDownload.
     /// </remarks>
@@ -47,7 +47,7 @@ namespace YahooFinanceIntegration
         /// The ending date to look for quotes, the date is inclusive.
         /// </param>
         /// <returns>
-        /// A list of <see cref="YahooHistoricalQuote"/> containg all 
+        /// A list of <see cref="YahooHistoricalQuote"/> containing all
         /// the market open days from startDate to endDate.
         /// The list can be empty if the requested filters yield no results.
         /// </returns>
@@ -80,7 +80,8 @@ namespace YahooFinanceIntegration
         }
 
         /// <summary>
-        /// Prepares the request string starting from the provided variables and handles the request.
+        /// Prepares the request string starting from the provided
+        /// variables and handles the request.
         /// </summary>
         /// <param name="ticker">
         /// The symbol of the ticker to look for quotes.
@@ -95,15 +96,16 @@ namespace YahooFinanceIntegration
         private static StreamReader MakeRequest(string ticker, DateTime startDate, DateTime endDate)
         {
             // Generate the request to be sent to Yahoo Finance.
-            string request = String.Format("http://ichart.yahoo.com/table.csv?s={0}&a={1}&b={2}&c={3}&d={4}&e={5}&f={6}&ignore=.csv",
-                                           ticker, startDate.Month - 1, startDate.Day, startDate.Year,
-                                           endDate.Month - 1, endDate.Day, endDate.Year);
+            string request = string.Format("http://ichart.yahoo.com/table.csv?s={0}&a={1}&b={2}&c={3}&d={4}&e={5}&f={6}&ignore=.csv",
+                                           ticker, startDate.Month - 1, startDate.Day,
+                                           startDate.Year, endDate.Month - 1,
+                                           endDate.Day, endDate.Year);
             return MakeRequest(request);
         }
 
         /// <summary>
-        /// Actually makes a request with the provided requestUrl and generates a StreaReader
-        /// ready for reading the result of the request.
+        /// Actually makes a request with the provided requestUrl and generates
+        /// a <see cref="StreamReader"/> ready for reading the result of the request.
         /// </summary>
         /// <param name="requestUrl">The url to use to request data.</param>
         /// <returns>A <see cref="StreamReader"/> ready for reading the request result.</returns>
@@ -121,7 +123,7 @@ namespace YahooFinanceIntegration
                 // Check if it was successful.
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    throw new Exception(String.Format("Server error (HTTP {0}: {1}).",
+                    throw new Exception(string.Format("Server error (HTTP {0}: {1}).",
                                                        response.StatusCode,
                                                        response.StatusDescription));
                 }

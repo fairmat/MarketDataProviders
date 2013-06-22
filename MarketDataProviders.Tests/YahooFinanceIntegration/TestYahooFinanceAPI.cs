@@ -17,8 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
 using YahooFinanceIntegration;
 
@@ -29,7 +27,7 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
     /// by <see cref="YahooFinanceAPI"/>.
     /// </summary>
     [TestFixture]
-    class TestYahooFinanceAPI
+    public class TestYahooFinanceAPI
     {
         /// <summary>
         /// Initializes the backend to run the tests.
@@ -42,12 +40,12 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
 
         /// <summary>
         /// Tests requesting a single entry and checks values correspond.
-        /// The values of the ticker are aproximated.
+        /// The values of the ticker are approximate.
         /// </summary>
         [Test]
         public void TestRequestOneEntry()
         {
-            List<YahooHistoricalQuote> quotes =YahooFinanceAPI.GetHistoricalQuotes("GOOG",
+            List<YahooHistoricalQuote> quotes = YahooFinanceAPI.GetHistoricalQuotes("GOOG",
                                                                                    new DateTime(2011, 1, 31),
                                                                                    new DateTime(2011, 1, 31));
 
@@ -59,7 +57,7 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
 
         /// <summary>
         /// Tests requesting more than one entry and checks values correspond.
-        /// The values of the ticker are aproximated.
+        /// The values of the ticker are approximate.
         /// </summary>
         [Test]
         public void TestRequestMultipleEntry()

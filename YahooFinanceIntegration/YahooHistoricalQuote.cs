@@ -26,53 +26,20 @@ namespace YahooFinanceIntegration
     /// </summary>
     internal class YahooHistoricalQuote
     {
-        /// <summary>
-        /// The date of this quote.
-        /// </summary>
-        public DateTime Date { get; private set; }
-
-        /// <summary>
-        /// The stock market opening price.
-        /// </summary>
-        public double Open { get; private set; }
-
-        /// <summary>
-        /// The stock market highest price.
-        /// </summary>
-        public double High { get; private set; }
-
-        /// <summary>
-        /// The stock market lowest price.
-        /// </summary>
-        public double Low { get; private set; }
-
-        /// <summary>
-        /// The stock market close price.
-        /// </summary>
-        public double Close { get; private set; }
-
-        /// <summary>
-        /// The volume of exchanges.
-        /// </summary>
-        public int Volume { get; private set; }
-
-        /// <summary>
-        /// The stock market adjusted close price.
-        /// </summary>
-        public double AdjClose { get; private set; }
+        #region Constructors
 
         /// <summary>
         /// Default constructor. It just sets default values.
         /// </summary>
         public YahooHistoricalQuote()
         {
-            Date = new DateTime();
-            Open = 0.0f;
-            High = 0.0f;
-            Low = 0.0f;
-            Close = 0.0f;
-            Volume = 0;
-            AdjClose = 0.0f;
+            this.Date = new DateTime();
+            this.Open = 0.0f;
+            this.High = 0.0f;
+            this.Low = 0.0f;
+            this.Close = 0.0f;
+            this.Volume = 0;
+            this.AdjClose = 0.0f;
         }
 
         /// <summary>
@@ -83,6 +50,47 @@ namespace YahooFinanceIntegration
         {
             ParseCSVLine(csvLine);
         }
+
+        #endregion Constructos
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the date of this quote.
+        /// </summary>
+        public DateTime Date { get; private set; }
+
+        /// <summary>
+        /// Gets the stock market opening price.
+        /// </summary>
+        public double Open { get; private set; }
+
+        /// <summary>
+        /// Gets the stock market highest price.
+        /// </summary>
+        public double High { get; private set; }
+
+        /// <summary>
+        /// Gets the stock market lowest price.
+        /// </summary>
+        public double Low { get; private set; }
+
+        /// <summary>
+        /// Gets the stock market close price.
+        /// </summary>
+        public double Close { get; private set; }
+
+        /// <summary>
+        /// Gets the volume of exchanges.
+        /// </summary>
+        public int Volume { get; private set; }
+
+        /// <summary>
+        /// Gets the stock market adjusted close price.
+        /// </summary>
+        public double AdjClose { get; private set; }
+
+        #endregion Properties
 
         /// <summary>
         /// Populates the data starting from a provided line from a Yahoo! Finance csv.
@@ -112,15 +120,15 @@ namespace YahooFinanceIntegration
             doubleFormat.NumberGroupSeparator = ",";
 
             // First item is a date.
-            Date = Convert.ToDateTime(rows[0], dateFormat);
+            this.Date = Convert.ToDateTime(rows[0], dateFormat);
 
             // The subsequent are all numbers. All doubles, except Volume which is an integer.
-            Open = Convert.ToDouble(rows[1], doubleFormat);
-            High = Convert.ToDouble(rows[2], doubleFormat);
-            Low = Convert.ToDouble(rows[3], doubleFormat);
-            Close = Convert.ToDouble(rows[4], doubleFormat);
-            Volume = Convert.ToInt32(rows[5]);
-            AdjClose = Convert.ToDouble(rows[6], doubleFormat);
+            this.Open = Convert.ToDouble(rows[1], doubleFormat);
+            this.High = Convert.ToDouble(rows[2], doubleFormat);
+            this.Low = Convert.ToDouble(rows[3], doubleFormat);
+            this.Close = Convert.ToDouble(rows[4], doubleFormat);
+            this.Volume = Convert.ToInt32(rows[5]);
+            this.AdjClose = Convert.ToDouble(rows[6], doubleFormat);
         }
     }
 }

@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using DVPLI;
-using DVPLI.MarketDataTypes;
 using System;
 using System.Collections.Generic;
+using DVPLI;
+using DVPLI.MarketDataTypes;
 
 namespace YahooFinanceIntegration
 {
@@ -32,6 +32,22 @@ namespace YahooFinanceIntegration
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
     public class YahooFinanceIntegration : IMarketDataProvider, IDescription
     {
+        #region IDescription Implementation
+
+        /// <summary>
+        /// Gets an user friendly description of the service provided by this class.
+        /// In this case "Yahoo! Finance".
+        /// </summary>
+        public string Description
+        {
+            get
+            {
+                return "Yahoo! Finance";
+            }
+        }
+
+        #endregion IDescription Implementation
+
         #region IMarketDataProvider Implementation
 
         /// <summary>
@@ -53,11 +69,10 @@ namespace YahooFinanceIntegration
         /// Gets the market data from a single day.
         /// </summary>
         /// <param name="mdq">
-        /// A <see cref="MarketDataQuery"/> with the data request
+        /// A <see cref="MarketDataQuery"/> with the data request.
         /// </param>
         /// <param name="marketData">
-        /// The requested market data as <see cref="IMarketData"/>,
-        /// in case of success.
+        /// In case of success, the requested market data as <see cref="IMarketData"/>.
         /// </param>
         /// <returns>
         /// A <see cref="RefreshStatus"/> indicating if the query was successful.
@@ -69,7 +84,7 @@ namespace YahooFinanceIntegration
             DateTime[] dates;
             IMarketData[] marketDatas;
             RefreshStatus status = GetTimeSeries(mdq, mdq.Date, out dates, out marketDatas);
-            
+
             // If there were errors already just report them back.
             if (status.HasErrors)
             {
@@ -84,7 +99,8 @@ namespace YahooFinanceIntegration
                 if (marketDatas.Length != 1 && dates.Length != 1 && dates[0] != mdq.Date)
                 {
                     status.HasErrors = true;
-                    status.ErrorMessage += "GetMarketData: Requested date or Market Data not available.";
+                    status.ErrorMessage += "GetMarketData: Requested date " +
+                                           "or Market Data not available.";
                     marketData = null;
                 }
                 else
@@ -102,11 +118,22 @@ namespace YahooFinanceIntegration
         /// Gets a series of Historical Market Data from the starting date
         /// to the end date.
         /// </summary>
-        /// <param name="mdq"></param>
-        /// <param name="end"></param>
-        /// <param name="dates"></param>
-        /// <param name="marketData"></param>
-        /// <returns></returns>
+        /// <param name="mdq">
+        /// A <see cref="MarketDataQuery"/> with the data request.
+        /// </param>
+        /// <param name="end">
+        /// A <see cref="DateTime"/> with the ending date of the period to fetch data from.
+        /// </param>
+        /// <param name="dates">
+        /// In case of success, a list of the dates data was fetched from in the requested period.
+        /// </param>
+        /// <param name="marketData">
+        /// In case of success, a list of the fetched market data day
+        /// by day corresponding to <see cref="dates"/>.
+        /// </param>
+        /// <returns>
+        /// A <see cref="RefreshStatus"/> indicating if the query was successful.
+        /// </returns>
         public RefreshStatus GetTimeSeries(MarketDataQuery mdq, DateTime end, out DateTime[] dates, out IMarketData[] marketData)
         {
             RefreshStatus status = new RefreshStatus();
@@ -118,26 +145,28 @@ namespace YahooFinanceIntegration
             switch (mdq.Field)
             {
                 case "open":
-                {
-                    closeRequest = false;
-                    break;
-                }
+                    {
+                        closeRequest = false;
+                        break;
+                    }
 
                 case "close":
-                {
-                    closeRequest = true;
-                    break;
-                }
+                    {
+                        closeRequest = true;
+                        break;
+                    }
 
                 default:
-                {
-                    // In case the request is neither open or close return an error.
-                    marketData = null;
-                    dates = null;
-                    status.HasErrors = true;
-                    status.ErrorMessage += "GetTimeSeries: Market data not available (only open and close values are available, " + mdq.Field + " was requested).";
-                    return status;
-                }
+                    {
+                        // In case the request is neither open or close return an error.
+                        marketData = null;
+                        dates = null;
+                        status.HasErrors = true;
+                        status.ErrorMessage += "GetTimeSeries: Market data not available (only " +
+                                               "open and close values are available, " +
+                                               mdq.Field + " was requested).";
+                        return status;
+                    }
             }
 
             // For now only Scalar requests are handled.
@@ -152,11 +181,13 @@ namespace YahooFinanceIntegration
                 }
                 catch (Exception e)
                 {
-                    // There can be conversion, server availability and other exceptions during this request.
+                    // There can be conversion, server availability
+                    // and other exceptions during this request.
                     marketData = null;
                     dates = null;
                     status.HasErrors = true;
-                    status.ErrorMessage += "GetTimeSeries: Market data not available due to problems with Yahoo! Finance: " + e.Message;
+                    status.ErrorMessage += "GetTimeSeries: Market data not available due " +
+                                           "to problems with Yahoo! Finance: " + e.Message;
                     return status;
                 }
 
@@ -190,7 +221,8 @@ namespace YahooFinanceIntegration
                     marketData = null;
                     dates = null;
                     status.HasErrors = true;
-                    status.ErrorMessage += "GetTimeSeries: Market data not available: empty data set for the request.";
+                    status.ErrorMessage += "GetTimeSeries: Market data not available: " +
+                                           "empty data set for the request.";
                     return status;
                 }
             }
@@ -224,7 +256,7 @@ namespace YahooFinanceIntegration
             // Prepare the default result, in case everything will go well.
             Status state = new Status();
             state.HasErrors = false;
-            state.ErrorMessage = "";
+            state.ErrorMessage = string.Empty;
 
             try
             {
@@ -234,7 +266,7 @@ namespace YahooFinanceIntegration
                                                                                         new DateTime(2011, 1, 31),
                                                                                         new DateTime(2011, 1, 31));
 
-                if(quotes.Count != 1)
+                if (quotes.Count != 1)
                 {
                     // If there is a number of results different than 1,
                     // it means the service is not answering as expected,
@@ -256,17 +288,5 @@ namespace YahooFinanceIntegration
         }
 
         #endregion IMarketDataProvider Implementation
-
-        #region IDescription Implementation
-
-        public string Description
-        {
-            get
-            {
-                return "Yahoo! Finance";
-            }
-        }
-
-        #endregion IDescription Implementation
     }
 }

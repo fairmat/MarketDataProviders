@@ -16,9 +16,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
 using YahooFinanceIntegration;
 
@@ -29,7 +26,7 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
     /// Primarily it's construction and parsing are tested.
     /// </summary>
     [TestFixture]
-    class TestYahooHistoricalQuote
+    public class TestYahooHistoricalQuote
     {
         /// <summary>
         /// Initializes the backend to run the tests.
@@ -49,7 +46,7 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
             // This is the format: Date,Open,High,Low,Close,Volume,Adj Close.
             return "2010-01-25,123.45,321.45,121.45,320.21,999,321.22";
         }
-      
+
         /// <summary>
         /// Tries to construct an empty <see cref="YahooHistoricalQuote"/>
         /// and parse a string.
@@ -63,7 +60,7 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
 
         /// <summary>
         /// Tries to construct a <see cref="YahooHistoricalQuote"/>
-        /// with the data to be parsed
+        /// with the data to be parsed.
         /// </summary>
         [Test]
         public void TestConstruction()
