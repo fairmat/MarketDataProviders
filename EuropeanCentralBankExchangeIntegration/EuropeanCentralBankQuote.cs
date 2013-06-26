@@ -41,7 +41,7 @@ namespace EuropeanCentralBankIntegration
         /// Constructs a new instance from a Date and a Value.
         /// </summary>
         /// <param name="date">The date corresponding to this quote, as a string.</param>
-        /// <param name="value">The date corresponding to this quote, as a string.</param>
+        /// <param name="value">The value corresponding to this quote, as a string.</param>
         public EuropeanCentralBankQuote(string date, string value)
         {
             ParseData(date, value);
@@ -51,7 +51,7 @@ namespace EuropeanCentralBankIntegration
         /// Constructs a new instance from a Date and a Value.
         /// </summary>
         /// <param name="date">The date corresponding to this quote.</param>
-        /// <param name="value">The date corresponding to this quote.</param>
+        /// <param name="value">The value corresponding to this quote.</param>
         public EuropeanCentralBankQuote(DateTime date, double value)
         {
             this.Date = date;
@@ -79,7 +79,7 @@ namespace EuropeanCentralBankIntegration
         /// European Central Bank.
         /// </summary>
         /// <param name="date">The date from the xml to parse, as a string.</param>
-        /// <param name="value">The date from the xml to parse, as a string.</param>
+        /// <param name="value">The value from the xml to parse, as a string.</param>
         public void ParseData(string date, string value)
         {
             // Format used by the European Central Bank for dates.

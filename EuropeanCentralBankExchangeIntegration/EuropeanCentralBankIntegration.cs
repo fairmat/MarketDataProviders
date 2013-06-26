@@ -161,8 +161,8 @@ namespace EuropeanCentralBankIntegration
                 dates = null;
                 status.HasErrors = true;
                 status.ErrorMessage += "GetTimeSeries: Market data not available (only " +
-                                       "conversion rates from EUR to another currency are available, " +
-                                       mdq.Ticker + " was requested).";
+                                       "conversion rates from EUR to another currency are " +
+                                       "available, " + mdq.Ticker + " was requested).";
                 return status;
             }
 
@@ -187,7 +187,8 @@ namespace EuropeanCentralBankIntegration
                     dates = null;
                     status.HasErrors = true;
                     status.ErrorMessage += "GetTimeSeries: Market data not available due " +
-                                           "to problems with the European Central Bank service: " + e.Message;
+                                           "to problems with the European Central Bank service: " +
+                                           e.Message;
                     return status;
                 }
 
@@ -263,8 +264,8 @@ namespace EuropeanCentralBankIntegration
                 // Try simply requesting a single data series known to exist
                 // and to produce 1 result (we use ZAR at 31 jan 2011).
                 List<EuropeanCentralBankQuote> quotes = EuropeanCentralBankAPI.GetHistoricalQuotes("ZAR",
-                                                                                        new DateTime(2011, 1, 31),
-                                                                                        new DateTime(2011, 1, 31));
+                                                                                                   new DateTime(2011, 1, 31),
+                                                                                                   new DateTime(2011, 1, 31));
 
                 if (quotes.Count != 1)
                 {
@@ -272,7 +273,8 @@ namespace EuropeanCentralBankIntegration
                     // it means the service is not answering as expected,
                     // so fail the test.
                     state.HasErrors = true;
-                    state.ErrorMessage = "Data from the European Central Bank not available or unreliable.";
+                    state.ErrorMessage = "Data from the European Central Bank " +
+                                         "not available or unreliable.";
                 }
             }
             catch (Exception e)
@@ -281,7 +283,8 @@ namespace EuropeanCentralBankIntegration
                 // there is a problem with the service (either timeout,
                 // connection failure, or the European Central Bank changed data format).
                 state.HasErrors = true;
-                state.ErrorMessage = "Unable to connect to the European CentralBank service: " + e.Message;
+                state.ErrorMessage = "Unable to connect to the European CentralBank service: " +
+                                     e.Message;
             }
 
             return state;

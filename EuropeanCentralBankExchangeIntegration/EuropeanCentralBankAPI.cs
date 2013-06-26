@@ -86,13 +86,13 @@ namespace EuropeanCentralBankIntegration
                     {
                         quotes.Add(quote);
                     }
-
                 }
             }
             catch (Exception e)
             {
                 throw new Exception("There was an error while attempting " +
-                                    "to parse the data from the European Central Bank servers: " + e.Message);
+                                    "to parse the data from the European Central Bank servers: " +
+                                    e.Message);
             }
 
             return quotes;
