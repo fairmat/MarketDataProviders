@@ -70,13 +70,37 @@ namespace EuropeanCentralBankIntegration
             XmlReader reader = MakeRequest(ticker, startDate, endDate);
 
             // Start parsing the result line by line.
-            /*while (!reader.EndOfStream)
+            try
             {
-                EuropeanCentralBankQuote quote = null;// new EuropeanCentralBankQuote(reader.ReadLine());
-                quotes.Add(quote);
-            }*/
+                while (reader.ReadToFollowing("Obs"))
+                {
+                    if (!reader.MoveToAttribute("TIME_PERIOD"))
+                    {
+                        throw new InvalidDataException("The data format is not valid");
+                    }
 
-            reader.ReadToFollowing("Obs");
+                    string date = reader.Value;
+
+                    if (!reader.MoveToAttribute("OBS_VALUE"))
+                    {
+                        throw new InvalidDataException("The data format is not valid");
+                    }
+
+                    string value = reader.Value;
+
+                    EuropeanCentralBankQuote quote = new EuropeanCentralBankQuote(date, value);
+                    if (quote.Date >= startDate && quote.Date <= endDate)
+                    {
+                        quotes.Add(quote);
+                    }
+
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("There was an error while attempting " +
+                                    "to parse the data from the European Central Bank servers: " + e.Message);
+            }
 
             return quotes;
         }
@@ -98,8 +122,8 @@ namespace EuropeanCentralBankIntegration
         private static XmlReader MakeRequest(string ticker, DateTime startDate, DateTime endDate)
         {
             // Generate the request to be sent to Yahoo Finance.
-            string request = string.Format("http://www.ecb.europa.eu/stats/eurofxref/{0}.xml",
-                                           ticker.ToLower());
+            string request = string.Format("http://www.ecb.int/stats/exchange/eurofxref/html/{0}.xml",
+                                            ticker.ToLower());
             return MakeRequest(request);
         }
 
@@ -131,11 +155,11 @@ namespace EuropeanCentralBankIntegration
                 // Obtain the stream of the response and initialize a reader.
                 Stream receiveStream = response.GetResponseStream();
                 return XmlReader.Create(receiveStream);
-            }
+           }
             catch (Exception e)
             {
                 throw new Exception("There was an error while attempting " +
-                                    "to contact Yahoo servers: " + e.Message);
+                                    "to contact the European Central Bank servers: " + e.Message);
             }
         }
     }

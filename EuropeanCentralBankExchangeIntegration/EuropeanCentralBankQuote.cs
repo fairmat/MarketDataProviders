@@ -40,7 +40,18 @@ namespace EuropeanCentralBankIntegration
         /// <summary>
         /// Constructs a new instance from a Date and a Value.
         /// </summary>
-        /// <param name="csvLine">A line from a Yahoo! Finance csv.</param>
+        /// <param name="date">The date corresponding to this quote, as a string.</param>
+        /// <param name="value">The date corresponding to this quote, as a string.</param>
+        public EuropeanCentralBankQuote(string date, string value)
+        {
+            ParseData(date, value);
+        }
+
+        /// <summary>
+        /// Constructs a new instance from a Date and a Value.
+        /// </summary>
+        /// <param name="date">The date corresponding to this quote.</param>
+        /// <param name="value">The date corresponding to this quote.</param>
         public EuropeanCentralBankQuote(DateTime date, double value)
         {
             this.Date = date;
@@ -62,5 +73,30 @@ namespace EuropeanCentralBankIntegration
         public double Value { get; private set; }
 
         #endregion Properties
+
+        /// <summary>
+        /// Populates the data starting from data from a line of the xml from the
+        /// European Central Bank.
+        /// </summary>
+        /// <param name="date">The date from the xml to parse, as a string.</param>
+        /// <param name="value">The date from the xml to parse, as a string.</param>
+        public void ParseData(string date, string value)
+        {
+            // Format used by the European Central Bank for dates.
+            DateTimeFormatInfo dateFormat = new DateTimeFormatInfo();
+            dateFormat.ShortDatePattern = "yyyy-MM-dd";
+            dateFormat.DateSeparator = "-";
+
+            // Format used by Yahoo! for doubles.
+            NumberFormatInfo doubleFormat = new NumberFormatInfo();
+            doubleFormat.NumberDecimalSeparator = ".";
+            doubleFormat.NumberGroupSeparator = ",";
+
+            // Converts the date.
+            this.Date = Convert.ToDateTime(date, dateFormat);
+
+            // Then converts the value.
+            this.Value = Convert.ToDouble(value, doubleFormat);
+        }
     }
 }
