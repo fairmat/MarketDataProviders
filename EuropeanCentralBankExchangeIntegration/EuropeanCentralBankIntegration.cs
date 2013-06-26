@@ -36,7 +36,7 @@ namespace EuropeanCentralBankIntegration
 
         /// <summary>
         /// Gets an user friendly description of the service provided by this class.
-        /// In this case "Yahoo! Finance".
+        /// In this case "European Central Bank Exchange".
         /// </summary>
         public string Description
         {
@@ -249,7 +249,7 @@ namespace EuropeanCentralBankIntegration
         /// </remarks>
         /// <returns>
         /// A <see cref="Status"/> indicating if the
-        /// Yahoo! Finance service is working.
+        /// European Central Bank exchange service is working.
         /// </returns>
         public Status TestConnectivity()
         {
@@ -279,7 +279,7 @@ namespace EuropeanCentralBankIntegration
             {
                 // If an exception was thrown during data fetching it means
                 // there is a problem with the service (either timeout,
-                // connection failure, or Yahoo! changed data format).
+                // connection failure, or the European Central Bank changed data format).
                 state.HasErrors = true;
                 state.ErrorMessage = "Unable to connect to the European CentralBank service: " + e.Message;
             }

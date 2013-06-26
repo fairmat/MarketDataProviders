@@ -87,7 +87,7 @@ namespace EuropeanCentralBankIntegration
             dateFormat.ShortDatePattern = "yyyy-MM-dd";
             dateFormat.DateSeparator = "-";
 
-            // Format used by Yahoo! for doubles.
+            // Format used by European Central Bank for doubles.
             NumberFormatInfo doubleFormat = new NumberFormatInfo();
             doubleFormat.NumberDecimalSeparator = ".";
             doubleFormat.NumberGroupSeparator = ",";

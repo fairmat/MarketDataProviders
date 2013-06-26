@@ -19,29 +19,22 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Text;
 using System.Xml;
-using System.IO;
-using System.Text;
 
 namespace EuropeanCentralBankIntegration
 {
     /// <summary>
-    /// Provides a simple interface to the Yahoo! Finance API.
-    /// http://code.google.com/p/yahoo-finance-managed/wiki/YahooFinanceAPIs.
+    /// Provides a simple interface to the Central European Bank data.
+    /// http://www.ecb.europa.eu/stats/exchange/eurofxref/html/index.en.html
+    /// http://www.ecb.int/stats/exchange/eurofxref/html/eurofxref-graph-zar.en.html
     /// </summary>
-    /// <remarks>
-    /// The class implements the CSV API using the historical quotes download functionality.
-    /// This API is detailed here:
-    /// http://code.google.com/p/yahoo-finance-managed/wiki/csvHistQuotesDownload.
-    /// </remarks>
     internal static class EuropeanCentralBankAPI
     {
         /// <summary>
-        /// Gets a List of <see cref="YahooHistoricalQuote"/> containing the requested data.
+        /// Gets a List of <see cref="EuropeanCentralBankQuote"/> containing the requested data.
         /// </summary>
         /// <param name="ticker">
-        /// The symbol of the ticker to look for quotes.
+        /// The symbol of the ticker to look for quotes (usually a currency).
         /// </param>
         /// <param name="startDate">
         /// The start date to look for quotes, the date is inclusive.
@@ -50,13 +43,13 @@ namespace EuropeanCentralBankIntegration
         /// The ending date to look for quotes, the date is inclusive.
         /// </param>
         /// <returns>
-        /// A list of <see cref="YahooHistoricalQuote"/> containing all
+        /// A list of <see cref="EuropeanCentralBankQuote"/> containing all
         /// the market open days from startDate to endDate.
         /// The list can be empty if the requested filters yield no results.
         /// </returns>
         /// <exception cref="Exception">
         /// A generic Exception can be thrown in case there are problems
-        /// contacting Yahoo! servers, like timeout or HTTP errors.
+        /// contacting the European Central Bank, like timeout or HTTP errors.
         /// </exception>
         /// <exception cref="InvalidDataException">
         /// An InvalidDataException might be parsed if the CSV
@@ -121,7 +114,7 @@ namespace EuropeanCentralBankIntegration
         /// <returns>A <see cref="StreamReader"/> ready for reading the request result.</returns>
         private static XmlReader MakeRequest(string ticker, DateTime startDate, DateTime endDate)
         {
-            // Generate the request to be sent to Yahoo Finance.
+            // Generate the request to be sent to the European Central Bank site.
             string request = string.Format("http://www.ecb.int/stats/exchange/eurofxref/html/{0}.xml",
                                             ticker.ToLower());
             return MakeRequest(request);
@@ -137,10 +130,10 @@ namespace EuropeanCentralBankIntegration
         {
             try
             {
-                // Prepare the object to handle the request to the Yahoo servers.
+                // Prepare the object to handle the request to the European Central Bank servers.
                 HttpWebRequest request = WebRequest.Create(requestUrl) as HttpWebRequest;
 
-                // Actually attempt the request to Yahoo.
+                // Actually attempt the request to the European Central Bank.
                 HttpWebResponse response = request.GetResponse() as HttpWebResponse;
 
                 // If this point is reached the response is instanced with something.
