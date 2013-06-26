@@ -154,7 +154,17 @@ namespace EuropeanCentralBankIntegration
             }
 
             // Check that the requested value is available.
-            if (!mdq.Ticker.StartsWith("EUCF"))
+            if (mdq.Ticker.StartsWith("EUCF"))
+            {
+                // Extract the target currency name as that's used to request the data.
+                currency = mdq.Ticker.Remove(0, 4);
+            }
+            else if(mdq.Ticker.StartsWith("EUR"))
+            {
+                // Extract the target currency name as that's used to request the data.
+                currency = mdq.Ticker.Remove(0, 3);
+            }
+            else
             {
                 // Only EUR TO TARGET CURRENCY is supported using the format EUCF<TARGET CURRENCY>
                 marketData = null;
@@ -165,9 +175,6 @@ namespace EuropeanCentralBankIntegration
                                        "available, " + mdq.Ticker + " was requested).";
                 return status;
             }
-
-            // Extract the target currency name as that's used to request the data.
-            currency = mdq.Ticker.Remove(0, 4);
 
             // For now only Scalar requests are handled.
             if (mdq.MarketDataType == typeof(Scalar).ToString())
