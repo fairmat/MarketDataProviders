@@ -20,6 +20,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Xml;
+using System.IO;
+using System.Text;
 
 namespace EuropeanCentralBankIntegration
 {
@@ -64,17 +67,16 @@ namespace EuropeanCentralBankIntegration
             List<EuropeanCentralBankQuote> quotes = new List<EuropeanCentralBankQuote>();
 
             // Try to do the request starting from the wanted data.
-            StreamReader reader = MakeRequest(ticker, startDate, endDate);
-
-            // Skip the first line of the output
-            reader.ReadLine();
+            XmlReader reader = MakeRequest(ticker, startDate, endDate);
 
             // Start parsing the result line by line.
-            while (!reader.EndOfStream)
+            /*while (!reader.EndOfStream)
             {
-                EuropeanCentralBankQuote quote = new EuropeanCentralBankQuote(reader.ReadLine());
+                EuropeanCentralBankQuote quote = null;// new EuropeanCentralBankQuote(reader.ReadLine());
                 quotes.Add(quote);
-            }
+            }*/
+
+            reader.ReadToFollowing("Obs");
 
             return quotes;
         }
@@ -93,13 +95,11 @@ namespace EuropeanCentralBankIntegration
         /// The ending date to look for quotes, the date is inclusive.
         /// </param>
         /// <returns>A <see cref="StreamReader"/> ready for reading the request result.</returns>
-        private static StreamReader MakeRequest(string ticker, DateTime startDate, DateTime endDate)
+        private static XmlReader MakeRequest(string ticker, DateTime startDate, DateTime endDate)
         {
             // Generate the request to be sent to Yahoo Finance.
-            string request = string.Format("http://ichart.yahoo.com/table.csv?s={0}&a={1}&b={2}&c={3}&d={4}&e={5}&f={6}&ignore=.csv",
-                                           ticker, startDate.Month - 1, startDate.Day,
-                                           startDate.Year, endDate.Month - 1,
-                                           endDate.Day, endDate.Year);
+            string request = string.Format("http://www.ecb.europa.eu/stats/eurofxref/{0}.xml",
+                                           ticker.ToLower());
             return MakeRequest(request);
         }
 
@@ -109,7 +109,7 @@ namespace EuropeanCentralBankIntegration
         /// </summary>
         /// <param name="requestUrl">The url to use to request data.</param>
         /// <returns>A <see cref="StreamReader"/> ready for reading the request result.</returns>
-        private static StreamReader MakeRequest(string requestUrl)
+        private static XmlReader MakeRequest(string requestUrl)
         {
             try
             {
@@ -130,8 +130,7 @@ namespace EuropeanCentralBankIntegration
 
                 // Obtain the stream of the response and initialize a reader.
                 Stream receiveStream = response.GetResponseStream();
-                Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
-                return new StreamReader(receiveStream, encode);
+                return XmlReader.Create(receiveStream);
             }
             catch (Exception e)
             {

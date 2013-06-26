@@ -138,36 +138,36 @@ namespace EuropeanCentralBankIntegration
         {
             RefreshStatus status = new RefreshStatus();
 
-            // Holds whathever we should take market close or market open values.
-            bool closeRequest;
+            string currency;
 
-            // Check if open or close value was requested.
-            switch (mdq.Field)
+            // Check if it's a close request.
+            if (mdq.Field != "close")
             {
-                case "open":
-                    {
-                        closeRequest = false;
-                        break;
-                    }
-
-                case "close":
-                    {
-                        closeRequest = true;
-                        break;
-                    }
-
-                default:
-                    {
-                        // In case the request is neither open or close return an error.
-                        marketData = null;
-                        dates = null;
-                        status.HasErrors = true;
-                        status.ErrorMessage += "GetTimeSeries: Market data not available (only " +
-                                               "open and close values are available, " +
-                                               mdq.Field + " was requested).";
-                        return status;
-                    }
+                // In case the request is not close return an error.
+                marketData = null;
+                dates = null;
+                status.HasErrors = true;
+                status.ErrorMessage += "GetTimeSeries: Market data not available (only " +
+                                       "close values are available, " +
+                                       mdq.Field + " was requested).";
+                return status;
             }
+
+            // Check that the requested value is available.
+            if (!mdq.Ticker.StartsWith("EUCF"))
+            {
+                // Only EUR TO TARGET CURRENCY is supported using the format EUCF<TARGET CURRENCY>
+                marketData = null;
+                dates = null;
+                status.HasErrors = true;
+                status.ErrorMessage += "GetTimeSeries: Market data not available (only " +
+                                       "conversion rates from EUR to another currency are available, " +
+                                       mdq.Ticker + " was requested).";
+                return status;
+            }
+
+            // Extract the target currency name as that's used to request the data.
+            currency = mdq.Ticker.Remove(0, 4);
 
             // For now only Scalar requests are handled.
             if (mdq.MarketDataType == typeof(Scalar).ToString())
@@ -177,7 +177,7 @@ namespace EuropeanCentralBankIntegration
                 try
                 {
                     // Request the data to the Market Data Provider.
-                    quotes = EuropeanCentralBankAPI.GetHistoricalQuotes(mdq.Ticker, mdq.Date, end);
+                    quotes = EuropeanCentralBankAPI.GetHistoricalQuotes(currency, mdq.Date, end);
                 }
                 catch (Exception e)
                 {
@@ -187,7 +187,7 @@ namespace EuropeanCentralBankIntegration
                     dates = null;
                     status.HasErrors = true;
                     status.ErrorMessage += "GetTimeSeries: Market data not available due " +
-                                           "to problems with Yahoo! Finance: " + e.Message;
+                                           "to problems with the European Central Bank service: " + e.Message;
                     return status;
                 }
 
@@ -207,7 +207,7 @@ namespace EuropeanCentralBankIntegration
                         // Prepare the single scalar data.
                         Scalar val = new Scalar();
                         val.TimeStamp = quotes[i].Date;
-                        val.Value = (closeRequest == true) ? quotes[i].Close : quotes[i].Open;
+                        val.Value = quotes[i].Value;
 
                         // Put it in the output structure.
                         marketData[i] = val;
@@ -261,8 +261,8 @@ namespace EuropeanCentralBankIntegration
             try
             {
                 // Try simply requesting a single data series known to exist
-                // and to produce 1 result (we use GOOG at 31 jan 2011).
-                List<EuropeanCentralBankQuote> quotes = EuropeanCentralBankAPI.GetHistoricalQuotes("GOOG",
+                // and to produce 1 result (we use ZAR at 31 jan 2011).
+                List<EuropeanCentralBankQuote> quotes = EuropeanCentralBankAPI.GetHistoricalQuotes("ZAR",
                                                                                         new DateTime(2011, 1, 31),
                                                                                         new DateTime(2011, 1, 31));
 
@@ -272,7 +272,7 @@ namespace EuropeanCentralBankIntegration
                     // it means the service is not answering as expected,
                     // so fail the test.
                     state.HasErrors = true;
-                    state.ErrorMessage = "Data from the Central European Bank not available or unreliable.";
+                    state.ErrorMessage = "Data from the European Central Bank not available or unreliable.";
                 }
             }
             catch (Exception e)
@@ -281,7 +281,7 @@ namespace EuropeanCentralBankIntegration
                 // there is a problem with the service (either timeout,
                 // connection failure, or Yahoo! changed data format).
                 state.HasErrors = true;
-                state.ErrorMessage = "Unable to connect to the Central European Bank service: " + e.Message;
+                state.ErrorMessage = "Unable to connect to the European CentralBank service: " + e.Message;
             }
 
             return state;

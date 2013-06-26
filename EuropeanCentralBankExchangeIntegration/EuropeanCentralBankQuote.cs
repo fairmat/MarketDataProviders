@@ -22,7 +22,7 @@ using System.IO;
 namespace EuropeanCentralBankIntegration
 {
     /// <summary>
-    /// Represents a single historical quote from Yahoo! Finance.
+    /// Represents a single historical quote from The European Central Bank exchange rates.
     /// </summary>
     internal class EuropeanCentralBankQuote
     {
@@ -34,21 +34,17 @@ namespace EuropeanCentralBankIntegration
         public EuropeanCentralBankQuote()
         {
             this.Date = new DateTime();
-            this.Open = 0.0f;
-            this.High = 0.0f;
-            this.Low = 0.0f;
-            this.Close = 0.0f;
-            this.Volume = 0;
-            this.AdjClose = 0.0f;
+            this.Value = 0.0f;
         }
 
         /// <summary>
-        /// Constructs a new instance starting from the provided line from a Yahoo! Finance csv.
+        /// Constructs a new instance from a Date and a Value.
         /// </summary>
         /// <param name="csvLine">A line from a Yahoo! Finance csv.</param>
-        public EuropeanCentralBankQuote(string csvLine)
+        public EuropeanCentralBankQuote(DateTime date, double value)
         {
-            ParseCSVLine(csvLine);
+            this.Date = date;
+            this.Value = value;
         }
 
         #endregion Constructos
@@ -61,74 +57,10 @@ namespace EuropeanCentralBankIntegration
         public DateTime Date { get; private set; }
 
         /// <summary>
-        /// Gets the stock market opening price.
+        /// Gets the exchange rate.
         /// </summary>
-        public double Open { get; private set; }
-
-        /// <summary>
-        /// Gets the stock market highest price.
-        /// </summary>
-        public double High { get; private set; }
-
-        /// <summary>
-        /// Gets the stock market lowest price.
-        /// </summary>
-        public double Low { get; private set; }
-
-        /// <summary>
-        /// Gets the stock market close price.
-        /// </summary>
-        public double Close { get; private set; }
-
-        /// <summary>
-        /// Gets the volume of exchanges.
-        /// </summary>
-        public int Volume { get; private set; }
-
-        /// <summary>
-        /// Gets the stock market adjusted close price.
-        /// </summary>
-        public double AdjClose { get; private set; }
+        public double Value { get; private set; }
 
         #endregion Properties
-
-        /// <summary>
-        /// Populates the data starting from a provided line from a Yahoo! Finance csv.
-        /// </summary>
-        /// <param name="csvLine">The line from a Yahoo! Finance csv to parse.</param>
-        public void ParseCSVLine(string csvLine)
-        {
-            // We take for granted the Yahoo! format doesn't change and so
-            // the data is listed in this way: Date,Open,High,Low,Close,Volume,Adj Close.
-            // This means rows must be of 7 elements.
-            string[] rows = csvLine.Split(',');
-
-            // Check if the number of elements is right.
-            if (rows.Length != 7)
-            {
-                throw new InvalidDataException("The csv line has a wrong number of items");
-            }
-
-            // Format used by Yahoo! for dates
-            DateTimeFormatInfo dateFormat = new DateTimeFormatInfo();
-            dateFormat.ShortDatePattern = "yyyy-MM-dd";
-            dateFormat.DateSeparator = "-";
-
-            // Format used by Yahoo! for doubles.
-            NumberFormatInfo doubleFormat = new NumberFormatInfo();
-            doubleFormat.NumberDecimalSeparator = ".";
-            doubleFormat.NumberGroupSeparator = ",";
-
-            // First item is a date.
-            this.Date = Convert.ToDateTime(rows[0], dateFormat);
-
-            // The subsequent are all numbers. All doubles, except Volume which is an integer.
-            this.Open = Convert.ToDouble(rows[1], doubleFormat);
-            this.High = Convert.ToDouble(rows[2], doubleFormat);
-            this.Low = Convert.ToDouble(rows[3], doubleFormat);
-            this.Close = Convert.ToDouble(rows[4], doubleFormat);
-            this.Volume = Convert.ToInt32(rows[5]);
-            this.AdjClose = Convert.ToDouble(rows[6], doubleFormat);
-        }
     }
 }
