@@ -90,9 +90,10 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
             List<YahooOptionChain> optionChains = YahooFinanceAPI.RequestOptions("GOOG");
             foreach (YahooOptionChain optionChain in optionChains)
             {
-                Console.WriteLine("Option Chain for " + optionChain.Symbol + " expiration " + optionChain.Expiration);
+                Console.WriteLine("Option Chain for " + optionChain.Symbol +
+                                  " expiration " + optionChain.Expiration);
                 Console.WriteLine("Options:");
-                foreach (YahooOption option in optionChain.options)
+                foreach (YahooOption option in optionChain.Options)
                 {
                     Console.WriteLine(option.Symbol);
                     Console.WriteLine(option.Bid);

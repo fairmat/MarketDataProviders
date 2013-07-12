@@ -17,21 +17,21 @@ namespace YahooFinanceIntegration
     public class YahooOptionChain
     {
         /// <summary>
-        /// Experation date of this series of options.
+        /// Gets or sets the expiration date of this series of options.
         /// </summary>
         [System.Xml.Serialization.XmlAttribute("expiration")]
         public DateTime Expiration { get; set; }
 
         /// <summary>
-        /// Ticker symbol of this series of options.
+        /// Gets or sets Ticker symbol of this series of options.
         /// </summary>
         [System.Xml.Serialization.XmlAttribute("symbol")]
         public string Symbol { get; set; }
 
         /// <summary>
-        /// The list of the options for this ticker symbol and expiration date.
+        /// Gets or sets the list of the options for this ticker symbol and expiration date.
         /// </summary>
         [System.Xml.Serialization.XmlElement("option")]
-        public List<YahooOption> options;
+        public List<YahooOption> Options { get; set; }
     }
 }

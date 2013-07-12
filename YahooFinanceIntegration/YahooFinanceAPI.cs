@@ -148,13 +148,13 @@ namespace YahooFinanceIntegration
         /// <param name="ticker">The ticker to request option data for.</param>
         /// <returns>
         /// A list of <see cref="YahooOptionChain"/>
-        /// containing all the gathered data
+        /// containing all the gathered data.
         /// </returns>
         public static List<YahooOptionChain> RequestOptions(string ticker)
         {
             DateTime datePoint = DateTime.Now;
             List<YahooOptionChain> optionChains = new List<YahooOptionChain>();
-            
+
             try
             {
                 // Try only the next 24 months (2 years).
@@ -166,10 +166,7 @@ namespace YahooFinanceIntegration
                     Console.WriteLine(requestUrl);
                     Console.WriteLine(datePoint.ToString());
 
-
                     // Prepare the object to handle the request to the Yahoo! Servers.
-                    //HttpWebRequest request = WebRequest.Create(requestUrl) as HttpWebRequest;
-                    HttpWebResponse response = null;
                     XmlReader reader = null;
 
                     // Prepare some variables for use to handle Yahoo! Servers time outs.
@@ -181,8 +178,10 @@ namespace YahooFinanceIntegration
                         try
                         {
                             HttpWebRequest request = WebRequest.Create(requestUrl) as HttpWebRequest;
+
                             // Actually attempt the request to the Yahoo! servers.
-                            response = request.GetResponse() as HttpWebResponse;
+                            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+
                             // If this point is reached the response is instanced with something.
                             // Check if it was successful.
                             if (response.StatusCode != HttpStatusCode.OK)
@@ -207,16 +206,16 @@ namespace YahooFinanceIntegration
                             if (attempts == 0)
                             {
                                 // just try for a while not always.
-                                throw new Exception("Too many failed attempts to retrieve the data (" + e.Message + ")");
+                                throw new Exception("Too many failed attempts to retrieve " +
+                                                    "the data (" + e.Message + ")");
                             }
 
                             // There was a failure so set the failure handling variables accordly.
                             failed = true;
                             attempts--;
 
-                            //request.UserAgent = "Mozzi";
-
-                            Console.WriteLine("Error during fetching attempt (" + e.Message + "). Retrying (left " + attempts + ")...");
+                            Console.WriteLine("Error during fetching attempt (" + e.Message +
+                                              "). Retrying (left " + attempts + ")...");
                         }
                     }
                     while (failed);
