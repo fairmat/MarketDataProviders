@@ -27,7 +27,7 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
     /// by <see cref="EuropeanCentralBankAPI"/>.
     /// </summary>
     [TestFixture]
-    public class TestYahooFinanceAPI
+    public class TestEuropeanCentralBankAPI
     {
         /// <summary>
         /// Initializes the backend to run the tests.
