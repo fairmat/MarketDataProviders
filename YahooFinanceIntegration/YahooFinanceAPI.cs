@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace YahooFinanceIntegration
 {
@@ -138,6 +140,104 @@ namespace YahooFinanceIntegration
                 throw new Exception("There was an error while attempting " +
                                     "to contact Yahoo servers: " + e.Message);
             }
+        }
+
+        /// <summary>
+        /// Tries to gather options data for the next 24 months, when available.
+        /// </summary>
+        /// <param name="ticker">The ticker to request option data for.</param>
+        /// <returns>
+        /// A list of <see cref="YahooOptionChain"/>
+        /// containing all the gathered data
+        /// </returns>
+        public static List<YahooOptionChain> RequestOptions(string ticker)
+        {
+            DateTime datePoint = DateTime.Now;
+            List<YahooOptionChain> optionChains = new List<YahooOptionChain>();
+            
+            try
+            {
+                // Try only the next 24 months (2 years).
+                for (int i = 0; i < 24; i++)
+                {
+                    // Prepare the request for th YQL API.
+                    string requestUrl = string.Format("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.options%20where%20symbol%3D%22{0}%22%20and%20expiration%3D%22{1:0000}-{2:00}%22&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys",
+                                                        ticker, datePoint.Year, datePoint.Month);
+                    Console.WriteLine(requestUrl);
+                    Console.WriteLine(datePoint.ToString());
+
+
+                    // Prepare the object to handle the request to the Yahoo! Servers.
+                    //HttpWebRequest request = WebRequest.Create(requestUrl) as HttpWebRequest;
+                    HttpWebResponse response = null;
+                    XmlReader reader = null;
+
+                    // Prepare some variables for use to handle Yahoo! Servers time outs.
+                    bool failed = false;
+                    int attempts = 10;
+
+                    do
+                    {
+                        try
+                        {
+                            HttpWebRequest request = WebRequest.Create(requestUrl) as HttpWebRequest;
+                            // Actually attempt the request to the Yahoo! servers.
+                            response = request.GetResponse() as HttpWebResponse;
+                            // If this point is reached the response is instanced with something.
+                            // Check if it was successful.
+                            if (response.StatusCode != HttpStatusCode.OK)
+                            {
+                                throw new Exception(string.Format("Server error (HTTP {0}: {1}).",
+                                                                   response.StatusCode,
+                                                                   response.StatusDescription));
+                            }
+
+                            // Obtain the stream of the response and initialize a reader.
+                            Stream receiveStream = response.GetResponseStream();
+                            reader = XmlReader.Create(receiveStream);
+
+                            if (!reader.ReadToDescendant("optionsChain")) throw new Exception();
+
+                            // All was successful so reset the failure handling variables
+                            failed = false;
+                            attempts = 10;
+                        }
+                        catch (Exception e)
+                        {
+                            if (attempts == 0)
+                            {
+                                // just try for a while not always.
+                                throw new Exception("Too many failed attempts to retrieve the data (" + e.Message + ")");
+                            }
+
+                            // There was a failure so set the failure handling variables accordly.
+                            failed = true;
+                            attempts--;
+
+                            //request.UserAgent = "Mozzi";
+
+                            Console.WriteLine("Error during fetching attempt (" + e.Message + "). Retrying (left " + attempts + ")...");
+                        }
+                    }
+                    while (failed);
+
+                    // Deserialize the message from Yahoo! servers.
+                    XmlSerializer serializer = new XmlSerializer(typeof(YahooOptionChain));
+                    YahooOptionChain optionChain = (YahooOptionChain)serializer.Deserialize(reader.ReadSubtree());
+                    reader.Close();
+
+                    // The next month will be checked.
+                    datePoint = datePoint.AddMonths(1);
+                    optionChains.Add(optionChain);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("There was an error while attempting " +
+                                    "to contact the Yahoo! Finance servers: " + e.Message);
+            }
+
+            return optionChains;
         }
     }
 }
