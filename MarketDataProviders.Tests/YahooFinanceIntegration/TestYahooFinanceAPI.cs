@@ -76,5 +76,32 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
             Assert.AreEqual(quotes[1].Open, 603, 1);
             Assert.AreEqual(quotes[1].Close, 600, 1);
         }
+
+        /// <summary>
+        /// Tests requesting option data from Yahoo! through YQL.
+        /// </summary>
+        /// <remarks>
+        /// There is no check on the output data as it seems the service
+        /// times out after 2 requests suceeded.
+        /// </remarks>
+        [Test]
+        public void TestOptionDataGathering()
+        {
+            List<YahooOptionChain> optionChains = YahooFinanceAPI.RequestOptions("GOOG");
+            foreach (YahooOptionChain optionChain in optionChains)
+            {
+                Console.WriteLine("Option Chain for " + optionChain.Symbol +
+                                  " expiration " + optionChain.Expiration);
+                Console.WriteLine("Options:");
+                foreach (YahooOption option in optionChain.Options)
+                {
+                    Console.WriteLine(option.Symbol);
+                    Console.WriteLine(option.Bid);
+                    Console.WriteLine("--");
+                }
+
+                Console.WriteLine("------------------");
+            }
+        }
     }
 }
