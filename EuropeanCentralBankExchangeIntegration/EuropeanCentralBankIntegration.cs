@@ -296,7 +296,52 @@ namespace EuropeanCentralBankIntegration
 
             return state;
         }
-
         #endregion IMarketDataProvider Implementation
+
+        /// <summary>
+        /// Returns the list of the tickers currently supported by this market data provider.
+        /// </summary>
+        /// <returns>The supported ticker array.</returns>
+        public static string[] GetSupportedTickers()
+        {
+            string[] currencies = new string[]{"USD",
+                    "JPY",
+                    "BGN",
+                    "CZK",
+                    "DKK",
+                    "GBP",
+                    "HUF",
+                    "LTL",
+                    "LVL",
+                    "PLN",
+                    "RON",
+                    "SEK",
+                    "CHF",
+                    "NOK",
+                    "HRK",
+                    "RUB",
+                    "TRY",
+                    "AUD",
+                    "BRL",
+                    "CAD",
+                    "CNY",
+                    "HKD",
+                    "IDR",
+                    "ILS",
+                    "INR",
+                    "KRW",
+                    "MXN",
+                    "MYR",
+                    "NZD",
+                    "PHP",
+                    "SGD",
+                    "THB",
+                    "ZAR"};
+            string[] tickers = new string[currencies.Length];
+            for (int t = 0; t < tickers.Length; t++)
+                tickers[t] = "EUCF" + currencies[t];
+
+            return tickers;
+        }
     }
 }
