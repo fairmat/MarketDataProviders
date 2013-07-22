@@ -54,8 +54,6 @@
     <Compile Include="MEEFIntegration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MEEFHistoricalQuote.cs" />
-    <Compile Include="YahooOption.cs" />
-    <Compile Include="YahooOptionChain.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
