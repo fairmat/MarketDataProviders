@@ -66,30 +66,62 @@ namespace MEEFIntegration
 
         #region Properties
 
+        /// <summary>
+        /// Gets the Session Date of this data, usually
+        /// the historical date revelation for the data.
+        /// </summary>
         public DateTime SessionDate { get; private set; }
 
         public string ClearingHouseCode { get; private set; }
 
+        /// <summary>
+        /// The code of this contact, also regarded as its name.
+        /// </summary>
         public string ContractCode { get; private set; }
+
 
         public string ContractGroupCode { get; private set; }
 
         public string CFICode { get; private set; }
 
+        /// <summary>
+        /// Gets the Strike price.
+        /// </summary>
         public double StrikePrice { get; private set; }
 
+        /// <summary>
+        /// Gets the maturity date.
+        /// </summary>
         public DateTime MaturityDate { get; private set; }
 
+        /// <summary>
+        /// Gets The bid price.
+        /// </summary>
         public double BidPrice { get; private set; }
 
+        /// <summary>
+        /// Gets the Ask price.
+        /// </summary>
         public double AskPrice { get; private set; }
 
+        /// <summary>
+        /// Gets the highest price in the day.
+        /// </summary>
         public double HighPrice { get; private set; }
 
+        /// <summary>
+        /// Gets the lowest price in the day.
+        /// </summary>
         public double LowPrice { get; private set; }
 
+        /// <summary>
+        /// Gets the last price in the day.
+        /// </summary>
         public double LastPrice { get; private set; }
 
+        /// <summary>
+        /// Gets the settled price in the day.
+        /// </summary>
         public double SettlPrice { get; private set; }
 
         public double SettlVolatility { get; private set; }
@@ -98,6 +130,9 @@ namespace MEEFIntegration
 
         public int TotalRegVolume { get; private set; }
 
+        /// <summary>
+        /// Gets the number of trades which happened in the day.
+        /// </summary>
         public int NumberOfTrades { get; private set; }
 
         public int OpenInterest { get; private set; }
@@ -130,6 +165,7 @@ namespace MEEFIntegration
             doubleFormat.NumberDecimalSeparator = ",";
             doubleFormat.NumberGroupSeparator = ".";
 
+            // Format has a succession of dates, strings, doubles (prices) and integers values.
             this.SessionDate = DateTime.ParseExact(cleanString(rows[0]), dateFormat, CultureInfo.InvariantCulture);
             this.ClearingHouseCode = cleanString(rows[1]);
             this.ContractCode = cleanString(rows[2]);
@@ -143,8 +179,11 @@ namespace MEEFIntegration
             this.LowPrice = Convert.ToDouble(rows[10], doubleFormat);
             this.LastPrice = Convert.ToDouble(rows[11], doubleFormat);
             this.SettlPrice = Convert.ToDouble(rows[12], doubleFormat);
+
+            // In some cases these fields are just missing data, when this happens consider them as zero.
             this.SettlVolatility = rows[13].Length > 0 ? Convert.ToDouble(rows[13], doubleFormat) : 0.0f;
             this.SettlDelta = rows[14].Length > 0 ? Convert.ToDouble(rows[14], doubleFormat) : 0.0f;
+
             this.TotalRegVolume = Convert.ToInt32(rows[15]);
             this.NumberOfTrades = Convert.ToInt32(rows[16]);
             this.OpenInterest = Convert.ToInt32(rows[17]);
