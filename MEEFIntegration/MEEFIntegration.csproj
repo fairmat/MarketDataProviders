@@ -47,8 +47,8 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="YahooFinanceAPI.cs" />
-    <Compile Include="YahooFinanceIntegration.cs" />
+    <Compile Include="MEEFAPI.cs" />
+    <Compile Include="MEEFIntegration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="YahooHistoricalQuote.cs" />
     <Compile Include="YahooOption.cs" />

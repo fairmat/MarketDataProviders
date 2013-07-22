@@ -34,7 +34,7 @@ namespace MEEFIntegration
     /// This API is detailed here:
     /// http://code.google.com/p/yahoo-finance-managed/wiki/csvHistQuotesDownload.
     /// </remarks>
-    internal static class YahooFinanceAPI
+    internal static class MEEFAPI
     {
         /// <summary>
         /// Gets a List of <see cref="YahooHistoricalQuote"/> containing the requested data.

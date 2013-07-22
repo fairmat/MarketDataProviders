@@ -24,13 +24,13 @@ namespace MEEFIntegration
 {
     /// <summary>
     /// Implements the interface to provide Fairmat access to the
-    /// Yahoo! Finance Market Data Provider.
+    /// MEEF Market Data Provider.
     /// </summary>
     /// <remarks>
     /// This Data Market Provider supports only Scalar requests.
     /// </remarks>
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
-    public class YahooFinanceIntegration : IMarketDataProvider, IDescription
+    public class MEEFIntegration : IMarketDataProvider, IDescription
     {
         #region IDescription Implementation
 
@@ -177,7 +177,7 @@ namespace MEEFIntegration
                 try
                 {
                     // Request the data to the Market Data Provider.
-                    quotes = YahooFinanceAPI.GetHistoricalQuotes(mdq.Ticker, mdq.Date, end);
+                    quotes = MEEFAPI.GetHistoricalQuotes(mdq.Ticker, mdq.Date, end);
                 }
                 catch (Exception e)
                 {
@@ -262,7 +262,7 @@ namespace MEEFIntegration
             {
                 // Try simply requesting a single data series known to exist
                 // and to produce 1 result (we use GOOG at 31 jan 2011).
-                List<YahooHistoricalQuote> quotes = YahooFinanceAPI.GetHistoricalQuotes("GOOG",
+                List<YahooHistoricalQuote> quotes = MEEFAPI.GetHistoricalQuotes("GOOG",
                                                                                         new DateTime(2011, 1, 31),
                                                                                         new DateTime(2011, 1, 31));
 

@@ -21,19 +21,19 @@ using System.Runtime.InteropServices;
 using Mono.Addins;
 
 // The following lines tell that the assembly is an addin.
-[assembly: Addin("Yahoo! Finance Integration", "1.0.0", Category = "Market Data Provider")]
+[assembly: Addin("MEEF Integration", "1.0.0", Category = "Market Data Provider")]
 [assembly: AddinDependency("Fairmat", "1.0")]
 [assembly: AddinAuthor("Fairmat SRL")]
-[assembly: AddinDescription("Provides access to Yahoo! Finance Market Data.")]
+[assembly: AddinDescription("Provides access to MEEF Market Data.")]
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Yahoo! Finance Integration")]
-[assembly: AddinDescription("Provides access to Yahoo! Finance Market Data.")]
+[assembly: AssemblyTitle("MEEF Integration")]
+[assembly: AddinDescription("Provides access to MEEF Market Data.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Fairmat SRL")]
-[assembly: AssemblyProduct("Yahoo! Finance Integration")]
+[assembly: AssemblyProduct("MEEF Integration")]
 [assembly: AssemblyCopyright("Copyright © Fairmat SRL 2013")]
 [assembly: AssemblyTrademark("Fairmat")]
 [assembly: AssemblyCulture("")]
