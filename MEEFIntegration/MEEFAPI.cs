@@ -89,10 +89,9 @@ namespace MEEFIntegration
                             if (entryCSV[0] != '\n')
                             {
                                 MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""));
-                                if (quote.ContractCode == ticker)
+                                if (quote.ContractCode == ticker && quote.SessionDate >= startDate && quote.SessionDate <= endDate)
                                 {
-                                    if (quote.SessionDate >= startDate && quote.SessionDate <= endDate)
-                                        quotes.Add(quote);
+                                    quotes.Add(quote);
                                 }
                             }
 
