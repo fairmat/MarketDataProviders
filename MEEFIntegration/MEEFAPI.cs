@@ -27,18 +27,14 @@ using ICSharpCode.SharpZipLib.Zip;
 namespace MEEFIntegration
 {
     /// <summary>
-    /// Provides a simple interface to the Yahoo! Finance API.
-    /// http://code.google.com/p/yahoo-finance-managed/wiki/YahooFinanceAPIs.
+    /// Provides a simple interface to the MEEF API.
+    /// http://www.meff.es/aspx/Comun/Pagina.aspx?l1=Financiero&f=Ddescarga
+    /// http://www.meff.es/aspx/Financiero/DescargaFicheros.aspx?id=esp.
     /// </summary>
-    /// <remarks>
-    /// The class implements the CSV API using the historical quotes download functionality.
-    /// This API is detailed here:
-    /// http://code.google.com/p/yahoo-finance-managed/wiki/csvHistQuotesDownload.
-    /// </remarks>
     internal static class MEEFAPI
     {
         /// <summary>
-        /// Gets a List of <see cref="YahooHistoricalQuote"/> containing the requested data.
+        /// Gets a List of <see cref="MEEFHistoricalQuote"/> containing the requested data.
         /// </summary>
         /// <param name="ticker">
         /// The symbol of the ticker to look for quotes.
@@ -50,7 +46,7 @@ namespace MEEFIntegration
         /// The ending date to look for quotes, the date is inclusive.
         /// </param>
         /// <returns>
-        /// A list of <see cref="YahooHistoricalQuote"/> containing all
+        /// A list of <see cref="MEEFHistoricalQuote"/> containing all
         /// the market open days from startDate to endDate.
         /// The list can be empty if the requested filters yield no results.
         /// </returns>
@@ -67,38 +63,53 @@ namespace MEEFIntegration
             List<MEEFHistoricalQuote> quotes = new List<MEEFHistoricalQuote>();
 
             // Scan through months and years in order to gather all needed data.
-            DateTime date = startDate;
             for (int year = startDate.Year; year <= endDate.Year; year++)
             {
+                // Calculate the start and end month for this year depending on the requested range.
                 int startMonth = (year == startDate.Year) ? startDate.Month : 1;
                 int endMonth = (year == endDate.Year) ? endDate.Month : 12;
                 for (int month = startMonth; month <= endMonth; month++)
                 {
                     // Try to do the request starting from the wanted data.
-                    ZipInputStream reader = MakeRequest(date);
-                    byte[] data = new byte[4096];
+                    ZipInputStream reader = MakeRequest(new DateTime(year, month, 1));
 
+                    // Start reading from the stream and unzipping the data.
+                    byte[] data = new byte[4096];
                     int size = reader.Read(data, 0, data.Length);
+
+                    // Keeps the current data in a format usable to parse the strings from the CSV.
                     string entryCSV = string.Empty;
+
+                    // Gather all which is in the stream till there is nothing else to read.
                     while (size > 0)
                     {
+                        // Convert the byte array in a string.
                         entryCSV += Encoding.ASCII.GetString(data, 0, size);
 
+                        // If there is an "\n" it means we have at least one line ready to parse
+                        // So continue scanning them till we have no more new lines.
                         while (entryCSV.Contains("\n"))
                         {
+                            // Check that the new line isn't at the beginning of the string in that case cut it out.
                             if (entryCSV[0] != '\n')
                             {
+                                // As we have a CSV line to parse go through  after cleaning it up.
                                 MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""));
+
+                                // Check that the quote which was just parsed is what was asked.
                                 if (quote.ContractCode == ticker && quote.SessionDate >= startDate && quote.SessionDate <= endDate)
                                 {
+                                    // In that case add to the results.
                                     quotes.Add(quote);
                                 }
                             }
 
+                            // Calculate and remove the line which was just parsed and prepare for the next line, if any.
                             int pos = entryCSV.IndexOf("\n") + 1;
                             entryCSV = pos < entryCSV.Length ? entryCSV.Substring(pos, entryCSV.Length - pos) : string.Empty;
                         }
 
+                        // Read another chunk of data.
                         size = reader.Read(data, 0, data.Length);
                     }
                 }
@@ -120,7 +131,7 @@ namespace MEEFIntegration
         /// <param name="endDate">
         /// The ending date to look for quotes, the date is inclusive.
         /// </param>
-        /// <returns>A <see cref="StreamReader"/> ready for reading the request result.</returns>
+        /// <returns>A <see cref="ZipInputStream"/> ready for reading the request result.</returns>
         private static ZipInputStream MakeRequest(DateTime date)
         {
             // Generate the request to be sent to MEEF site.
@@ -132,10 +143,10 @@ namespace MEEFIntegration
 
         /// <summary>
         /// Actually makes a request with the provided requestUrl and generates
-        /// a <see cref="StreamReader"/> ready for reading the result of the request.
+        /// a <see cref="ZipInputStream"/> ready for reading the result of the request.
         /// </summary>
         /// <param name="requestUrl">The url to use to request data.</param>
-        /// <returns>A <see cref="StreamReader"/> ready for reading the request result.</returns>
+        /// <returns>A <see cref="ZipInputStream"/> ready for reading the request result.</returns>
         private static ZipInputStream MakeRequest(string requestUrl)
         {
             try
@@ -158,8 +169,8 @@ namespace MEEFIntegration
                 // Obtain the stream of the response and initialize a reader.
                 Stream receiveStream = response.GetResponseStream();
 
+                // Prepare a zip input stream as we are getting a zip file and we need the content of it.
                 ZipInputStream zipStream = new ICSharpCode.SharpZipLib.Zip.ZipInputStream(receiveStream);
-
                 zipStream.GetNextEntry();
 
                 return zipStream;
