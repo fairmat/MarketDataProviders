@@ -65,30 +65,44 @@ namespace MEEFIntegration
         internal static List<MEEFHistoricalQuote> GetHistoricalQuotes(string ticker, DateTime startDate, DateTime endDate)
         {
             List<MEEFHistoricalQuote> quotes = new List<MEEFHistoricalQuote>();
-            DateTime date = new DateTime(2012, 1, 1);
-            // Try to do the request starting from the wanted data.
-            ZipInputStream reader = MakeRequest(date);
-            byte[] data = new byte[4096];
 
-            int size = reader.Read(data, 0, data.Length);
-            string entryCSV = string.Empty;
-            while (size > 0)
+            // Scan through months and years in order to gather all needed data.
+            DateTime date = startDate;
+            for (int year = startDate.Year; year <= endDate.Year; year++)
             {
-                entryCSV += Encoding.ASCII.GetString(data, 0, size);
-
-                while (entryCSV.Contains("\n"))
+                int startMonth = (year == startDate.Year) ? startDate.Month : 1;
+                int endMonth = (year == endDate.Year) ? endDate.Month : 12;
+                for (int month = startMonth; month <= endMonth; month++)
                 {
-                    if (entryCSV[0] != '\n')
+                    // Try to do the request starting from the wanted data.
+                    ZipInputStream reader = MakeRequest(date);
+                    byte[] data = new byte[4096];
+
+                    int size = reader.Read(data, 0, data.Length);
+                    string entryCSV = string.Empty;
+                    while (size > 0)
                     {
-                        MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""));
-                        quotes.Add(quote);
+                        entryCSV += Encoding.ASCII.GetString(data, 0, size);
+
+                        while (entryCSV.Contains("\n"))
+                        {
+                            if (entryCSV[0] != '\n')
+                            {
+                                MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""));
+                                if (quote.ContractCode == ticker)
+                                {
+                                    if (quote.SessionDate >= startDate && quote.SessionDate <= endDate)
+                                        quotes.Add(quote);
+                                }
+                            }
+
+                            int pos = entryCSV.IndexOf("\n") + 1;
+                            entryCSV = pos < entryCSV.Length ? entryCSV.Substring(pos, entryCSV.Length - pos) : string.Empty;
+                        }
+
+                        size = reader.Read(data, 0, data.Length);
                     }
-
-                    int pos = entryCSV.IndexOf("\n") + 1;
-                    entryCSV = pos < entryCSV.Length ? entryCSV.Substring(pos, entryCSV.Length - pos) : string.Empty;
                 }
-
-                size = reader.Read(data, 0, data.Length);
             }
 
             return quotes;
