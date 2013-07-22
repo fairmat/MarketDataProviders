@@ -22,6 +22,7 @@ using System.Net;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using ICSharpCode.SharpZipLib.Zip;
 
 namespace MEEFIntegration
 {
@@ -61,21 +62,33 @@ namespace MEEFIntegration
         /// An InvalidDataException might be parsed if the CSV
         /// has different fields than expected.
         /// </exception>
-        internal static List<YahooHistoricalQuote> GetHistoricalQuotes(string ticker, DateTime startDate, DateTime endDate)
+        internal static List<MEEFHistoricalQuote> GetHistoricalQuotes(string ticker, DateTime startDate, DateTime endDate)
         {
-            List<YahooHistoricalQuote> quotes = new List<YahooHistoricalQuote>();
-
+            List<MEEFHistoricalQuote> quotes = new List<MEEFHistoricalQuote>();
+            DateTime date = new DateTime(2012, 1, 1);
             // Try to do the request starting from the wanted data.
-            StreamReader reader = MakeRequest(ticker, startDate, endDate);
+            ZipInputStream reader = MakeRequest(date);
+            byte[] data = new byte[4096];
 
-            // Skip the first line of the output
-            reader.ReadLine();
-
-            // Start parsing the result line by line.
-            while (!reader.EndOfStream)
+            int size = reader.Read(data, 0, data.Length);
+            string entryCSV = string.Empty;
+            while (size > 0)
             {
-                YahooHistoricalQuote quote = new YahooHistoricalQuote(reader.ReadLine());
-                quotes.Add(quote);
+                entryCSV += Encoding.ASCII.GetString(data, 0, size);
+
+                while (entryCSV.Contains("\n"))
+                {
+                    if (entryCSV[0] != '\n')
+                    {
+                        MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""));
+                        quotes.Add(quote);
+                    }
+
+                    int pos = entryCSV.IndexOf("\n") + 1;
+                    entryCSV = pos < entryCSV.Length ? entryCSV.Substring(pos, entryCSV.Length - pos) : string.Empty;
+                }
+
+                size = reader.Read(data, 0, data.Length);
             }
 
             return quotes;
@@ -95,13 +108,12 @@ namespace MEEFIntegration
         /// The ending date to look for quotes, the date is inclusive.
         /// </param>
         /// <returns>A <see cref="StreamReader"/> ready for reading the request result.</returns>
-        private static StreamReader MakeRequest(string ticker, DateTime startDate, DateTime endDate)
+        private static ZipInputStream MakeRequest(DateTime date)
         {
-            // Generate the request to be sent to Yahoo Finance.
-            string request = string.Format("http://ichart.yahoo.com/table.csv?s={0}&a={1}&b={2}&c={3}&d={4}&e={5}&f={6}&ignore=.csv",
-                                           ticker, startDate.Month - 1, startDate.Day,
-                                           startDate.Year, endDate.Month - 1,
-                                           endDate.Day, endDate.Year);
+            // Generate the request to be sent to MEEF site.
+            string year = date.Year.ToString();
+            string request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}{1:00}ACO.zip", year.Substring(year.Length - 2), date.Month);
+
             return MakeRequest(request);
         }
 
@@ -111,7 +123,7 @@ namespace MEEFIntegration
         /// </summary>
         /// <param name="requestUrl">The url to use to request data.</param>
         /// <returns>A <see cref="StreamReader"/> ready for reading the request result.</returns>
-        private static StreamReader MakeRequest(string requestUrl)
+        private static ZipInputStream MakeRequest(string requestUrl)
         {
             try
             {
@@ -132,111 +144,18 @@ namespace MEEFIntegration
 
                 // Obtain the stream of the response and initialize a reader.
                 Stream receiveStream = response.GetResponseStream();
-                Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
-                return new StreamReader(receiveStream, encode);
+
+                ZipInputStream zipStream = new ICSharpCode.SharpZipLib.Zip.ZipInputStream(receiveStream);
+
+                zipStream.GetNextEntry();
+
+                return zipStream;
             }
             catch (Exception e)
             {
                 throw new Exception("There was an error while attempting " +
                                     "to contact Yahoo servers: " + e.Message);
             }
-        }
-
-        /// <summary>
-        /// Tries to gather options data for the next 24 months, when available.
-        /// </summary>
-        /// <param name="ticker">The ticker to request option data for.</param>
-        /// <returns>
-        /// A list of <see cref="YahooOptionChain"/>
-        /// containing all the gathered data.
-        /// </returns>
-        public static List<YahooOptionChain> RequestOptions(string ticker)
-        {
-            DateTime datePoint = DateTime.Now;
-            List<YahooOptionChain> optionChains = new List<YahooOptionChain>();
-
-            try
-            {
-                // Try only the next 24 months (2 years).
-                for (int i = 0; i < 24; i++)
-                {
-                    // Prepare the request for th YQL API.
-                    string requestUrl = string.Format("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.options%20where%20symbol%3D%22{0}%22%20and%20expiration%3D%22{1:0000}-{2:00}%22&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys",
-                                                        ticker, datePoint.Year, datePoint.Month);
-                    Console.WriteLine(requestUrl);
-                    Console.WriteLine(datePoint.ToString());
-
-                    // Prepare the object to handle the request to the Yahoo! Servers.
-                    XmlReader reader = null;
-
-                    // Prepare some variables for use to handle Yahoo! Servers time outs.
-                    bool failed = false;
-                    int attempts = 10;
-
-                    do
-                    {
-                        try
-                        {
-                            HttpWebRequest request = WebRequest.Create(requestUrl) as HttpWebRequest;
-
-                            // Actually attempt the request to the Yahoo! servers.
-                            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-
-                            // If this point is reached the response is instanced with something.
-                            // Check if it was successful.
-                            if (response.StatusCode != HttpStatusCode.OK)
-                            {
-                                throw new Exception(string.Format("Server error (HTTP {0}: {1}).",
-                                                                   response.StatusCode,
-                                                                   response.StatusDescription));
-                            }
-
-                            // Obtain the stream of the response and initialize a reader.
-                            Stream receiveStream = response.GetResponseStream();
-                            reader = XmlReader.Create(receiveStream);
-
-                            if (!reader.ReadToDescendant("optionsChain")) throw new Exception();
-
-                            // All was successful so reset the failure handling variables
-                            failed = false;
-                            attempts = 10;
-                        }
-                        catch (Exception e)
-                        {
-                            if (attempts == 0)
-                            {
-                                // just try for a while not always.
-                                throw new Exception("Too many failed attempts to retrieve " +
-                                                    "the data (" + e.Message + ")");
-                            }
-
-                            // There was a failure so set the failure handling variables accordly.
-                            failed = true;
-                            attempts--;
-
-                            Console.WriteLine("Error during fetching attempt (" + e.Message +
-                                              "). Retrying (left " + attempts + ")...");
-                        }
-                    }
-                    while (failed);
-
-                    // Deserialize the message from Yahoo! servers.
-                    XmlSerializer serializer = new XmlSerializer(typeof(YahooOptionChain));
-                    YahooOptionChain optionChain = (YahooOptionChain)serializer.Deserialize(reader.ReadSubtree());
-                    reader.Close();
-
-                    // The next month will be checked.
-                    datePoint = datePoint.AddMonths(1);
-                    optionChains.Add(optionChain);
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception("There was an error while attempting " +
-                                    "to contact the Yahoo! Finance servers: " + e.Message);
-            }
-
-            return optionChains;
         }
     }
 }

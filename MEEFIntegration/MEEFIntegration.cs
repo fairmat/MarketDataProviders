@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using DVPLI;
 using DVPLI.MarketDataTypes;
-
+//TODO: REMOVE OPEN
 namespace MEEFIntegration
 {
     /// <summary>
@@ -30,7 +30,7 @@ namespace MEEFIntegration
     /// This Data Market Provider supports only Scalar requests.
     /// </remarks>
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
-    public class MEEFIntegration : IMarketDataProvider, IDescription
+    public class YahooFinanceIntegration : IMarketDataProvider, IDescription
     {
         #region IDescription Implementation
 
@@ -172,7 +172,7 @@ namespace MEEFIntegration
             // For now only Scalar requests are handled.
             if (mdq.MarketDataType == typeof(Scalar).ToString())
             {
-                List<YahooHistoricalQuote> quotes = null;
+                List<MEEFHistoricalQuote> quotes = null;
 
                 try
                 {
@@ -202,12 +202,12 @@ namespace MEEFIntegration
                     for (int i = 0; i < quotes.Count; i++)
                     {
                         // Fill the dates array from the date field of each quote.
-                        dates[i] = quotes[i].Date;
+                        dates[i] = quotes[i].SessionDate;
 
                         // Prepare the single scalar data.
                         Scalar val = new Scalar();
-                        val.TimeStamp = quotes[i].Date;
-                        val.Value = (closeRequest == true) ? quotes[i].Close : quotes[i].Open;
+                        val.TimeStamp = quotes[i].SessionDate;
+                        val.Value = (closeRequest == true) ? quotes[i].SettlPrice : quotes[i].SettlPrice;
 
                         // Put it in the output structure.
                         marketData[i] = val;
@@ -262,7 +262,7 @@ namespace MEEFIntegration
             {
                 // Try simply requesting a single data series known to exist
                 // and to produce 1 result (we use GOOG at 31 jan 2011).
-                List<YahooHistoricalQuote> quotes = MEEFAPI.GetHistoricalQuotes("GOOG",
+                List<MEEFHistoricalQuote> quotes = MEEFAPI.GetHistoricalQuotes("GOOG",
                                                                                         new DateTime(2011, 1, 31),
                                                                                         new DateTime(2011, 1, 31));
 

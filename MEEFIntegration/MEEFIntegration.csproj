@@ -38,6 +38,9 @@
       <HintPath>..\..\DVPLReferences\DVPLInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\..\DVPLReferences\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Addins">
       <HintPath>..\..\DVPLReferences\Mono.Addins.dll</HintPath>
       <Private>False</Private>
@@ -50,7 +53,7 @@
     <Compile Include="MEEFAPI.cs" />
     <Compile Include="MEEFIntegration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="YahooHistoricalQuote.cs" />
+    <Compile Include="MEEFHistoricalQuote.cs" />
     <Compile Include="YahooOption.cs" />
     <Compile Include="YahooOptionChain.cs" />
   </ItemGroup>
