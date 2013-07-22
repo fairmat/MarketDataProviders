@@ -105,7 +105,7 @@ namespace YahooFinanceIntegration
                 }
                 else
                 {
-                    // If they pass just take the first element as resykt
+                    // If they pass just take the first element as result
                     // (which must be also the only one).
                     marketData = marketDatas[0];
                 }
