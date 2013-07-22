@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using DVPLI;
 using DVPLI.MarketDataTypes;
-//TODO: REMOVE OPEN
+
 namespace MEEFIntegration
 {
     /// <summary>
@@ -30,7 +30,7 @@ namespace MEEFIntegration
     /// This Data Market Provider supports only Scalar requests.
     /// </remarks>
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
-    public class YahooFinanceIntegration : IMarketDataProvider, IDescription
+    public class MEEFIntegration : IMarketDataProvider, IDescription
     {
         #region IDescription Implementation
 
@@ -42,7 +42,7 @@ namespace MEEFIntegration
         {
             get
             {
-                return "Yahoo! Finance";
+                return "MEEF";
             }
         }
 
@@ -105,7 +105,7 @@ namespace MEEFIntegration
                 }
                 else
                 {
-                    // If they pass just take the first element as resykt
+                    // If they pass just take the first element as result
                     // (which must be also the only one).
                     marketData = marketDatas[0];
                 }
@@ -138,32 +138,22 @@ namespace MEEFIntegration
         {
             RefreshStatus status = new RefreshStatus();
 
-            // Holds whathever we should take market close or market open values.
-            bool closeRequest;
-
-            // Check if open or close value was requested.
+            // Check if close value was requested.
             switch (mdq.Field)
             {
-                case "open":
-                    {
-                        closeRequest = false;
-                        break;
-                    }
-
                 case "close":
                     {
-                        closeRequest = true;
                         break;
                     }
 
                 default:
                     {
-                        // In case the request is neither open or close return an error.
+                        // In case the request is not close return an error.
                         marketData = null;
                         dates = null;
                         status.HasErrors = true;
                         status.ErrorMessage += "GetTimeSeries: Market data not available (only " +
-                                               "open and close values are available, " +
+                                               "close values are available, " +
                                                mdq.Field + " was requested).";
                         return status;
                     }
@@ -187,7 +177,7 @@ namespace MEEFIntegration
                     dates = null;
                     status.HasErrors = true;
                     status.ErrorMessage += "GetTimeSeries: Market data not available due " +
-                                           "to problems with Yahoo! Finance: " + e.Message;
+                                           "to problems with MEEF service: " + e.Message;
                     return status;
                 }
 
@@ -207,7 +197,7 @@ namespace MEEFIntegration
                         // Prepare the single scalar data.
                         Scalar val = new Scalar();
                         val.TimeStamp = quotes[i].SessionDate;
-                        val.Value = (closeRequest == true) ? quotes[i].SettlPrice : quotes[i].SettlPrice;
+                        val.Value = quotes[i].SettlPrice;
 
                         // Put it in the output structure.
                         marketData[i] = val;
@@ -240,7 +230,7 @@ namespace MEEFIntegration
         }
 
         /// <summary>
-        /// Checks if the Yahoo! Finance service is reachable
+        /// Checks if the MEEF service is reachable
         /// and answers to requests correctly.
         /// </summary>
         /// <remarks>
@@ -249,7 +239,7 @@ namespace MEEFIntegration
         /// </remarks>
         /// <returns>
         /// A <see cref="Status"/> indicating if the
-        /// Yahoo! Finance service is working.
+        /// MEEF service is working.
         /// </returns>
         public Status TestConnectivity()
         {
@@ -261,10 +251,10 @@ namespace MEEFIntegration
             try
             {
                 // Try simply requesting a single data series known to exist
-                // and to produce 1 result (we use GOOG at 31 jan 2011).
-                List<MEEFHistoricalQuote> quotes = MEEFAPI.GetHistoricalQuotes("GOOG",
-                                                                                        new DateTime(2011, 1, 31),
-                                                                                        new DateTime(2011, 1, 31));
+                // and to produce 1 result (we use GRF at 31 jan 2011).
+                List<MEEFHistoricalQuote> quotes = MEEFAPI.GetHistoricalQuotes("GRF",
+                                                                               new DateTime(2011, 1, 31),
+                                                                               new DateTime(2011, 1, 31));
 
                 if (quotes.Count != 1)
                 {
@@ -272,16 +262,16 @@ namespace MEEFIntegration
                     // it means the service is not answering as expected,
                     // so fail the test.
                     state.HasErrors = true;
-                    state.ErrorMessage = "Data from Yahoo! Finance not available or unreliable.";
+                    state.ErrorMessage = "Data from MEEF not available or unreliable.";
                 }
             }
             catch (Exception e)
             {
                 // If an exception was thrown during data fetching it means
                 // there is a problem with the service (either timeout,
-                // connection failure, or Yahoo! changed data format).
+                // connection failure, or MEEF changed data format).
                 state.HasErrors = true;
-                state.ErrorMessage = "Unable to connect to Yahoo! Finance service: " + e.Message;
+                state.ErrorMessage = "Unable to connect to MEEF service: " + e.Message;
             }
 
             return state;
