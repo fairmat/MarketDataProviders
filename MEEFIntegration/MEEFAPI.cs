@@ -66,56 +66,119 @@ namespace MEEFIntegration
             for (int year = startDate.Year; year <= endDate.Year; year++)
             {
                 // Calculate the start and end month for this year depending on the requested range.
-                int startMonth = (year == startDate.Year) ? startDate.Month : 1;
-                int endMonth = (year == endDate.Year) ? endDate.Month : 12;
-                for (int month = startMonth; month <= endMonth; month++)
+                // Depending on the actual year this might change (caused by different distribution
+                // of data by the Market Data Provider.
+                if (year <= 1997 || (year >= 1999 && year <= 2000))
                 {
-                    // Try to do the request starting from the wanted data.
-                    ZipInputStream reader = MakeRequest(new DateTime(year, month, 1));
-
-                    // Start reading from the stream and unzipping the data.
-                    byte[] data = new byte[4096];
-                    int size = reader.Read(data, 0, data.Length);
-
-                    // Keeps the current data in a format usable to parse the strings from the CSV.
-                    string entryCSV = string.Empty;
-
-                    // Gather all which is in the stream till there is nothing else to read.
-                    while (size > 0)
+                    // Single file for the whole year in this case,
+                    // So we do a single query even with the first month of the year.
+                    GetMonthData(ticker, startDate, endDate, year, 1, ref quotes, true);
+                }
+                else if (year == 1998 || (year >= 2001 && year <= 2006))
+                {
+                    // In year 1998 and between 2001 and 2006 the data was split in semesters.
+                    int startMonth = (year == startDate.Year) ? startDate.Month : 1;
+                    int endMonth = (year == endDate.Year) ? endDate.Month : 12;
+                    for (int month = startMonth; month <= endMonth; month += 6)
                     {
-                        // Convert the byte array in a string.
-                        entryCSV += Encoding.ASCII.GetString(data, 0, size);
-
-                        // If there is an "\n" it means we have at least one line ready to parse
-                        // So continue scanning them till we have no more new lines.
-                        while (entryCSV.Contains("\n"))
-                        {
-                            // Check that the new line isn't at the beginning of the string in that case cut it out.
-                            if (entryCSV[0] != '\n')
-                            {
-                                // As we have a CSV line to parse go through  after cleaning it up.
-                                MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""));
-
-                                // Check that the quote which was just parsed is what was asked.
-                                if (quote.ContractCode == ticker && quote.SessionDate >= startDate && quote.SessionDate <= endDate)
-                                {
-                                    // In that case add to the results.
-                                    quotes.Add(quote);
-                                }
-                            }
-
-                            // Calculate and remove the line which was just parsed and prepare for the next line, if any.
-                            int pos = entryCSV.IndexOf("\n") + 1;
-                            entryCSV = pos < entryCSV.Length ? entryCSV.Substring(pos, entryCSV.Length - pos) : string.Empty;
-                        }
-
-                        // Read another chunk of data.
-                        size = reader.Read(data, 0, data.Length);
+                        GetMonthData(ticker, startDate, endDate, year, month, ref quotes, true);
+                    }
+                }
+                else
+                {
+                    // The rest of the cases are using the new normal format.
+                    int startMonth = (year == startDate.Year) ? startDate.Month : 1;
+                    int endMonth = (year == endDate.Year) ? endDate.Month : 12;
+                    for (int month = startMonth; month <= endMonth; month++)
+                    {
+                        GetMonthData(ticker, startDate, endDate, year, month, ref quotes);
                     }
                 }
             }
 
             return quotes;
+        }
+
+        /// <summary>
+        /// Handles gathering of data for a specific month.
+        /// This is used to simplify the GetHistoricalQuotes function.
+        /// </summary>
+        /// <param name="ticker">
+        /// The symbol of the ticker to look for quotes.
+        /// </param>
+        /// <param name="startDate">
+        /// The start date to look for quotes, the date is inclusive.
+        /// </param>
+        /// <param name="endDate">
+        /// The ending date to look for quotes, the date is inclusive.
+        /// </param>
+        /// <param name="year">The specific year which is being looked now.</param>
+        /// <param name="month">The specific month which is being looked now.</param>
+        /// <param name="quotes">
+        /// A list of <see cref="MEEFHistoricalQuote"/> which will contain all
+        /// the market open days from startDate to endDate.
+        /// If any data is found it's appended to the list (call this function
+        /// with progressive dates only).
+        /// <param name="oldFormat">
+        /// Whathever to parse the CSV from the server with the older format.
+        /// </param>
+        /// <exception cref="Exception">
+        /// A generic Exception can be thrown in case there are problems
+        /// contacting Yahoo! servers, like timeout or HTTP errors.
+        /// </exception>
+        /// <exception cref="InvalidDataException">
+        /// An InvalidDataException might be parsed if the CSV
+        /// has different fields than expected.
+        /// </exception>
+        private static void GetMonthData(string ticker, DateTime startDate, DateTime endDate, int year, int month, ref  List<MEEFHistoricalQuote> quotes, bool oldFormat = false)
+        {
+            // Try to do the request starting from the wanted data.
+            ZipInputStream reader = MakeRequest(new DateTime(year, month, 1));
+            ZipEntry entry;
+
+            // Some files contain more than one file so we need to parse them all.
+            while ((entry = reader.GetNextEntry()) != null)
+            {
+                // Start reading from the stream and unzipping the data.
+                byte[] data = new byte[4096];
+                int size = reader.Read(data, 0, data.Length);
+
+                // Keeps the current data in a format usable to parse the strings from the CSV.
+                string entryCSV = string.Empty;
+
+                // Gather all which is in the stream till there is nothing else to read.
+                while (size > 0)
+                {
+                    // Convert the byte array in a string.
+                    entryCSV += Encoding.ASCII.GetString(data, 0, size);
+
+                    // If there is an "\n" it means we have at least one line ready to parse
+                    // So continue scanning them till we have no more new lines.
+                    while (entryCSV.Contains("\n"))
+                    {
+                        // Check that the new line isn't at the beginning of the string in that case cut it out.
+                        if (entryCSV[0] != '\n')
+                        {
+                            // As we have a CSV line to parse go through  after cleaning it up.
+                            MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""), oldFormat);
+
+                            // Check that the quote which was just parsed is what was asked.
+                            if (quote.ContractCode == ticker && quote.SessionDate >= startDate && quote.SessionDate <= endDate)
+                            {
+                                // In that case add to the results.
+                                quotes.Add(quote);
+                            }
+                        }
+
+                        // Calculate and remove the line which was just parsed and prepare for the next line, if any.
+                        int pos = entryCSV.IndexOf("\n") + 1;
+                        entryCSV = pos < entryCSV.Length ? entryCSV.Substring(pos, entryCSV.Length - pos) : string.Empty;
+                    }
+
+                    // Read another chunk of data.
+                    size = reader.Read(data, 0, data.Length);
+                }
+            }
         }
 
         /// <summary>
@@ -136,7 +199,36 @@ namespace MEEFIntegration
         {
             // Generate the request to be sent to MEEF site.
             string year = date.Year.ToString();
-            string request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}{1:00}ACO.zip", year.Substring(year.Length - 2), date.Month);
+            string request;
+
+            if (date.Year > 2006)
+            {
+                request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}{1:00}ACO.zip", year.Substring(year.Length - 2), date.Month);
+            }
+            else
+            {
+                // Data before 2007 is stored incosistently so there is need to do several
+                // checks in order to ensure the presence of the data.
+                // This code is optimized to the actual structure of data on the site, which 
+                // isn't supposed to change for the passed dates.
+                if (date.Year < 1993)
+                {
+                    // No data available before 1993
+                    throw new Exception("Data is only available from year 1993 " +
+                                        "when using this Market Data Provider");
+                }
+                else if (date.Year >= 1993 && (date.Year <= 1997 || (date.Year >= 1999 && date.Year <= 2000)))
+                {
+                    // Beetween 1993 and 1997 and between 1999 and 2000 the data
+                    // has only one file and it contains the whole year.
+                    request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}000a.zip", year.Substring(year.Length - 2));
+                }
+                else
+                {
+                    // The rest of the data follows a semester subdivision. 1s for the first semester 00 for the rest.
+                    request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}1s0a.zip", year.Substring(year.Length - 2), date.Month <= 6 ? "1s" : "00");
+                }
+            }
 
             return MakeRequest(request);
         }
@@ -149,6 +241,7 @@ namespace MEEFIntegration
         /// <returns>A <see cref="ZipInputStream"/> ready for reading the request result.</returns>
         private static ZipInputStream MakeRequest(string requestUrl)
         {
+            Console.WriteLine("request: " + requestUrl);
             try
             {
                 // Prepare the object to handle the request to the Yahoo servers.
@@ -171,14 +264,13 @@ namespace MEEFIntegration
 
                 // Prepare a zip input stream as we are getting a zip file and we need the content of it.
                 ZipInputStream zipStream = new ICSharpCode.SharpZipLib.Zip.ZipInputStream(receiveStream);
-                zipStream.GetNextEntry();
 
                 return zipStream;
             }
             catch (Exception e)
             {
                 throw new Exception("There was an error while attempting " +
-                                    "to contact Yahoo servers: " + e.Message);
+                                    "to contact MEEF servers: " + e.Message);
             }
         }
     }
