@@ -34,9 +34,9 @@ namespace MEEFIntegration
         public MEEFHistoricalQuote()
         {
             this.SessionDate = new DateTime();
-            this.ClearingHouseCode = string.Empty;
+            this.ContractGroup = string.Empty;
             this.ContractCode = string.Empty;
-            this.ContractGroupCode = string.Empty;
+            this.ContractSubgroupCode = string.Empty;
             this.CFICode = string.Empty;
             this.StrikePrice = 0.0f;
             this.MaturityDate = new DateTime();
@@ -57,9 +57,17 @@ namespace MEEFIntegration
         /// Constructs a new instance starting from the provided line from a MEEF csv.
         /// </summary>
         /// <param name="csvLine">A line from a MEEF csv.</param>
-        public MEEFHistoricalQuote(string csvLine)
+        /// <param name="oldFormat">If the csvLine is in the MEEF old format.</param>
+        public MEEFHistoricalQuote(string csvLine, bool oldFormat = false)
         {
-            ParseCSVLine(csvLine);
+            if (oldFormat)
+            {
+                ParseOldFormatCSVLine(csvLine);
+            }
+            else
+            {
+                ParseCSVLine(csvLine);
+            }
         }
 
         #endregion Constructors
@@ -72,7 +80,7 @@ namespace MEEFIntegration
         /// </summary>
         public DateTime SessionDate { get; private set; }
 
-        public string ClearingHouseCode { get; private set; }
+        public string ContractGroup { get; private set; }
 
         /// <summary>
         /// The code of this contact, also regarded as its name.
@@ -80,7 +88,7 @@ namespace MEEFIntegration
         public string ContractCode { get; private set; }
 
 
-        public string ContractGroupCode { get; private set; }
+        public string ContractSubgroupCode { get; private set; }
 
         public string CFICode { get; private set; }
 
@@ -140,6 +148,49 @@ namespace MEEFIntegration
         #endregion Properties
 
         /// <summary>
+        /// Populates the data starting from a provided line from a MEEF Historical csv
+        /// using the pre-2006 format.
+        /// </summary>
+        /// <param name="csvLine">The line from a MEEF Historical csv to parse.</param>
+        /// <remarks>
+        /// This format lacks some data, so that will remain to its default value.
+        /// </remarks>
+        public void ParseOldFormatCSVLine(string csvLine)
+        {
+            // We take for granted the MEEF format doesn't change.
+            // This means rows must be of 16 elements.
+            string[] rows = csvLine.Split(',');
+
+            // Check if the number of elements is right.
+            if (rows.Length != 16)
+            {
+                throw new InvalidDataException("The csv line has a wrong number of items");
+            }
+
+            // Format used by MEEF for doubles.
+            NumberFormatInfo doubleFormat = new NumberFormatInfo();
+            doubleFormat.NumberDecimalSeparator = ".";
+            doubleFormat.NumberGroupSeparator = ",";
+
+            // Format has a succession of dates, strings, doubles (prices) and integers values.
+            this.SessionDate = DateTime.ParseExact(rows[0], "yyyyMMdd", CultureInfo.InvariantCulture);
+            this.ContractGroup = rows[1];
+            // row 2 maps to? instrument call put futuro
+            this.MaturityDate = DateTime.ParseExact(rows[3], "yyMMdd", CultureInfo.InvariantCulture);
+            this.StrikePrice = Convert.ToDouble(rows[4], doubleFormat);
+            this.ContractCode = rows[5];
+            this.BidPrice = Convert.ToDouble(rows[6], doubleFormat);
+            this.AskPrice = Convert.ToDouble(rows[7], doubleFormat);
+            this.HighPrice = Convert.ToDouble(rows[8], doubleFormat);
+            this.LowPrice = Convert.ToDouble(rows[9], doubleFormat);
+            this.LastPrice = Convert.ToDouble(rows[10], doubleFormat);
+            this.TotalRegVolume = Convert.ToInt32(rows[11]);
+            this.SettlPrice = Convert.ToDouble(rows[12], doubleFormat);
+            this.OpenInterest = Convert.ToInt32(rows[13]);
+            this.SettlPrice = Convert.ToDouble(rows[14], doubleFormat);
+        }
+
+        /// <summary>
         /// Populates the data starting from a provided line from a MEEF Historical csv.
         /// </summary>
         /// <param name="csvLine">The line from a MEEF Historical csv to parse.</param>
@@ -167,9 +218,9 @@ namespace MEEFIntegration
 
             // Format has a succession of dates, strings, doubles (prices) and integers values.
             this.SessionDate = DateTime.ParseExact(cleanString(rows[0]), dateFormat, CultureInfo.InvariantCulture);
-            this.ClearingHouseCode = cleanString(rows[1]);
+            this.ContractGroup = cleanString(rows[1]);
             this.ContractCode = cleanString(rows[2]);
-            this.ContractGroupCode = cleanString(rows[3]);
+            this.ContractSubgroupCode = cleanString(rows[3]);
             this.CFICode = cleanString(rows[4]);
             this.StrikePrice = Convert.ToDouble(rows[5], doubleFormat);
             this.MaturityDate = DateTime.ParseExact(cleanString(rows[6]), dateFormat, CultureInfo.InvariantCulture);
