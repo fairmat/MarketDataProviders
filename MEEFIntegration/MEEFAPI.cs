@@ -228,7 +228,7 @@ namespace MEEFIntegration
 
             if (date.Year > 2006)
             {
-                request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}{1:00}{2}.zip", year.Substring(year.Length - 2), date.Month, actions ? "FIE" : "ACO");
+                request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}{1:00}{2}.zip", year.Substring(year.Length - 2), date.Month, actions ? "ACO" : "FIE");
             }
             else
             {
