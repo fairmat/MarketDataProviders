@@ -60,6 +60,7 @@ namespace MEEFIntegration
         /// </exception>
         internal static List<MEEFHistoricalQuote> GetHistoricalQuotes(string ticker, DateTime startDate, DateTime endDate)
         {
+            bool actions = true;
             List<MEEFHistoricalQuote> quotes = new List<MEEFHistoricalQuote>();
 
             // Scan through months and years in order to gather all needed data.
@@ -72,7 +73,7 @@ namespace MEEFIntegration
                 {
                     // Single file for the whole year in this case,
                     // So we do a single query even with the first month of the year.
-                    GetMonthData(ticker, startDate, endDate, year, 1, ref quotes, true);
+                    GetMonthData(ticker, startDate, endDate, year, 1, ref quotes, true, actions);
                 }
                 else if (year == 1998 || (year >= 2001 && year <= 2006))
                 {
@@ -81,7 +82,7 @@ namespace MEEFIntegration
                     int endMonth = (year == endDate.Year) ? endDate.Month : 12;
                     for (int month = startMonth; month <= endMonth; month += 6)
                     {
-                        GetMonthData(ticker, startDate, endDate, year, month, ref quotes, true);
+                        GetMonthData(ticker, startDate, endDate, year, month, ref quotes, true, actions);
                     }
                 }
                 else
@@ -91,7 +92,25 @@ namespace MEEFIntegration
                     int endMonth = (year == endDate.Year) ? endDate.Month : 12;
                     for (int month = startMonth; month <= endMonth; month++)
                     {
-                        GetMonthData(ticker, startDate, endDate, year, month, ref quotes);
+                        GetMonthData(ticker, startDate, endDate, year, month, ref quotes, actions);
+                    }
+                }
+
+                // Check if the data could be gather, and if not retry last year.
+                if(quotes.Count == 0)
+                {
+                    if(actions)
+                    {
+                        // Try the IBEX instead of actions.
+                        actions = false;
+                        year--;
+                    }
+                    else
+                    {
+                        // Couldn't find anything also in the IBEX, go to next year,
+                        // maybe the data doesn't exist at this point in time.
+                        // Next step we will retry actions again.
+                        actions = true;
                     }
                 }
             }
@@ -130,10 +149,10 @@ namespace MEEFIntegration
         /// An InvalidDataException might be parsed if the CSV
         /// has different fields than expected.
         /// </exception>
-        private static void GetMonthData(string ticker, DateTime startDate, DateTime endDate, int year, int month, ref  List<MEEFHistoricalQuote> quotes, bool oldFormat = false)
+        private static void GetMonthData(string ticker, DateTime startDate, DateTime endDate, int year, int month, ref  List<MEEFHistoricalQuote> quotes, bool oldFormat = false, bool actions = true)
         {
             // Try to do the request starting from the wanted data.
-            ZipInputStream reader = MakeRequest(new DateTime(year, month, 1));
+            ZipInputStream reader = MakeRequest(new DateTime(year, month, 1), actions);
             ZipEntry entry;
 
             // Some files contain more than one file so we need to parse them all.
@@ -195,7 +214,7 @@ namespace MEEFIntegration
         /// The ending date to look for quotes, the date is inclusive.
         /// </param>
         /// <returns>A <see cref="ZipInputStream"/> ready for reading the request result.</returns>
-        private static ZipInputStream MakeRequest(DateTime date)
+        private static ZipInputStream MakeRequest(DateTime date, bool actions = false)
         {
             // Generate the request to be sent to MEEF site.
             string year = date.Year.ToString();
@@ -203,7 +222,7 @@ namespace MEEFIntegration
 
             if (date.Year > 2006)
             {
-                request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}{1:00}ACO.zip", year.Substring(year.Length - 2), date.Month);
+                request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}{1:00}{2}.zip", year.Substring(year.Length - 2), date.Month, actions? "FIE":"ACO");
             }
             else
             {
@@ -221,12 +240,12 @@ namespace MEEFIntegration
                 {
                     // Beetween 1993 and 1997 and between 1999 and 2000 the data
                     // has only one file and it contains the whole year.
-                    request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}000a.zip", year.Substring(year.Length - 2));
+                    request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}000{1}.zip", year.Substring(year.Length - 2), actions? "a":"i");
                 }
                 else
                 {
                     // The rest of the data follows a semester subdivision. 1s for the first semester 00 for the rest.
-                    request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}1s0a.zip", year.Substring(year.Length - 2), date.Month <= 6 ? "1s" : "00");
+                    request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}{1}0{2}.zip", year.Substring(year.Length - 2), date.Month <= 6 ? "1s" : "00", actions? "a":"i");
                 }
             }
 
