@@ -36,7 +36,7 @@ namespace MEEFIntegration
 
         /// <summary>
         /// Gets an user friendly description of the service provided by this class.
-        /// In this case "Yahoo! Finance".
+        /// In this case "MEEF".
         /// </summary>
         public string Description
         {

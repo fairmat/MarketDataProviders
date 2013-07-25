@@ -52,7 +52,7 @@ namespace MEEFIntegration
         /// </returns>
         /// <exception cref="Exception">
         /// A generic Exception can be thrown in case there are problems
-        /// contacting Yahoo! servers, like timeout or HTTP errors.
+        /// contacting MEEF servers, like timeout or HTTP errors.
         /// </exception>
         /// <exception cref="InvalidDataException">
         /// An InvalidDataException might be parsed if the CSV
@@ -143,7 +143,7 @@ namespace MEEFIntegration
         /// </param>
         /// <exception cref="Exception">
         /// A generic Exception can be thrown in case there are problems
-        /// contacting Yahoo! servers, like timeout or HTTP errors.
+        /// contacting MEEF servers, like timeout or HTTP errors.
         /// </exception>
         /// <exception cref="InvalidDataException">
         /// An InvalidDataException might be parsed if the CSV
@@ -263,10 +263,10 @@ namespace MEEFIntegration
             Console.WriteLine("request: " + requestUrl);
             try
             {
-                // Prepare the object to handle the request to the Yahoo servers.
+                // Prepare the object to handle the request to the MEEF servers.
                 HttpWebRequest request = WebRequest.Create(requestUrl) as HttpWebRequest;
 
-                // Actually attempt the request to Yahoo.
+                // Actually attempt the request to meef.
                 HttpWebResponse response = request.GetResponse() as HttpWebResponse;
 
                 // If this point is reached the response is instanced with something.
