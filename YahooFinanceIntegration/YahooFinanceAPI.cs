@@ -168,6 +168,9 @@ namespace YahooFinanceIntegration
 
                     // Prepare the object to handle the request to the Yahoo! Servers.
                     XmlReader reader = null;
+                    HttpWebResponse response = null;
+                    Stream receiveStream = null;
+
 
                     // Prepare some variables for use to handle Yahoo! Servers time outs.
                     bool failed = false;
@@ -180,7 +183,7 @@ namespace YahooFinanceIntegration
                             HttpWebRequest request = WebRequest.Create(requestUrl) as HttpWebRequest;
 
                             // Actually attempt the request to the Yahoo! servers.
-                            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+                            response = request.GetResponse() as HttpWebResponse;
 
                             // If this point is reached the response is instanced with something.
                             // Check if it was successful.
@@ -192,7 +195,7 @@ namespace YahooFinanceIntegration
                             }
 
                             // Obtain the stream of the response and initialize a reader.
-                            Stream receiveStream = response.GetResponseStream();
+                            receiveStream = response.GetResponseStream();
                             reader = XmlReader.Create(receiveStream);
 
                             if (!reader.ReadToDescendant("optionsChain")) throw new Exception();
@@ -224,6 +227,8 @@ namespace YahooFinanceIntegration
                     XmlSerializer serializer = new XmlSerializer(typeof(YahooOptionChain));
                     YahooOptionChain optionChain = (YahooOptionChain)serializer.Deserialize(reader.ReadSubtree());
                     reader.Close();
+                    response.Close();
+                    receiveStream.Close();
 
                     // The next month will be checked.
                     datePoint = datePoint.AddMonths(1);
