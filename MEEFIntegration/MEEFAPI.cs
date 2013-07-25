@@ -33,6 +33,12 @@ namespace MEEFIntegration
     /// </summary>
     internal static class MEEFAPI
     {
+        #region Cached Static Data
+
+        static Dictionary<string, byte[]> downloadedData = new Dictionary<string, byte[]>();
+
+        #endregion Cached Static Data
+
         /// <summary>
         /// Gets a List of <see cref="MEEFHistoricalQuote"/> containing the requested data.
         /// </summary>
@@ -92,14 +98,14 @@ namespace MEEFIntegration
                     int endMonth = (year == endDate.Year) ? endDate.Month : 12;
                     for (int month = startMonth; month <= endMonth; month++)
                     {
-                        GetMonthData(ticker, startDate, endDate, year, month, ref quotes, actions);
+                        GetMonthData(ticker, startDate, endDate, year, month, ref quotes, false, actions);
                     }
                 }
 
                 // Check if the data could be gather, and if not retry last year.
-                if(quotes.Count == 0)
+                if (quotes.Count == 0)
                 {
-                    if(actions)
+                    if (actions)
                     {
                         // Try the IBEX instead of actions.
                         actions = false;
@@ -222,7 +228,7 @@ namespace MEEFIntegration
 
             if (date.Year > 2006)
             {
-                request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}{1:00}{2}.zip", year.Substring(year.Length - 2), date.Month, actions? "FIE":"ACO");
+                request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}{1:00}{2}.zip", year.Substring(year.Length - 2), date.Month, actions ? "FIE" : "ACO");
             }
             else
             {
@@ -240,12 +246,12 @@ namespace MEEFIntegration
                 {
                     // Beetween 1993 and 1997 and between 1999 and 2000 the data
                     // has only one file and it contains the whole year.
-                    request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}000{1}.zip", year.Substring(year.Length - 2), actions? "a":"i");
+                    request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}000{1}.zip", year.Substring(year.Length - 2), actions ? "a" : "i");
                 }
                 else
                 {
                     // The rest of the data follows a semester subdivision. 1s for the first semester 00 for the rest.
-                    request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}{1}0{2}.zip", year.Substring(year.Length - 2), date.Month <= 6 ? "1s" : "00", actions? "a":"i");
+                    request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}{1}0{2}.zip", year.Substring(year.Length - 2), date.Month <= 6 ? "1s" : "00", actions ? "a" : "i");
                 }
             }
 
@@ -261,30 +267,53 @@ namespace MEEFIntegration
         private static ZipInputStream MakeRequest(string requestUrl)
         {
             Console.WriteLine("request: " + requestUrl);
+
+            // First try fetching the data from the cache.
+            if (downloadedData.ContainsKey(requestUrl))
+            {
+                Console.WriteLine(requestUrl + " was found in cache");
+                return new ZipInputStream(new MemoryStream(downloadedData[requestUrl]));
+            }
+
+            // Else fetch it from the web server.
             try
             {
                 // Prepare the object to handle the request to the MEEF servers.
                 HttpWebRequest request = WebRequest.Create(requestUrl) as HttpWebRequest;
 
                 // Actually attempt the request to meef.
-                HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-
-                // If this point is reached the response is instanced with something.
-                // Check if it was successful.
-                if (response.StatusCode != HttpStatusCode.OK)
+                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                 {
-                    throw new Exception(string.Format("Server error (HTTP {0}: {1}).",
-                                                       response.StatusCode,
-                                                       response.StatusDescription));
+                    // If this point is reached the response is instanced with something.
+                    // Check if it was successful.
+                    if (response.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(string.Format("Server error (HTTP {0}: {1}).",
+                                                           response.StatusCode,
+                                                           response.StatusDescription));
+                    }
+
+                    // Obtain the stream of the response and initialize a reader.
+                    using (Stream receiveStream = response.GetResponseStream())
+                    {
+                        MemoryStream ms = new MemoryStream();
+                        byte[] buffer = new byte[16 * 4096];
+                        int read;
+                        while ((read = receiveStream.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            ms.Write(buffer, 0, read);
+                        }
+
+                        // Make a copy of the stream for later use
+                        downloadedData.Add(requestUrl, ms.ToArray());
+
+                        // Rollback the memory buffer to begin.
+                        ms.Seek(0, SeekOrigin.Begin);
+
+                        // Prepare a zip input stream as we are getting a zip file and we need the content of it.
+                        return new ZipInputStream(ms);
+                    }
                 }
-
-                // Obtain the stream of the response and initialize a reader.
-                Stream receiveStream = response.GetResponseStream();
-
-                // Prepare a zip input stream as we are getting a zip file and we need the content of it.
-                ZipInputStream zipStream = new ICSharpCode.SharpZipLib.Zip.ZipInputStream(receiveStream);
-
-                return zipStream;
             }
             catch (Exception e)
             {
