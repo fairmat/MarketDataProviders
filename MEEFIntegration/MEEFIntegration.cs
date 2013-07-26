@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using DVPLI;
+using DVPLI.Interfaces;
 using DVPLI.MarketDataTypes;
 
 namespace MEEFIntegration
@@ -30,7 +31,7 @@ namespace MEEFIntegration
     /// This Data Market Provider supports only Scalar requests.
     /// </remarks>
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
-    public class MEEFIntegration : IMarketDataProvider, IDescription
+    public class MEEFIntegration : IMarketDataProvider, IDescription, ITickersInfo
     {
         #region IDescription Implementation
 
@@ -47,6 +48,22 @@ namespace MEEFIntegration
         }
 
         #endregion IDescription Implementation
+
+        #region ITickersInfo Implementation
+
+        /// <summary>
+        /// Returns the list of the tickers currently supported by this market data provider.
+        /// </summary>
+        /// <returns>The supported ticker array.</returns>
+        public string[] SupportedTickers
+        {
+            get
+            {
+               return MEEFAPI.GetTickerList();    
+            }
+        }
+
+        #endregion ITickersInfo Implementation
 
         #region IMarketDataProvider Implementation
 

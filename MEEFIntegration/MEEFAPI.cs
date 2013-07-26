@@ -207,6 +207,77 @@ namespace MEEFIntegration
         }
 
         /// <summary>
+        /// Gets a list of tickers available from the Market Data Provider
+        /// </summary>
+        /// <returns>A string array of the available tickers.</returns>
+        public static string[] GetTickerList()
+        {
+            // Used to keep unique entries for all tickers.
+            HashSet<string> tickers = new HashSet<string>();
+
+            // Use today month to gather data, check that it's not the first of the month,
+            // in that case go back of one day.
+            DateTime referenceDate = DateTime.Now;
+
+            if (referenceDate.Day == 1)
+            {
+                referenceDate = referenceDate.AddDays(-1);
+            }
+
+            for (int i = 0; i < 2; i++)
+            {
+                // Try to do the request starting from the wanted data for both IBEX and actions.
+                ZipInputStream reader = MakeRequest(referenceDate, i == 0 ? true : false);
+                ZipEntry entry;
+
+                // Some files contain more than one file so we need to parse them all.
+                while ((entry = reader.GetNextEntry()) != null)
+                {
+                    // Start reading from the stream and unzipping the data.
+                    byte[] data = new byte[4096];
+                    int size = reader.Read(data, 0, data.Length);
+
+                    // Keeps the current data in a format usable to parse the strings from the CSV.
+                    string entryCSV = string.Empty;
+
+                    // Gather all which is in the stream till there is nothing else to read.
+                    while (size > 0)
+                    {
+                        // Convert the byte array in a string.
+                        entryCSV += Encoding.ASCII.GetString(data, 0, size);
+
+                        // If there is an "\n" it means we have at least one line ready to parse
+                        // So continue scanning them till we have no more new lines.
+                        while (entryCSV.Contains("\n"))
+                        {
+                            // Check that the new line isn't at the beginning of the string in that case cut it out.
+                            if (entryCSV[0] != '\n')
+                            {
+                                // As we have a CSV line to parse go through  after cleaning it up.
+                                MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""));
+
+                                // Add the name of the contract to the list of available tickers.
+                                tickers.Add(quote.ContractCode);
+                            }
+
+                            // Calculate and remove the line which was just parsed and prepare for the next line, if any.
+                            int pos = entryCSV.IndexOf("\n") + 1;
+                            entryCSV = pos < entryCSV.Length ? entryCSV.Substring(pos, entryCSV.Length - pos) : string.Empty;
+                        }
+
+                        // Read another chunk of data.
+                        size = reader.Read(data, 0, data.Length);
+                    }
+                }
+            }
+
+            // Copies all in the result string array.
+            string[] result = new string[tickers.Count];
+            tickers.CopyTo(result);
+            return result;
+        }
+
+        /// <summary>
         /// Prepares the request string starting from the provided
         /// variables and handles the request.
         /// </summary>
