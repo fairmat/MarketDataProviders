@@ -35,7 +35,16 @@ namespace MEEFIntegration
     {
         #region Cached Static Data
 
+        /// <summary>
+        /// A dictionary containing the request URI for the Market Data Provider.
+        /// The data is the actual downloaded data, when available.
+        /// </summary>
         static Dictionary<string, byte[]> downloadedData = new Dictionary<string, byte[]>();
+
+        /// <summary>
+        /// A cached list of the available tickers on this Market Data Provider.
+        /// </summary>
+        static string[] availableTickers = null;
 
         #endregion Cached Static Data
 
@@ -212,6 +221,12 @@ namespace MEEFIntegration
         /// <returns>A string array of the available tickers.</returns>
         public static string[] GetTickerList()
         {
+            // Use the cached copy if available.
+            if (availableTickers != null)
+            {
+                return availableTickers;
+            }
+
             // Used to keep unique entries for all tickers.
             HashSet<string> tickers = new HashSet<string>();
 
@@ -274,6 +289,10 @@ namespace MEEFIntegration
             // Copies all in the result string array.
             string[] result = new string[tickers.Count];
             tickers.CopyTo(result);
+
+            // Store a copy for caching.
+            availableTickers = result;
+
             return result;
         }
 
