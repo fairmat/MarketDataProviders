@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using DVPLI;
+using DVPLI.Interfaces;
 using DVPLI.MarketDataTypes;
 
 namespace EuropeanCentralBankIntegration
@@ -30,7 +31,7 @@ namespace EuropeanCentralBankIntegration
     /// This Data Market Provider supports only Scalar requests.
     /// </remarks>
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
-    public class EuropeanCentralBankIntegration : IMarketDataProvider, IDescription, IMarketDataProviderInfo
+    public class EuropeanCentralBankIntegration : IMarketDataProvider, IDescription, ITickersInfo, IMarketDataProviderInfo
     {
         #region IDescription Implementation
 
@@ -298,51 +299,60 @@ namespace EuropeanCentralBankIntegration
         }
         #endregion IMarketDataProvider Implementation
 
+        #region ITickersInfo Implementation
         /// <summary>
-        /// Returns the list of the tickers currently supported by this market data provider.
+        /// Gets the list of the tickers currently supported by this market data provider.
         /// </summary>
-        /// <returns>The supported ticker array.</returns>
-        public static string[] GetSupportedTickers()
+        public string[] SupportedTickers
         {
-            string[] currencies = new string[]{"USD",
-                    "JPY",
-                    "BGN",
-                    "CZK",
-                    "DKK",
-                    "GBP",
-                    "HUF",
-                    "LTL",
-                    "LVL",
-                    "PLN",
-                    "RON",
-                    "SEK",
-                    "CHF",
-                    "NOK",
-                    "HRK",
-                    "RUB",
-                    "TRY",
-                    "AUD",
-                    "BRL",
-                    "CAD",
-                    "CNY",
-                    "HKD",
-                    "IDR",
-                    "ILS",
-                    "INR",
-                    "KRW",
-                    "MXN",
-                    "MYR",
-                    "NZD",
-                    "PHP",
-                    "SGD",
-                    "THB",
-                    "ZAR"};
-            string[] tickers = new string[currencies.Length];
-            for (int t = 0; t < tickers.Length; t++)
-                tickers[t] = "EUCF" + currencies[t];
+            get
+            {
+                string[] currencies = new string[]{"USD",
+                                                   "JPY",
+                                                   "BGN",
+                                                   "CZK",
+                                                   "DKK",
+                                                   "GBP",
+                                                   "HUF",
+                                                   "LTL",
+                                                   "LVL",
+                                                   "PLN",
+                                                   "RON",
+                                                   "SEK",
+                                                   "CHF",
+                                                   "NOK",
+                                                   "HRK",
+                                                   "RUB",
+                                                   "TRY",
+                                                   "AUD",
+                                                   "BRL",
+                                                   "CAD",
+                                                   "CNY",
+                                                   "HKD",
+                                                   "IDR",
+                                                   "ILS",
+                                                   "INR",
+                                                   "KRW",
+                                                   "MXN",
+                                                   "MYR",
+                                                   "NZD",
+                                                   "PHP",
+                                                   "SGD",
+                                                   "THB",
+                                                   "ZAR"};
+                string[] tickers = new string[currencies.Length];
+                for (int t = 0; t < tickers.Length; t++)
+                {
+                    tickers[t] = "EUCF" + currencies[t];
+                }
 
-            return tickers;
+                return tickers;
+            }
         }
+
+        #endregion ITickersInfo Implementation
+
+        #region IMarketDataProviderInfo Implementation
 
         /// <summary>
         /// Returns information about the data providers capabilities.
@@ -353,12 +363,18 @@ namespace EuropeanCentralBankIntegration
         {
             switch (category)
             {
-                default:
-                    return MarketDataAccessType.NotAvailable;
                 case MarketDataCategory.EquityPrice:
-                    // Exchange rate series are considered equities becuase they share the same undelying type 
-                    return MarketDataAccessType.Local;
+                    {
+                        // Exchange rate series are considered equities becuase they share the same undelying type 
+                        return MarketDataAccessType.Local;
+                    }
+                default:
+                    {
+                        return MarketDataAccessType.NotAvailable;
+                    }
             }
         }
+
+        #endregion IMarketDataProviderInfo Implementation
     }
 }
