@@ -30,7 +30,7 @@ namespace EuropeanCentralBankIntegration
     /// This Data Market Provider supports only Scalar requests.
     /// </remarks>
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
-    public class EuropeanCentralBankIntegration : IMarketDataProvider, IDescription
+    public class EuropeanCentralBankIntegration : IMarketDataProvider, IDescription, IMarketDataProviderInfo
     {
         #region IDescription Implementation
 
@@ -342,6 +342,23 @@ namespace EuropeanCentralBankIntegration
                 tickers[t] = "EUCF" + currencies[t];
 
             return tickers;
+        }
+
+        /// <summary>
+        /// Returns information about the data providers capabilities.
+        /// </summary>
+        /// <param name="category">The required data category.</param>
+        /// <returns>The data category access type.</returns>
+        public MarketDataAccessType GetDataAvailabilityInfo(MarketDataCategory category)
+        {
+            switch (category)
+            {
+                default:
+                    return MarketDataAccessType.NotAvailable;
+                case MarketDataCategory.EquityPrice:
+                    // Exchange rate series are considered equities becuase they share the same undelying type 
+                    return MarketDataAccessType.Local;
+            }
         }
     }
 }

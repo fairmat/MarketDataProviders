@@ -31,7 +31,7 @@ namespace MEEFIntegration
     /// This Data Market Provider supports only Scalar requests.
     /// </remarks>
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
-    public class MEEFIntegration : IMarketDataProvider, IDescription, ITickersInfo
+    public class MEEFIntegration : IMarketDataProvider, IDescription, ITickersInfo, IMarketDataProviderInfo
     {
         #region IDescription Implementation
 
@@ -295,5 +295,24 @@ namespace MEEFIntegration
         }
 
         #endregion IMarketDataProvider Implementation
+        
+        /// <summary>
+        /// Returns information about the data providers capabilities.
+        /// </summary>
+        /// <param name="category">The required data category.</param>
+        /// <returns>The data category access type.</returns>
+        public MarketDataAccessType GetDataAvailabilityInfo(MarketDataCategory category)
+        {
+            switch (category)
+            {
+                default:
+                    return MarketDataAccessType.NotAvailable;
+                case MarketDataCategory.EquityPrice:
+                    return MarketDataAccessType.Local;
+                case MarketDataCategory.EquityVolatilitySurface:
+                    return MarketDataAccessType.Local;
+            }
+        }
+        
     }
 }
