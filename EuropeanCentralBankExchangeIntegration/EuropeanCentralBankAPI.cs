@@ -134,20 +134,36 @@ namespace EuropeanCentralBankIntegration
                 HttpWebRequest request = WebRequest.Create(requestUrl) as HttpWebRequest;
 
                 // Actually attempt the request to the European Central Bank.
-                HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-
-                // If this point is reached the response is instanced with something.
-                // Check if it was successful.
-                if (response.StatusCode != HttpStatusCode.OK)
+                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                 {
-                    throw new Exception(string.Format("Server error (HTTP {0}: {1}).",
-                                                       response.StatusCode,
-                                                       response.StatusDescription));
-                }
 
-                // Obtain the stream of the response and initialize a reader.
-                Stream receiveStream = response.GetResponseStream();
-                return XmlReader.Create(receiveStream);
+                    // If this point is reached the response is instanced with something.
+                    // Check if it was successful.
+                    if (response.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(string.Format("Server error (HTTP {0}: {1}).",
+                                                           response.StatusCode,
+                                                           response.StatusDescription));
+                    }
+
+                    // Obtain the stream of the response and initialize a reader.
+                    using (Stream receiveStream = response.GetResponseStream())
+                    {
+                        MemoryStream memoryStream = new MemoryStream();
+                        byte[] buffer = new byte[16 * 4096];
+                        int read;
+                        while ((read = receiveStream.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            memoryStream.Write(buffer, 0, read);
+                        }
+
+                        // Rollback the memory buffer to begin.
+                        memoryStream.Seek(0, SeekOrigin.Begin);
+
+                        // Prepare the XmlReader with the downloaded data.
+                        return XmlReader.Create(memoryStream);
+                    }
+                }
            }
             catch (Exception e)
             {
