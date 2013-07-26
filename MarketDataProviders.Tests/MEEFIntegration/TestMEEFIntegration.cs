@@ -23,7 +23,7 @@ using NUnit.Framework;
 namespace MarketDataProviders.Tests.MEEFIntegration
 {
     /// <summary>
-    /// Tests the Fairmat interface to Yahoo! Finance API provided by
+    /// Tests the Fairmat interface to MEEF API provided by
     /// <see cref="MEEFIntegration"/>.
     /// </summary>
     [TestFixture]
