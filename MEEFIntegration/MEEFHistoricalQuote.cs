@@ -80,6 +80,9 @@ namespace MEEFIntegration
         /// </summary>
         public DateTime SessionDate { get; private set; }
 
+        /// <summary>
+        /// The group of this item.
+        /// </summary>
         public string ContractGroup { get; private set; }
 
         /// <summary>
@@ -87,9 +90,14 @@ namespace MEEFIntegration
         /// </summary>
         public string ContractCode { get; private set; }
 
-
+        /// <summary>
+        /// The code of the subgroup of this item.
+        /// </summary>
         public string ContractSubgroupCode { get; private set; }
 
+        /// <summary>
+        /// Code of the financial instrument following ISO 10962.
+        /// </summary>
         public string CFICode { get; private set; }
 
         /// <summary>
@@ -128,14 +136,25 @@ namespace MEEFIntegration
         public double LastPrice { get; private set; }
 
         /// <summary>
-        /// Gets the settled price in the day.
+        /// Gets the settle price in the day.
         /// </summary>
         public double SettlPrice { get; private set; }
 
+        /// <summary>
+        /// Gets the volatility of the settle price at the end of the day.
+        /// This might be missing for big options.
+        /// </summary>
         public double SettlVolatility { get; private set; }
 
+        /// <summary>
+        /// Gets the delta of the settle price at the end of the day.
+        /// This might be missing for big options.
+        /// </summary>
         public double SettlDelta { get; private set; }
 
+        /// <summary>
+        /// Gets the total registered volume of transactions.
+        /// </summary>
         public int TotalRegVolume { get; private set; }
 
         /// <summary>
@@ -143,6 +162,9 @@ namespace MEEFIntegration
         /// </summary>
         public int NumberOfTrades { get; private set; }
 
+        /// <summary>
+        /// Gets the open position for the owner.
+        /// </summary>
         public int OpenInterest { get; private set; }
 
         #endregion Properties
@@ -164,7 +186,7 @@ namespace MEEFIntegration
             // Check if the number of elements is right.
             if (rows.Length != 16)
             {
-                throw new InvalidDataException("The csv line has a wrong number of items");
+                throw new InvalidDataException("The csv line has a wrong number of items 16 expected, " + rows.Length + " found");
             }
 
             // Format used by MEEF for doubles.
@@ -205,7 +227,7 @@ namespace MEEFIntegration
             // Check if the number of elements is right.
             if (rows.Length != 18)
             {
-                throw new InvalidDataException("The csv line has a wrong number of items");
+                throw new InvalidDataException("The csv line has a wrong number of items 18 expected, " + rows.Length + " found");
             }
 
             // Format used by MEEF for dates
