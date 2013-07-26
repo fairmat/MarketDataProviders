@@ -183,12 +183,6 @@ namespace YahooFinanceIntegration
                     Console.WriteLine(requestUrl);
                     Console.WriteLine(datePoint.ToString());
 
-                    // Prepare the object to handle the request to the Yahoo! Servers.
-                    XmlReader reader = null;
-                    HttpWebResponse response = null;
-                    Stream receiveStream = null;
-
-
                     // Prepare some variables for use to handle Yahoo! Servers time outs.
                     bool failed = false;
                     int attempts = 10;
@@ -200,26 +194,36 @@ namespace YahooFinanceIntegration
                             HttpWebRequest request = WebRequest.Create(requestUrl) as HttpWebRequest;
 
                             // Actually attempt the request to the Yahoo! servers.
-                            response = request.GetResponse() as HttpWebResponse;
-
-                            // If this point is reached the response is instanced with something.
-                            // Check if it was successful.
-                            if (response.StatusCode != HttpStatusCode.OK)
+                            using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                             {
-                                throw new Exception(string.Format("Server error (HTTP {0}: {1}).",
-                                                                   response.StatusCode,
-                                                                   response.StatusDescription));
+
+                                // If this point is reached the response is instanced with something.
+                                // Check if it was successful.
+                                if (response.StatusCode != HttpStatusCode.OK)
+                                {
+                                    throw new Exception(string.Format("Server error (HTTP {0}: {1}).",
+                                                                       response.StatusCode,
+                                                                       response.StatusDescription));
+                                }
+
+                                // Obtain the stream of the response and initialize a reader.
+                                Stream receiveStream = response.GetResponseStream();
+                                XmlReader reader = XmlReader.Create(receiveStream);
+
+                                if (!reader.ReadToDescendant("optionsChain")) throw new Exception();
+
+                                // Deserialize the message from Yahoo! servers.
+                                XmlSerializer serializer = new XmlSerializer(typeof(YahooOptionChain));
+                                YahooOptionChain optionChain = (YahooOptionChain)serializer.Deserialize(reader.ReadSubtree());
+
+                                // The next month will be checked.
+                                datePoint = datePoint.AddMonths(1);
+                                optionChains.Add(optionChain);
+
+                                // All was successful so reset the failure handling variables
+                                failed = false;
+                                attempts = 10;
                             }
-
-                            // Obtain the stream of the response and initialize a reader.
-                            receiveStream = response.GetResponseStream();
-                            reader = XmlReader.Create(receiveStream);
-
-                            if (!reader.ReadToDescendant("optionsChain")) throw new Exception();
-
-                            // All was successful so reset the failure handling variables
-                            failed = false;
-                            attempts = 10;
                         }
                         catch (Exception e)
                         {
@@ -239,17 +243,6 @@ namespace YahooFinanceIntegration
                         }
                     }
                     while (failed);
-
-                    // Deserialize the message from Yahoo! servers.
-                    XmlSerializer serializer = new XmlSerializer(typeof(YahooOptionChain));
-                    YahooOptionChain optionChain = (YahooOptionChain)serializer.Deserialize(reader.ReadSubtree());
-                    reader.Close();
-                    response.Close();
-                    receiveStream.Close();
-
-                    // The next month will be checked.
-                    datePoint = datePoint.AddMonths(1);
-                    optionChains.Add(optionChain);
                 }
             }
             catch (Exception e)

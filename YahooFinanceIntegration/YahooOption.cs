@@ -66,7 +66,7 @@ namespace YahooFinanceIntegration
         /// Gets or sets the volume for this option.
         /// </summary>
         [System.Xml.Serialization.XmlElement("vol")]
-        public int Vol { get; set; }
+        public double Vol { get; set; }
 
         /// <summary>
         /// Gets or sets the open interest for this option.
