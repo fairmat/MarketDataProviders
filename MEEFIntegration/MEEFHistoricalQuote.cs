@@ -174,11 +174,11 @@ namespace MEEFIntegration
 
             // Format has a succession of dates, strings, doubles (prices) and integers values.
             this.SessionDate = DateTime.ParseExact(rows[0], "yyyyMMdd", CultureInfo.InvariantCulture);
-            this.ContractGroup = rows[1];
+            this.ContractGroup = rows[1].Trim();
             // row 2 maps to? instrument call put futuro
             this.MaturityDate = DateTime.ParseExact(rows[3], "yyMMdd", CultureInfo.InvariantCulture);
             this.StrikePrice = Convert.ToDouble(rows[4], doubleFormat);
-            this.ContractCode = rows[5];
+            this.ContractCode = rows[5].Trim();
             this.BidPrice = Convert.ToDouble(rows[6], doubleFormat);
             this.AskPrice = Convert.ToDouble(rows[7], doubleFormat);
             this.HighPrice = Convert.ToDouble(rows[8], doubleFormat);
@@ -187,7 +187,7 @@ namespace MEEFIntegration
             this.TotalRegVolume = Convert.ToInt32(rows[11]);
             this.SettlPrice = Convert.ToDouble(rows[12], doubleFormat);
             this.OpenInterest = Convert.ToInt32(rows[13]);
-            this.SettlPrice = Convert.ToDouble(rows[14], doubleFormat);
+            this.SettlVolatility = Convert.ToDouble(rows[14], doubleFormat);
         }
 
         /// <summary>
