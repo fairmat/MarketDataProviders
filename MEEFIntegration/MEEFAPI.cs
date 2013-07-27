@@ -353,12 +353,24 @@ namespace MEEFIntegration
         {
             Console.WriteLine("request: " + requestUrl);
 
-            // First try fetching the data from the cache.
+            // First try fetching the data from the memory cache.
             if (downloadedData.ContainsKey(requestUrl))
             {
-                Console.WriteLine(requestUrl + " was found in cache");
+                Console.WriteLine(requestUrl + " was found in cache.");
                 return new ZipInputStream(new MemoryStream(downloadedData[requestUrl]));
             }
+
+            // Prepare some data used to handle the file cache.
+            string folder = Path.Combine(DVPLI.UserSettingFolder.GetBaseSettingsPath(), "MEEFCACHE");
+
+             DirectoryInfo directoryInfo = new DirectoryInfo(folder);
+             if (!directoryInfo.Exists)
+             {
+                 // Create the cache directory if missing.
+                 directoryInfo.Create();
+             }
+
+            string file = Path.Combine(folder, requestUrl.Substring(requestUrl.LastIndexOf("/") + 1));
 
             // Else fetch it from the web server.
             try
@@ -369,6 +381,7 @@ namespace MEEFIntegration
                 // Actually attempt the request to meef.
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                 {
+                    Console.WriteLine(response.LastModified);
                     // If this point is reached the response is instanced with something.
                     // Check if it was successful.
                     if (response.StatusCode != HttpStatusCode.OK)
@@ -376,6 +389,27 @@ namespace MEEFIntegration
                         throw new Exception(string.Format("Server error (HTTP {0}: {1}).",
                                                            response.StatusCode,
                                                            response.StatusDescription));
+                    }
+
+                    // Check if there is a file on disk. If more recent prefer that one.
+                    if (File.Exists(file))
+                    {
+                        Console.WriteLine(requestUrl + " was found in disk cache.");
+
+                        byte[] data = System.IO.File.ReadAllBytes(file);
+                        if (System.IO.File.GetLastWriteTime(file) > response.LastModified)
+                        {
+                            MemoryStream ms = new MemoryStream(data);
+
+                            // Make a copy of the stream for later use
+                            downloadedData.Add(requestUrl, ms.ToArray());
+
+                            // Rollback the memory buffer to begin.
+                            ms.Seek(0, SeekOrigin.Begin);
+
+                            // Prepare a zip input stream as we are getting a zip file and we need the content of it.
+                            return new ZipInputStream(ms);
+                        }
                     }
 
                     // Obtain the stream of the response and initialize a reader.
@@ -391,6 +425,9 @@ namespace MEEFIntegration
 
                         // Make a copy of the stream for later use
                         downloadedData.Add(requestUrl, ms.ToArray());
+
+                        // Save the file to disk too if not current month
+                        System.IO.File.WriteAllBytes(file, ms.ToArray());
 
                         // Rollback the memory buffer to begin.
                         ms.Seek(0, SeekOrigin.Begin);
