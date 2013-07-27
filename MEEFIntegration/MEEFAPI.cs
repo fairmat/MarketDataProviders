@@ -230,14 +230,9 @@ namespace MEEFIntegration
             // Used to keep unique entries for all tickers.
             HashSet<string> tickers = new HashSet<string>();
 
-            // Use today month to gather data, check that it's not the first of the month,
-            // in that case go back of one day.
-            DateTime referenceDate = DateTime.Now;
-
-            if (referenceDate.Day == 1)
-            {
-                referenceDate = referenceDate.AddDays(-1);
-            }
+            // Use the month previous that current one to gather data.
+            // This way the file won't change each day.
+            DateTime referenceDate = DateTime.Now.AddMonths(-1);
 
             for (int i = 0; i < 2; i++)
             {
