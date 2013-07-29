@@ -167,10 +167,10 @@ namespace YahooFinanceIntegration
         /// </summary>
         /// <param name="filter">The filter string for this list.</param>
         /// <returns>A list with all the tickers passing the filter.</returns>
-        public static List<string> GetTickersWithFilter(string filter)
+        public static List<Dictionary<string, object>> GetTickersWithFilter(string filter)
         {
             JavaScriptSerializer serializer = new JavaScriptSerializer();
-            List<string> tickers = new List<string>();
+            List<Dictionary<string, object>> tickers = new List<Dictionary<string, object>>();
 
             // Prepares the request url to be used to search for the autocompletion choices.
             string requestUrl = string.Format("http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback", filter);
@@ -212,10 +212,9 @@ namespace YahooFinanceIntegration
                             // than symbol).
                             foreach (Dictionary<string, object> result in resultList)
                             {
-                                string symbol = (string)result["symbol"];
-                                if (symbol.StartsWith(filter))
+                                if (((string)result["symbol"]).StartsWith(filter))
                                 {
-                                    tickers.Add(symbol);
+                                    tickers.Add(result);
                                 }
                             }
                         }
@@ -225,7 +224,7 @@ namespace YahooFinanceIntegration
             catch (Exception)
             {
                 // If something failed because of network or wrong data just return an empty list.
-                return new List<string>();
+                return new List<Dictionary<string, object>>();
             }
 
             return tickers;

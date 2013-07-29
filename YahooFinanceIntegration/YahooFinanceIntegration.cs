@@ -59,16 +59,21 @@ namespace YahooFinanceIntegration
         /// For Yahoo! Finance it's not possible to get the full list, so queries will return
         /// data only if filtered.
         /// </remarks>
-        public string[] SupportedTickers(string filter = null)
+        public ISymbolDefinition[] SupportedTickers(string filter = null)
         {
-            if (filter != null && filter.Length > 0)
+            try
             {
-                return YahooFinanceAPI.GetTickersWithFilter(filter).ToArray();
+                if (filter != null && filter.Length > 0)
+                {
+                    List<ISymbolDefinition> symbols = new List<ISymbolDefinition>();
+                    YahooFinanceAPI.GetTickersWithFilter(filter).ForEach(x => symbols.Add(new SymbolDefinition((string)x["symbol"], "Yahoo! Finance " + (string)x["typeDisp"])));
+                    return symbols.ToArray();
+                }
             }
-            else
-            {
-                return new string[0];
-            }
+            catch (Exception)
+            { }
+
+            return new ISymbolDefinition[0];
         }
 
         #endregion ITickersInfo Implementation
