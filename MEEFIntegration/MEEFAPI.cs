@@ -252,8 +252,8 @@ namespace MEEFIntegration
                                 MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""), oldFormat);
 
                                 // Check that the quote which was just parsed is what was asked.
-                                if (quote.SessionDate == date && 
-                                    (quote.CFICode == "OPASPS" || quote.CFICode == "OCASPS") &&
+                                if (quote.SessionDate == date &&
+                                    (quote.CFICode.StartsWith("OP") || quote.CFICode.StartsWith("OC") &&
                                     quote.ContractCode.Substring(1).StartsWith(ticker))
                                 {
                                     quotes.Add(quote);
@@ -330,7 +330,7 @@ namespace MEEFIntegration
                                     MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""));
 
                                     // Add the name of the contract to the list of available tickers, if of type ESXXXA.
-                                    if (quote.CFICode == "ESXXXA")
+                                    if (quote.CFICode.StartsWith("ES"))
                                     {
                                         tickers.Add(quote.ContractCode);
                                     }

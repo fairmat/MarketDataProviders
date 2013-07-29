@@ -203,7 +203,7 @@ namespace MEEFIntegration
             this.CFICode = rows[2].Trim();
             if (this.CFICode != "F")
             {
-                this.CFICode = "O" + this.CFICode + "ASPS";
+                this.CFICode = "O" + this.CFICode;
             }
 
             this.MaturityDate = DateTime.ParseExact(rows[3], "yyMMdd", CultureInfo.InvariantCulture);
