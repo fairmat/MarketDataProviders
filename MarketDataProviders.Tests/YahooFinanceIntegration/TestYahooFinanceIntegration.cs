@@ -138,19 +138,18 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
         public void TestTickerList()
         {
             global::YahooFinanceIntegration.YahooFinanceIntegration wrapper = new global::YahooFinanceIntegration.YahooFinanceIntegration();
-            List<string> data = new List<string>(wrapper.SupportedTickers("G"));
+            List<ISymbolDefinition> data = new List<ISymbolDefinition>(wrapper.SupportedTickers("G"));
 
             // Should contain G, GOOG, GE, GILD, GLD, GME. So 6 elements.
             Assert.AreEqual(data.Count, 6);
 
             // Check the actual elements.
-            Assert.IsTrue(data.Contains("G"));
-            Assert.IsTrue(data.Contains("GOOG"));
-            Assert.IsTrue(data.Contains("GE"));
-            Assert.IsTrue(data.Contains("GILD"));
-            Assert.IsTrue(data.Contains("GLD"));
-            Assert.IsTrue(data.Contains("GME"));
-
+            Assert.IsTrue(data.Exists(x => (x.Name == "G" && x.Description == "Yahoo! Finance Equity")));
+            Assert.IsTrue(data.Exists(x => (x.Name == "GOOG" && x.Description == "Yahoo! Finance Equity")));
+            Assert.IsTrue(data.Exists(x => (x.Name == "GE" && x.Description == "Yahoo! Finance Equity")));
+            Assert.IsTrue(data.Exists(x => (x.Name == "GILD" && x.Description == "Yahoo! Finance Equity")));
+            Assert.IsTrue(data.Exists(x => (x.Name == "GLD" && x.Description == "Yahoo! Finance ETF")));
+            Assert.IsTrue(data.Exists(x => (x.Name == "GME" && x.Description == "Yahoo! Finance Equity")));
         }
     }
 }
