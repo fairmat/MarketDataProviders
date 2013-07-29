@@ -303,7 +303,7 @@ namespace EuropeanCentralBankIntegration
         /// <summary>
         /// Gets the list of the tickers currently supported by this market data provider.
         /// </summary>
-        public string[] SupportedTickers(string filter = null)
+        public ISymbolDefinition[] SupportedTickers(string filter = null)
         {
             string[] currencies = new string[]{"USD",
                                                "JPY",
@@ -339,7 +339,7 @@ namespace EuropeanCentralBankIntegration
                                                "THB",
                                                "ZAR"};
 
-            List<string> tickers = new List<string>();
+            List<ISymbolDefinition> tickers = new List<ISymbolDefinition>();
             foreach(string currency in currencies)
             {
                 // Generate the string for output.
@@ -352,7 +352,7 @@ namespace EuropeanCentralBankIntegration
                     continue;
                 }
 
-                tickers.Add(fullName);
+                tickers.Add(new SymbolDefinition(fullName, "EBC exchange rate"));
             }
 
             return tickers.ToArray();
