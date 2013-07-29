@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using DVPLI;
 using DVPLI.MarketDataTypes;
+using DVPLI.Interfaces;
 
 namespace YahooFinanceIntegration
 {
@@ -30,7 +31,7 @@ namespace YahooFinanceIntegration
     /// This Data Market Provider supports only Scalar requests.
     /// </remarks>
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
-    public class YahooFinanceIntegration : IMarketDataProvider, IDescription, IMarketDataProviderInfo
+    public class YahooFinanceIntegration : IDescription, ITickersInfo, IMarketDataProviderInfo, IMarketDataProvider
     {
         #region IDescription Implementation
 
@@ -47,6 +48,30 @@ namespace YahooFinanceIntegration
         }
 
         #endregion IDescription Implementation
+
+        #region ITickersInfo Implementation
+
+        /// <summary>
+        /// Returns the list of the tickers currently supported by this market data provider.
+        /// </summary>
+        /// <returns>The supported ticker array.</returns>
+        /// <remarks>
+        /// For Yahoo! Finance it's not possible to get the full list, so queries will return
+        /// data only if filtered.
+        /// </remarks>
+        public string[] SupportedTickers(string filter = null)
+        {
+            if (filter != null && filter.Length > 0)
+            {
+                return YahooFinanceAPI.GetTickersWithFilter(filter).ToArray();
+            }
+            else
+            {
+                return new string[0];
+            }
+        }
+
+        #endregion ITickersInfo Implementation
 
         #region IMarketDataProviderInfo Implementation
 

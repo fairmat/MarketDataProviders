@@ -16,10 +16,12 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Web.Script.Serialization;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -157,6 +159,76 @@ namespace YahooFinanceIntegration
                 throw new Exception("There was an error while attempting " +
                                     "to contact Yahoo servers: " + e.Message);
             }
+        }
+
+        /// <summary>
+        /// Gets a filtered list of tickers available from Yahoo! Finance.
+        /// The filter must be always be something meaningful or no result will be returned.
+        /// </summary>
+        /// <param name="filter">The filter string for this list.</param>
+        /// <returns>A list with all the tickers passing the filter.</returns>
+        public static List<string> GetTickersWithFilter(string filter)
+        {
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            List<string> tickers = new List<string>();
+
+            // Prepares the request url to be used to search for the autocompletion choices.
+            string requestUrl = string.Format("http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback", filter);
+
+            try
+            {
+                HttpWebRequest request = WebRequest.Create(requestUrl) as HttpWebRequest;
+
+                // Actually attempt the request to the Yahoo! servers.
+                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
+                {
+
+                    // If this point is reached the response is instanced with something.
+                    // Check if it was successful.
+                    if (response.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(string.Format("Server error (HTTP {0}: {1}).",
+                                                            response.StatusCode,
+                                                            response.StatusDescription));
+                    }
+
+                    // Obtain the stream of the response and initialize a reader.
+                    using (Stream receiveStream = response.GetResponseStream())
+                    {
+                        Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
+                        using (StreamReader reader = new StreamReader(receiveStream, encode))
+                        {
+                            // Get the whole JSON string from the server.
+                            string jsontxt = reader.ReadToEnd();
+
+                            // Purify it of the callback wrapper.
+                            jsontxt = jsontxt.Substring(jsontxt.IndexOf("(") + 1, jsontxt.LastIndexOf(")") - jsontxt.IndexOf("(") - 1);
+
+                            // Deserialize the JSON string and get the result list.
+                            ArrayList resultList = serializer.Deserialize<Dictionary<string, dynamic>>(jsontxt)["ResultSet"]["Result"];
+
+                            // For each entry interpret the symbol entry and check if it is
+                            // ok for our filter (Yahoo! returns also matches from other fields
+                            // than symbol).
+                            foreach (Dictionary<string, object> result in resultList)
+                            {
+                                string symbol = (string)result["symbol"];
+                                if (symbol.StartsWith(filter))
+                                {
+                                    tickers.Add(symbol);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // If something failed because of network or wrong data just return an empty list.
+                return new List<string>();
+            }
+
+            return tickers;
         }
 
         /// <summary>
