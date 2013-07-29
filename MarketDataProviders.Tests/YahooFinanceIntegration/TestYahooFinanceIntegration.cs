@@ -16,6 +16,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using DVPLI;
 using DVPLI.MarketDataTypes;
 using NUnit.Framework;
@@ -127,6 +128,29 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
 
             Assert.AreEqual((datas[0] as Scalar).Value, 611, 1);
             Assert.AreEqual((datas[1] as Scalar).Value, 600, 1);
+        }
+
+        /// <summary>
+        /// Tests the ticker list request. This test might change
+        /// if symbols starting with G are added or removed.
+        /// </summary>
+        [Test]
+        public void TestTickerList()
+        {
+            global::YahooFinanceIntegration.YahooFinanceIntegration wrapper = new global::YahooFinanceIntegration.YahooFinanceIntegration();
+            List<string> data = new List<string>(wrapper.SupportedTickers("G"));
+
+            // Should contain G, GOOG, GE, GILD, GLD, GME. So 6 elements.
+            Assert.AreEqual(data.Count, 6);
+
+            // Check the actual elements.
+            Assert.IsTrue(data.Contains("G"));
+            Assert.IsTrue(data.Contains("GOOG"));
+            Assert.IsTrue(data.Contains("GE"));
+            Assert.IsTrue(data.Contains("GILD"));
+            Assert.IsTrue(data.Contains("GLD"));
+            Assert.IsTrue(data.Contains("GME"));
+
         }
     }
 }
