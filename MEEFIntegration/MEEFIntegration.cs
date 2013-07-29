@@ -55,9 +55,10 @@ namespace MEEFIntegration
         /// Returns the list of the tickers currently supported by this market data provider.
         /// </summary>
         /// <returns>The supported ticker array.</returns>
-        public string[] SupportedTickers(string filter = null)
+        public ISymbolDefinition[] SupportedTickers(string filter = null)
         {
             List<string> tickers = new List<string>(MEEFAPI.GetTickerList());
+            List<ISymbolDefinition> symbols = new List<ISymbolDefinition>();
 
             // Apply a filter if requested.
             if (filter != null)
@@ -65,7 +66,10 @@ namespace MEEFIntegration
                 tickers = tickers.FindAll(x => x.StartsWith(filter));
             }
 
-            return tickers.ToArray();
+            // Put all in Symbol Definition Entries.
+            tickers.ForEach( x => symbols.Add(new SymbolDefinition(x, "MEEF Market Equity")));
+
+            return symbols.ToArray();
         }
 
         #endregion ITickersInfo Implementation
