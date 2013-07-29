@@ -16,6 +16,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using DVPLI;
 using DVPLI.MarketDataTypes;
 using NUnit.Framework;
@@ -102,6 +103,21 @@ namespace MarketDataProviders.Tests.MEEFIntegration
 
             Assert.AreEqual((datas[0] as Scalar).Value, 28, 1);
             Assert.AreEqual((datas[1] as Scalar).Value, 29, 1);
+        }
+
+        [Test]
+        public void TestTickerList()
+        {
+            global::MEEFIntegration.MEEFIntegration wrapper = new global::MEEFIntegration.MEEFIntegration();
+            List<string> data = new List<string>(wrapper.SupportedTickers("G"));
+
+            // Should contain GAS, GAM, GRF. So 3 elements.
+            Assert.AreEqual(data.Count, 3);
+            
+            // Check the actual elements.
+            Assert.IsTrue(data.Contains("GAS"));
+            Assert.IsTrue(data.Contains("GAM"));
+            Assert.IsTrue(data.Contains("GRF"));
         }
     }
 }

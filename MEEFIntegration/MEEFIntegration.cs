@@ -55,12 +55,17 @@ namespace MEEFIntegration
         /// Returns the list of the tickers currently supported by this market data provider.
         /// </summary>
         /// <returns>The supported ticker array.</returns>
-        public string[] SupportedTickers
+        public string[] SupportedTickers(string filter = null)
         {
-            get
+            List<string> tickers = new List<string>(MEEFAPI.GetTickerList());
+
+            // Apply a filter if requested.
+            if (filter != null)
             {
-               return MEEFAPI.GetTickerList();    
+                tickers = tickers.FindAll(x => x.StartsWith(filter));
             }
+
+            return tickers.ToArray();
         }
 
         #endregion ITickersInfo Implementation
