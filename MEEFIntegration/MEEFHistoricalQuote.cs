@@ -198,6 +198,14 @@ namespace MEEFIntegration
             this.SessionDate = DateTime.ParseExact(rows[0], "yyyyMMdd", CultureInfo.InvariantCulture);
             this.ContractGroup = rows[1].Trim();
             // row 2 maps to? instrument call put futuro
+
+            // Row 2 is mapped to CFICODES OPASPS, OCASPS or F. To be checked if correct.
+            this.CFICode = rows[2].Trim();
+            if (this.CFICode != "F")
+            {
+                this.CFICode = "O" + this.CFICode + "ASPS";
+            }
+
             this.MaturityDate = DateTime.ParseExact(rows[3], "yyMMdd", CultureInfo.InvariantCulture);
             this.StrikePrice = Convert.ToDouble(rows[4], doubleFormat);
             this.ContractCode = rows[5].Trim();
