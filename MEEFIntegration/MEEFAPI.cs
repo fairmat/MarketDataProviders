@@ -263,8 +263,11 @@ namespace MEEFIntegration
                                     // As we have a CSV line to parse go through  after cleaning it up.
                                     MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""));
 
-                                    // Add the name of the contract to the list of available tickers.
-                                    tickers.Add(quote.ContractCode);
+                                    // Add the name of the contract to the list of available tickers, if of type ESXXXA.
+                                    if (quote.CFICode == "ESXXXA")
+                                    {
+                                        tickers.Add(quote.ContractCode);
+                                    }
                                 }
 
                                 // Calculate and remove the line which was just parsed and prepare for the next line, if any.
