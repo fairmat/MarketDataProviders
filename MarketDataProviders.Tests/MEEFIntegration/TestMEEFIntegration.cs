@@ -113,15 +113,15 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         public void TestTickerList()
         {
             global::MEEFIntegration.MEEFIntegration wrapper = new global::MEEFIntegration.MEEFIntegration();
-            List<string> data = new List<string>(wrapper.SupportedTickers("G"));
+            List<ISymbolDefinition> data = new List<ISymbolDefinition>(wrapper.SupportedTickers("G"));
 
             // Should contain GAS, GAM, GRF. So 3 elements.
             Assert.AreEqual(data.Count, 3);
             
             // Check the actual elements.
-            Assert.IsTrue(data.Contains("GAS"));
-            Assert.IsTrue(data.Contains("GAM"));
-            Assert.IsTrue(data.Contains("GRF"));
+            Assert.IsTrue(data.Exists(x => (x.Name == "GAS" && x.Description == "MEEF Market Equity")));
+            Assert.IsTrue(data.Exists(x => (x.Name == "GAM" && x.Description == "MEEF Market Equity")));
+            Assert.IsTrue(data.Exists(x => (x.Name == "GRF" && x.Description == "MEEF Market Equity")));
         }
     }
 }
