@@ -105,6 +105,10 @@ namespace MarketDataProviders.Tests.MEEFIntegration
             Assert.AreEqual((datas[1] as Scalar).Value, 29, 1);
         }
 
+        /// <summary>
+        /// Tests the ticker list request. This test might change
+        /// if symbols starting with G are added or removed.
+        /// </summary>
         [Test]
         public void TestTickerList()
         {
