@@ -303,51 +303,59 @@ namespace EuropeanCentralBankIntegration
         /// <summary>
         /// Gets the list of the tickers currently supported by this market data provider.
         /// </summary>
-        public string[] SupportedTickers
+        public string[] SupportedTickers(string filter = null)
         {
-            get
+            string[] currencies = new string[]{"USD",
+                                               "JPY",
+                                               "BGN",
+                                               "CZK",
+                                               "DKK",
+                                               "GBP",
+                                               "HUF",
+                                               "LTL",
+                                               "LVL",
+                                               "PLN",
+                                               "RON",
+                                               "SEK",
+                                               "CHF",
+                                               "NOK",
+                                               "HRK",
+                                               "RUB",
+                                               "TRY",
+                                               "AUD",
+                                               "BRL",
+                                               "CAD",
+                                               "CNY",
+                                               "HKD",
+                                               "IDR",
+                                               "ILS",
+                                               "INR",
+                                               "KRW",
+                                               "MXN",
+                                               "MYR",
+                                               "NZD",
+                                               "PHP",
+                                               "SGD",
+                                               "THB",
+                                               "ZAR"};
+
+            List<string> tickers = new List<string>();
+            foreach(string currency in currencies)
             {
-                string[] currencies = new string[]{"USD",
-                                                   "JPY",
-                                                   "BGN",
-                                                   "CZK",
-                                                   "DKK",
-                                                   "GBP",
-                                                   "HUF",
-                                                   "LTL",
-                                                   "LVL",
-                                                   "PLN",
-                                                   "RON",
-                                                   "SEK",
-                                                   "CHF",
-                                                   "NOK",
-                                                   "HRK",
-                                                   "RUB",
-                                                   "TRY",
-                                                   "AUD",
-                                                   "BRL",
-                                                   "CAD",
-                                                   "CNY",
-                                                   "HKD",
-                                                   "IDR",
-                                                   "ILS",
-                                                   "INR",
-                                                   "KRW",
-                                                   "MXN",
-                                                   "MYR",
-                                                   "NZD",
-                                                   "PHP",
-                                                   "SGD",
-                                                   "THB",
-                                                   "ZAR"};
-                string[] tickers = new string[currencies.Length];
-                for (int t = 0; t < tickers.Length; t++)
+                // Generate the string for output.
+                string fullName = "EUCF" + currency;
+
+                // Check if the string is ok with the current filter if any.
+                if (filter != null && !fullName.StartsWith(filter))
                 {
-                    tickers[t] = "EUCF" + currencies[t];
+                    // If it's not skip this currency.
+                    continue;
                 }
 
-                return tickers;
+                tickers.Add(fullName);
             }
+
+            return tickers.ToArray();
         }
 
         #endregion ITickersInfo Implementation
