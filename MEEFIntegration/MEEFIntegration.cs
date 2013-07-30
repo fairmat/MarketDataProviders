@@ -133,6 +133,11 @@ namespace MEEFIntegration
         /// </returns>
         public RefreshStatus GetMarketData(MarketDataQuery mdq, out IMarketData marketData)
         {
+            if (mdq.MarketDataType == typeof(Fairmat.MarketData.CallPriceMarketData).ToString())
+            {
+                return GetCallPriceMarketData(mdq, out marketData);
+            }
+
             // Reuse the Historical time series to get the single quote
             // (Equal start/end date = get the quote of the day).
             DateTime[] dates;
@@ -329,6 +334,21 @@ namespace MEEFIntegration
             }
 
             return state;
+        }
+
+        /// <summary>
+        /// Retrieves available call and put options for a given ticker.
+        /// </summary>
+        /// <param name="mdq">The market data query</param>
+        /// <param name="marketData"></param>
+        /// <returns></returns>
+        RefreshStatus GetCallPriceMarketData(MarketDataQuery mdq, out IMarketData marketData)
+        {
+            List<MEEFHistoricalQuote> options= MEEFAPI.GetOptions(mdq.Ticker, mdq.Date);
+            foreach(MEEFHistoricalQuote q in options)
+                Console.WriteLine(q.ContractCode+" "+q.StrikePrice+" "+q.MaturityDate+" "+q.SettlPrice);
+            marketData = null;
+            return null;
         }
 
         #endregion IMarketDataProvider Implementation

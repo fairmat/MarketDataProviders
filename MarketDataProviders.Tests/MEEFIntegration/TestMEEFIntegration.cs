@@ -123,5 +123,22 @@ namespace MarketDataProviders.Tests.MEEFIntegration
             Assert.IsTrue(data.Exists(x => (x.Name == "GAM" && x.Description == "MEEF Market Equity")));
             Assert.IsTrue(data.Exists(x => (x.Name == "GRF" && x.Description == "MEEF Market Equity")));
         }
+
+
+        [Test]
+        public void TestGetCallPriceMarketData()
+        {
+            global::MEEFIntegration.MEEFIntegration wrapper = new global::MEEFIntegration.MEEFIntegration();
+                
+            MarketDataQuery mdq= new MarketDataQuery();
+            mdq.Ticker="BBVA";
+            mdq.Date= new DateTime(2013,07,01);
+            mdq.Market="EU";
+            mdq.MarketDataType=typeof(Fairmat.MarketData.CallPriceMarketData).ToString();
+            IMarketData marketData;
+            var status=wrapper.GetMarketData(mdq, out marketData);
+        }
+
+
     }
 }
