@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DVPLI;
 using DVPLI.Interfaces;
 using DVPLI.MarketDataTypes;
@@ -344,11 +345,67 @@ namespace MEEFIntegration
         /// <returns></returns>
         RefreshStatus GetCallPriceMarketData(MarketDataQuery mdq, out IMarketData marketData)
         {
+            marketData = null;
+            Fairmat.MarketData.CallPriceMarketData data = new Fairmat.MarketData.CallPriceMarketData();
+
             List<MEEFHistoricalQuote> options= MEEFAPI.GetOptions(mdq.Ticker, mdq.Date);
             foreach(MEEFHistoricalQuote q in options)
                 Console.WriteLine(q.ContractCode+" "+q.StrikePrice+" "+q.MaturityDate+" "+q.SettlPrice);
-            marketData = null;
-            return null;
+
+
+            //Gets call options
+            var calls = options.FindAll(x => x.ContractCode.StartsWith("C"));
+            var puts =  options.FindAll(x => x.ContractCode.StartsWith("P"));
+           
+            //get maturities and strikes
+            var maturtiesDates = options.Select(item => item.MaturityDate).Distinct().OrderBy(x => x).ToList();
+            var strikes = options.Select(item => item.StrikePrice).Distinct().OrderBy(x=>x).ToList();
+            data.Strike = (Vector)strikes.ToArray();
+            //var callMaturtiesDates = calls.Select(item => item.MaturityDate).Distinct().ToList();
+
+            Console.WriteLine("Maturities");
+            data.Maturity= new Vector(maturtiesDates.Count);
+            for (int z = 0; z < maturtiesDates.Count; z++)
+                data.Maturity[z] = RightValueDate.DatesDifferenceCalculator(mdq.Date, maturtiesDates[z]);
+
+
+            data.CallPrice = new Matrix(data.Strike.Length, data.Maturity.Length);
+            var PutPrices = new Matrix(data.Strike.Length, data.Maturity.Length);
+            for(int si=0;si<data.Strike.Length;si++)
+                for (int mi = 0; mi < maturtiesDates.Count; mi++)
+                {
+                    MEEFHistoricalQuote quote=calls.Find(x => x.StrikePrice == data.Strike[si] && x.MaturityDate == maturtiesDates[mi]);
+                    if(quote!=null)
+                        data.CallPrice[si, mi] = quote.SettlPrice;
+                    
+                    quote = puts.Find(x => x.StrikePrice == data.Strike[si] && x.MaturityDate == maturtiesDates[mi]);
+                    if (quote != null)
+                        PutPrices[si, mi] = quote.SettlPrice;
+                }
+            Console.WriteLine("CallPrices");
+            Console.WriteLine(data.CallPrice);
+            Console.WriteLine("Putprices");
+            Console.WriteLine(PutPrices);
+
+
+            //Request the starting value for process
+            var mdq2= DVPLI.ObjectSerialization.CloneObject(mdq) as MarketDataQuery;
+            mdq2.MarketDataType= typeof(Scalar).ToString();
+            IMarketData s0;
+            var s0Result = this.GetMarketData(mdq2, out s0);
+            if (s0Result.HasErrors)
+                return s0Result;
+
+           
+            data.S0 = (s0 as Scalar).Value;
+            data.Ticker = mdq.Ticker;
+            data.Market = mdq.Market;
+            data.Date = mdq.Date;
+            data.Maturity = new Vector(maturtiesDates.Count);
+
+
+            marketData = data;
+            return new RefreshStatus();
         }
 
         #endregion IMarketDataProvider Implementation
