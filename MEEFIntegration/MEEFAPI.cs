@@ -253,8 +253,8 @@ namespace MEEFIntegration
 
                                 // Check that the quote which was just parsed is what was asked.
                                 if (quote.SessionDate == date &&
-                                    (quote.CFICode.StartsWith("OP") || quote.CFICode.StartsWith("OC") &&
-                                    quote.ContractCode.Substring(1).StartsWith(ticker)))
+                                    (quote.CFICode.StartsWith("OP") || quote.CFICode.StartsWith("OC")) &&
+                                    quote.ContractCode.Substring(1).StartsWith(ticker))
                                 {
                                     quotes.Add(quote);
                                 }
