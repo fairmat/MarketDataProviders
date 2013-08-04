@@ -48,6 +48,8 @@ namespace MEEFIntegration
 
         #endregion Cached Static Data
 
+        #region API visible methods
+
         /// <summary>
         /// Gets a List of <see cref="MEEFHistoricalQuote"/> containing the requested data.
         /// </summary>
@@ -132,6 +134,87 @@ namespace MEEFIntegration
 
             return quotes;
         }
+
+        /// <summary>
+        /// Gets the options related to a certain ticker at a specific date.
+        /// </summary>
+        /// <param name="ticker">The ticker to search options for.</param>
+        /// <param name="date">The date to consider to gather option information.</param>
+        /// <returns>
+        /// A list of all PUT and CALL options related to the ticker at a certain date.
+        /// </returns>
+        internal static List<MEEFHistoricalQuote> GetOptions(string ticker, DateTime date)
+        {
+            List<MEEFHistoricalQuote> quotes = new List<MEEFHistoricalQuote>();
+
+            // Handles the filtering of the quotes while being gathered.
+            Action<MEEFHistoricalQuote> handleParsedQuote = (quote) =>
+            {
+                // Check that the quote which was just parsed is what was asked.
+                if (quote.SessionDate == date &&
+                    (quote.CFICode.StartsWith("OP") || quote.CFICode.StartsWith("OC")) &&
+                    quote.ContractCode.Substring(1).StartsWith(ticker))
+                {
+                    quotes.Add(quote);
+                }
+            };
+
+            for (int i = 0; i < 2; i++)
+            {
+                GetData(date.Year, date.Month, handleParsedQuote, i == 0 ? true : false);
+
+                // If quotes were found don't check the other file.
+                if (quotes.Count > 0)
+                {
+                    break;
+                }
+            }
+
+            return quotes;
+        }
+
+        /// <summary>
+        /// Gets a list of tickers available from the Market Data Provider
+        /// </summary>
+        /// <returns>A string array of the available tickers.</returns>
+        internal static List<string> GetTickerList()
+        {
+            // Get the data if the cache is not available.
+            if (availableTickers == null)
+            {
+
+                // Used to keep unique entries for all tickers.
+                HashSet<string> tickers = new HashSet<string>();
+
+                // Use the month previous that current one to gather data.
+                // This way the file won't change each day.
+                DateTime referenceDate = DateTime.Now.AddMonths(-1);
+
+                // Handles the filtering of quotes while being gathered.
+                Action<MEEFHistoricalQuote> handleParsedQuote = (quote) =>
+                {
+                    // Add the name of the contract to the list of available tickers, if of type ESXXXA.
+                    if (quote.CFICode.StartsWith("ES"))
+                    {
+                        tickers.Add(quote.ContractCode);
+                    }
+                };
+
+                for (int i = 0; i < 2; i++)
+                {
+                    GetData(referenceDate.Year, referenceDate.Month, handleParsedQuote, i == 0 ? true : false);
+                }
+
+                // Store a copy for caching.
+                availableTickers = new List<string>(tickers); ;
+            }
+
+            return availableTickers;
+        }
+
+        #endregion API visible methods
+
+        #region API internal methods
 
         /// <summary>
         /// Handles the request and parsing of data and applies the operations of the
@@ -245,83 +328,6 @@ namespace MEEFIntegration
             };
 
             GetData(year, month, handleParsedQuote, actions);
-        }
-
-        /// <summary>
-        /// Gets the options related to a certain ticker at a specific date.
-        /// </summary>
-        /// <param name="ticker">The ticker to search options for.</param>
-        /// <param name="date">The date to consider to gather option information.</param>
-        /// <returns>
-        /// A list of all PUT and CALL options related to the ticker at a certain date.
-        /// </returns>
-        internal static List<MEEFHistoricalQuote> GetOptions(string ticker, DateTime date)
-        {
-            List<MEEFHistoricalQuote> quotes = new List<MEEFHistoricalQuote>();
-
-            // Handles the filtering of the quotes while being gathered.
-            Action<MEEFHistoricalQuote> handleParsedQuote = (quote) =>
-            {
-                // Check that the quote which was just parsed is what was asked.
-                if (quote.SessionDate == date &&
-                    (quote.CFICode.StartsWith("OP") || quote.CFICode.StartsWith("OC")) &&
-                    quote.ContractCode.Substring(1).StartsWith(ticker))
-                {
-                    quotes.Add(quote);
-                }
-            };
-
-            for (int i = 0; i < 2; i++)
-            {
-                GetData(date.Year, date.Month, handleParsedQuote, i == 0 ? true : false);
-
-                // If quotes were found don't check the other file.
-                if (quotes.Count > 0)
-                {
-                    break;
-                }
-            }
-
-            return quotes;
-        }
-
-        /// <summary>
-        /// Gets a list of tickers available from the Market Data Provider
-        /// </summary>
-        /// <returns>A string array of the available tickers.</returns>
-        internal static List<string> GetTickerList()
-        {
-            // Get the data if the cache is not available.
-            if (availableTickers == null)
-            {
-
-                // Used to keep unique entries for all tickers.
-                HashSet<string> tickers = new HashSet<string>();
-
-                // Use the month previous that current one to gather data.
-                // This way the file won't change each day.
-                DateTime referenceDate = DateTime.Now.AddMonths(-1);
-
-                // Handles the filtering of quotes while being gathered.
-                Action<MEEFHistoricalQuote> handleParsedQuote = (quote) =>
-                {
-                    // Add the name of the contract to the list of available tickers, if of type ESXXXA.
-                    if (quote.CFICode.StartsWith("ES"))
-                    {
-                        tickers.Add(quote.ContractCode);
-                    }
-                };
-
-                for (int i = 0; i < 2; i++)
-                {
-                    GetData(referenceDate.Year, referenceDate.Month, handleParsedQuote, i == 0 ? true : false);
-                }
-
-                // Store a copy for caching.
-                availableTickers = new List<string>(tickers); ;
-            }
-
-            return availableTickers;
         }
 
         /// <summary>
@@ -477,5 +483,7 @@ namespace MEEFIntegration
                                     "to contact MEEF servers: " + e.Message);
             }
         }
+
+        #endregion API internal methods
     }
 }
