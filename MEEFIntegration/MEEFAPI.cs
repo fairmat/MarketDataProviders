@@ -346,6 +346,7 @@ namespace MEEFIntegration
 
             if (date.Year > 2006)
             {
+                // Formats the string for the new type of data, note that ACO ending determines actions, FIE the IBEEX.
                 request = string.Format("http://www.meff.es/docs/Ficheros/Descarga/dRV/HP{0}{1:00}{2}.zip", year.Substring(year.Length - 2), date.Month, actions ? "ACO" : "FIE");
             }
             else
