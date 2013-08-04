@@ -88,7 +88,7 @@ namespace MEEFIntegration
                 {
                     // Single file for the whole year in this case,
                     // So we do a single query even with the first month of the year.
-                    GetMonthData(ticker, startDate, endDate, year, 1, ref quotes, true, actions);
+                    GetMonthData(ticker, startDate, endDate, year, 1, quotes, true, actions);
                 }
                 else if (year == 1998 || (year >= 2001 && year <= 2006))
                 {
@@ -97,7 +97,7 @@ namespace MEEFIntegration
                     int endMonth = (year == endDate.Year) ? endDate.Month : 12;
                     for (int month = startMonth; month <= endMonth; month += 6)
                     {
-                        GetMonthData(ticker, startDate, endDate, year, month, ref quotes, true, actions);
+                        GetMonthData(ticker, startDate, endDate, year, month, quotes, true, actions);
                     }
                 }
                 else
@@ -107,7 +107,7 @@ namespace MEEFIntegration
                     int endMonth = (year == endDate.Year) ? endDate.Month : 12;
                     for (int month = startMonth; month <= endMonth; month++)
                     {
-                        GetMonthData(ticker, startDate, endDate, year, month, ref quotes, false, actions);
+                        GetMonthData(ticker, startDate, endDate, year, month, quotes, false, actions);
                     }
                 }
 
@@ -130,6 +130,68 @@ namespace MEEFIntegration
             }
 
             return quotes;
+        }
+
+        /// <summary>
+        /// Handles the request and parsing of data and applies the operations of the
+        /// handleParsedQuote action to the newly parsed Quote.
+        /// </summary>
+        /// <param name="year">The year to request data from.</param>
+        /// <param name="month">The month to request data from.</param>
+        /// <param name="handleParsedQuote">
+        /// An Action taking as argument a <see cref="MEEFHistoricalQuote"/> which
+        /// decides what to do with all the parsed objects.
+        /// </param>
+        /// <param name="oldFormat">
+        /// Whathever the parsing should be done with the new or old format.
+        /// </param>
+        /// <param name="actions">
+        /// Whathever actions or the IBEX should be searched for the data.
+        /// </param>
+        private static void GetData(int year, int month, Action<MEEFHistoricalQuote> handleParsedQuote, bool oldFormat = false, bool actions = true)
+        {
+            // Try to do the request starting from the wanted data.
+            ZipInputStream reader = MakeRequest(new DateTime(year, month, 1), actions);
+            ZipEntry entry;
+
+            // Some files contain more than one file so we need to parse them all.
+            while ((entry = reader.GetNextEntry()) != null)
+            {
+                // Start reading from the stream and unzipping the data.
+                byte[] data = new byte[4096];
+                int size = reader.Read(data, 0, data.Length);
+
+                // Keeps the current data in a format usable to parse the strings from the CSV.
+                string entryCSV = string.Empty;
+
+                // Gather all which is in the stream till there is nothing else to read.
+                while (size > 0)
+                {
+                    // Convert the byte array in a string.
+                    entryCSV += Encoding.ASCII.GetString(data, 0, size);
+
+                    // If there is an "\n" it means we have at least one line ready to parse
+                    // So continue scanning them till we have no more new lines.
+                    while (entryCSV.Contains("\n"))
+                    {
+                        // Check that the new line isn't at the beginning of the string in that case cut it out.
+                        if (entryCSV[0] != '\n')
+                        {
+                            // As we have a CSV line to parse go through  after cleaning it up.
+                            MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""), oldFormat);
+
+                            handleParsedQuote(quote);
+                        }
+
+                        // Calculate and remove the line which was just parsed and prepare for the next line, if any.
+                        int pos = entryCSV.IndexOf("\n") + 1;
+                        entryCSV = pos < entryCSV.Length ? entryCSV.Substring(pos, entryCSV.Length - pos) : string.Empty;
+                    }
+
+                    // Read another chunk of data.
+                    size = reader.Read(data, 0, data.Length);
+                }
+            }
         }
 
         /// <summary>
@@ -163,112 +225,50 @@ namespace MEEFIntegration
         /// An InvalidDataException might be parsed if the CSV
         /// has different fields than expected.
         /// </exception>
-        private static void GetMonthData(string ticker, DateTime startDate, DateTime endDate, int year, int month, ref  List<MEEFHistoricalQuote> quotes, bool oldFormat = false, bool actions = true)
+        private static void GetMonthData(string ticker, DateTime startDate, DateTime endDate, int year, int month, List<MEEFHistoricalQuote> quotes, bool oldFormat = false, bool actions = true)
         {
-            // Try to do the request starting from the wanted data.
-            ZipInputStream reader = MakeRequest(new DateTime(year, month, 1), actions);
-            ZipEntry entry;
-
-            // Some files contain more than one file so we need to parse them all.
-            while ((entry = reader.GetNextEntry()) != null)
+            // Handles the filtering of the quotes while being gathered.
+            Action<MEEFHistoricalQuote> handleParsedQuote = (quote) =>
             {
-                // Start reading from the stream and unzipping the data.
-                byte[] data = new byte[4096];
-                int size = reader.Read(data, 0, data.Length);
-
-                // Keeps the current data in a format usable to parse the strings from the CSV.
-                string entryCSV = string.Empty;
-
-                // Gather all which is in the stream till there is nothing else to read.
-                while (size > 0)
+                // Check that the quote which was just parsed is what was asked.
+                if (quote.ContractCode == ticker && quote.SessionDate >= startDate && quote.SessionDate <= endDate)
                 {
-                    // Convert the byte array in a string.
-                    entryCSV += Encoding.ASCII.GetString(data, 0, size);
-
-                    // If there is an "\n" it means we have at least one line ready to parse
-                    // So continue scanning them till we have no more new lines.
-                    while (entryCSV.Contains("\n"))
-                    {
-                        // Check that the new line isn't at the beginning of the string in that case cut it out.
-                        if (entryCSV[0] != '\n')
-                        {
-                            // As we have a CSV line to parse go through  after cleaning it up.
-                            MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""), oldFormat);
-
-                            // Check that the quote which was just parsed is what was asked.
-                            if (quote.ContractCode == ticker && quote.SessionDate >= startDate && quote.SessionDate <= endDate)
-                            {
-                                // In that case add to the results.
-                                quotes.Add(quote);
-                            }
-                        }
-
-                        // Calculate and remove the line which was just parsed and prepare for the next line, if any.
-                        int pos = entryCSV.IndexOf("\n") + 1;
-                        entryCSV = pos < entryCSV.Length ? entryCSV.Substring(pos, entryCSV.Length - pos) : string.Empty;
-                    }
-
-                    // Read another chunk of data.
-                    size = reader.Read(data, 0, data.Length);
+                    // In that case add to the results.
+                    quotes.Add(quote);
                 }
-            }
+            };
+
+            GetData(year, month, handleParsedQuote, oldFormat, actions);
         }
 
+        /// <summary>
+        /// Gets the options related to a certain ticker at a specific date.
+        /// </summary>
+        /// <param name="ticker">The ticker to search options for.</param>
+        /// <param name="date">The date to consider to gather option information.</param>
+        /// <returns>
+        /// A list of all PUT and CALL options related to the ticker at a certain date.
+        /// </returns>
         public static List<MEEFHistoricalQuote> GetOptions(string ticker, DateTime date)
         {
-            List<MEEFHistoricalQuote> quotes = new List<MEEFHistoricalQuote>();
             bool oldFormat = (date.Year <= 1997 || (date.Year >= 1999 && date.Year <= 2000)) || (date.Year == 1998 || (date.Year >= 2001 && date.Year <= 2006));
+            List<MEEFHistoricalQuote> quotes = new List<MEEFHistoricalQuote>();
+
+            // Handles the filtering of the quotes while being gathered.
+            Action<MEEFHistoricalQuote> handleParsedQuote = (quote) =>
+            {
+                // Check that the quote which was just parsed is what was asked.
+                if (quote.SessionDate == date &&
+                    (quote.CFICode.StartsWith("OP") || quote.CFICode.StartsWith("OC")) &&
+                    quote.ContractCode.Substring(1).StartsWith(ticker))
+                {
+                    quotes.Add(quote);
+                }
+            };
 
             for (int i = 0; i < 2; i++)
             {
-                // Try to do the request starting from the wanted data.
-                ZipInputStream reader = MakeRequest(date, i == 0? true: false);
-                ZipEntry entry;
-
-                // Some files contain more than one file so we need to parse them all.
-                while ((entry = reader.GetNextEntry()) != null)
-                {
-                    // Start reading from the stream and unzipping the data.
-                    byte[] data = new byte[4096];
-                    int size = reader.Read(data, 0, data.Length);
-
-                    // Keeps the current data in a format usable to parse the strings from the CSV.
-                    string entryCSV = string.Empty;
-
-                    // Gather all which is in the stream till there is nothing else to read.
-                    while (size > 0)
-                    {
-                        // Convert the byte array in a string.
-                        entryCSV += Encoding.ASCII.GetString(data, 0, size);
-
-                        // If there is an "\n" it means we have at least one line ready to parse
-                        // So continue scanning them till we have no more new lines.
-                        while (entryCSV.Contains("\n"))
-                        {
-                            // Check that the new line isn't at the beginning of the string in that case cut it out.
-                            if (entryCSV[0] != '\n')
-                            {
-                                // As we have a CSV line to parse go through  after cleaning it up.
-                                MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""), oldFormat);
-
-                                // Check that the quote which was just parsed is what was asked.
-                                if (quote.SessionDate == date &&
-                                    (quote.CFICode.StartsWith("OP") || quote.CFICode.StartsWith("OC")) &&
-                                    quote.ContractCode.Substring(1).StartsWith(ticker))
-                                {
-                                    quotes.Add(quote);
-                                }
-                            }
-
-                            // Calculate and remove the line which was just parsed and prepare for the next line, if any.
-                            int pos = entryCSV.IndexOf("\n") + 1;
-                            entryCSV = pos < entryCSV.Length ? entryCSV.Substring(pos, entryCSV.Length - pos) : string.Empty;
-                        }
-
-                        // Read another chunk of data.
-                        size = reader.Read(data, 0, data.Length);
-                    }
-                }
+                GetData(date.Year, date.Month, handleParsedQuote, oldFormat, i == 0 ? true : false);
 
                 // If quotes were found don't check the other file.
                 if (quotes.Count > 0)
@@ -297,54 +297,19 @@ namespace MEEFIntegration
                 // This way the file won't change each day.
                 DateTime referenceDate = DateTime.Now.AddMonths(-1);
 
+                // Handles the filtering of quotes while being gathered.
+                Action<MEEFHistoricalQuote> handleParsedQuote = (quote) =>
+                {
+                    // Add the name of the contract to the list of available tickers, if of type ESXXXA.
+                    if (quote.CFICode.StartsWith("ES"))
+                    {
+                        tickers.Add(quote.ContractCode);
+                    }
+                };
+
                 for (int i = 0; i < 2; i++)
                 {
-                    // Try to do the request starting from the wanted data for both IBEX and actions.
-                    ZipInputStream reader = MakeRequest(referenceDate, i == 0 ? true : false);
-                    ZipEntry entry;
-
-                    // Some files contain more than one file so we need to parse them all.
-                    while ((entry = reader.GetNextEntry()) != null)
-                    {
-                        // Start reading from the stream and unzipping the data.
-                        byte[] data = new byte[4096];
-                        int size = reader.Read(data, 0, data.Length);
-
-                        // Keeps the current data in a format usable to parse the strings from the CSV.
-                        string entryCSV = string.Empty;
-
-                        // Gather all which is in the stream till there is nothing else to read.
-                        while (size > 0)
-                        {
-                            // Convert the byte array in a string.
-                            entryCSV += Encoding.ASCII.GetString(data, 0, size);
-
-                            // If there is an "\n" it means we have at least one line ready to parse
-                            // So continue scanning them till we have no more new lines.
-                            while (entryCSV.Contains("\n"))
-                            {
-                                // Check that the new line isn't at the beginning of the string in that case cut it out.
-                                if (entryCSV[0] != '\n')
-                                {
-                                    // As we have a CSV line to parse go through  after cleaning it up.
-                                    MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""));
-
-                                    // Add the name of the contract to the list of available tickers, if of type ESXXXA.
-                                    if (quote.CFICode.StartsWith("ES"))
-                                    {
-                                        tickers.Add(quote.ContractCode);
-                                    }
-                                }
-
-                                // Calculate and remove the line which was just parsed and prepare for the next line, if any.
-                                int pos = entryCSV.IndexOf("\n") + 1;
-                                entryCSV = pos < entryCSV.Length ? entryCSV.Substring(pos, entryCSV.Length - pos) : string.Empty;
-                            }
-
-                            // Read another chunk of data.
-                            size = reader.Read(data, 0, data.Length);
-                        }
-                    }
+                    GetData(referenceDate.Year, referenceDate.Month, handleParsedQuote, false, i == 0 ? true : false);
                 }
 
                 // Store a copy for caching.
@@ -426,12 +391,12 @@ namespace MEEFIntegration
             // Prepare some data used to handle the file cache.
             string folder = Path.Combine(DVPLI.UserSettingFolder.GetBaseSettingsPath(), "MEEFCACHE");
 
-             DirectoryInfo directoryInfo = new DirectoryInfo(folder);
-             if (!directoryInfo.Exists)
-             {
-                 // Create the cache directory if missing.
-                 directoryInfo.Create();
-             }
+            DirectoryInfo directoryInfo = new DirectoryInfo(folder);
+            if (!directoryInfo.Exists)
+            {
+                // Create the cache directory if missing.
+                directoryInfo.Create();
+            }
 
             string file = Path.Combine(folder, requestUrl.Substring(requestUrl.LastIndexOf("/") + 1));
 
