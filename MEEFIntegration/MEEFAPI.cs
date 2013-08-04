@@ -255,7 +255,7 @@ namespace MEEFIntegration
         /// <returns>
         /// A list of all PUT and CALL options related to the ticker at a certain date.
         /// </returns>
-        public static List<MEEFHistoricalQuote> GetOptions(string ticker, DateTime date)
+        internal static List<MEEFHistoricalQuote> GetOptions(string ticker, DateTime date)
         {
             List<MEEFHistoricalQuote> quotes = new List<MEEFHistoricalQuote>();
 
@@ -289,7 +289,7 @@ namespace MEEFIntegration
         /// Gets a list of tickers available from the Market Data Provider
         /// </summary>
         /// <returns>A string array of the available tickers.</returns>
-        public static List<string> GetTickerList()
+        internal static List<string> GetTickerList()
         {
             // Get the data if the cache is not available.
             if (availableTickers == null)
