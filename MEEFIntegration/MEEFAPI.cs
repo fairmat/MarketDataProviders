@@ -88,7 +88,7 @@ namespace MEEFIntegration
                 {
                     // Single file for the whole year in this case,
                     // So we do a single query even with the first month of the year.
-                    GetMonthData(ticker, startDate, endDate, year, 1, quotes, true, actions);
+                    GetMonthData(ticker, startDate, endDate, year, 1, quotes, actions);
                 }
                 else if (year == 1998 || (year >= 2001 && year <= 2006))
                 {
@@ -97,17 +97,18 @@ namespace MEEFIntegration
                     int endMonth = (year == endDate.Year) ? endDate.Month : 12;
                     for (int month = startMonth; month <= endMonth; month += 6)
                     {
-                        GetMonthData(ticker, startDate, endDate, year, month, quotes, true, actions);
+                        GetMonthData(ticker, startDate, endDate, year, month, quotes, actions);
                     }
                 }
                 else
                 {
-                    // The rest of the cases are using the new normal format.
+                    // The rest of the cases are using the new normal format with
+                    // data split month by month.
                     int startMonth = (year == startDate.Year) ? startDate.Month : 1;
                     int endMonth = (year == endDate.Year) ? endDate.Month : 12;
                     for (int month = startMonth; month <= endMonth; month++)
                     {
-                        GetMonthData(ticker, startDate, endDate, year, month, quotes, false, actions);
+                        GetMonthData(ticker, startDate, endDate, year, month, quotes, actions);
                     }
                 }
 
@@ -148,8 +149,13 @@ namespace MEEFIntegration
         /// <param name="actions">
         /// Whathever actions or the IBEX should be searched for the data.
         /// </param>
-        private static void GetData(int year, int month, Action<MEEFHistoricalQuote> handleParsedQuote, bool oldFormat = false, bool actions = true)
+        private static void GetData(int year, int month, Action<MEEFHistoricalQuote> handleParsedQuote, bool actions = true)
         {
+            // Check which format is going to be used.
+            // All data from before 2007 is using the old format, while from 2007
+            // the data format has changed to a more complete version.
+            bool oldFormat = year <= 2006;
+
             // Try to do the request starting from the wanted data.
             ZipInputStream reader = MakeRequest(new DateTime(year, month, 1), actions);
             ZipEntry entry;
@@ -225,7 +231,7 @@ namespace MEEFIntegration
         /// An InvalidDataException might be parsed if the CSV
         /// has different fields than expected.
         /// </exception>
-        private static void GetMonthData(string ticker, DateTime startDate, DateTime endDate, int year, int month, List<MEEFHistoricalQuote> quotes, bool oldFormat = false, bool actions = true)
+        private static void GetMonthData(string ticker, DateTime startDate, DateTime endDate, int year, int month, List<MEEFHistoricalQuote> quotes, bool actions = true)
         {
             // Handles the filtering of the quotes while being gathered.
             Action<MEEFHistoricalQuote> handleParsedQuote = (quote) =>
@@ -238,7 +244,7 @@ namespace MEEFIntegration
                 }
             };
 
-            GetData(year, month, handleParsedQuote, oldFormat, actions);
+            GetData(year, month, handleParsedQuote, actions);
         }
 
         /// <summary>
@@ -251,7 +257,6 @@ namespace MEEFIntegration
         /// </returns>
         public static List<MEEFHistoricalQuote> GetOptions(string ticker, DateTime date)
         {
-            bool oldFormat = date.Year <= 2006;
             List<MEEFHistoricalQuote> quotes = new List<MEEFHistoricalQuote>();
 
             // Handles the filtering of the quotes while being gathered.
@@ -268,7 +273,7 @@ namespace MEEFIntegration
 
             for (int i = 0; i < 2; i++)
             {
-                GetData(date.Year, date.Month, handleParsedQuote, oldFormat, i == 0 ? true : false);
+                GetData(date.Year, date.Month, handleParsedQuote, i == 0 ? true : false);
 
                 // If quotes were found don't check the other file.
                 if (quotes.Count > 0)
@@ -309,7 +314,7 @@ namespace MEEFIntegration
 
                 for (int i = 0; i < 2; i++)
                 {
-                    GetData(referenceDate.Year, referenceDate.Month, handleParsedQuote, false, i == 0 ? true : false);
+                    GetData(referenceDate.Year, referenceDate.Month, handleParsedQuote, i == 0 ? true : false);
                 }
 
                 // Store a copy for caching.
