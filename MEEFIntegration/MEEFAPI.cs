@@ -251,7 +251,7 @@ namespace MEEFIntegration
         /// </returns>
         public static List<MEEFHistoricalQuote> GetOptions(string ticker, DateTime date)
         {
-            bool oldFormat = (date.Year <= 1997 || (date.Year >= 1999 && date.Year <= 2000)) || (date.Year == 1998 || (date.Year >= 2001 && date.Year <= 2006));
+            bool oldFormat = date.Year <= 2006;
             List<MEEFHistoricalQuote> quotes = new List<MEEFHistoricalQuote>();
 
             // Handles the filtering of the quotes while being gathered.
