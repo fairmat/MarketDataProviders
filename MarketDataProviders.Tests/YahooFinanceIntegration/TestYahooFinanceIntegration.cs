@@ -134,22 +134,23 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
         /// Tests the ticker list request. This test might change
         /// if symbols starting with G are added or removed.
         /// </summary>
+        /// <remarks>
+        /// It seems the output of Yahoo! Finance is quite variable and might give different
+        /// results from time to time. So in case this fails check with
+        /// http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=G&callback=YAHOO.Finance.SymbolSuggest.ssCallback
+        /// if it has the same elements.
+        /// </remarks>
         [Test]
         public void TestTickerList()
         {
             global::YahooFinanceIntegration.YahooFinanceIntegration wrapper = new global::YahooFinanceIntegration.YahooFinanceIntegration();
             List<ISymbolDefinition> data = new List<ISymbolDefinition>(wrapper.SupportedTickers("G"));
 
-            // Should contain G, GOOG, GE, GILD, GLD, GME. So 6 elements.
-            Assert.AreEqual(data.Count, 6);
-
             // Check the actual elements.
             Assert.IsTrue(data.Exists(x => (x.Name == "G" && x.Description == "Yahoo! Finance Equity")));
             Assert.IsTrue(data.Exists(x => (x.Name == "GOOG" && x.Description == "Yahoo! Finance Equity")));
             Assert.IsTrue(data.Exists(x => (x.Name == "GE" && x.Description == "Yahoo! Finance Equity")));
-            Assert.IsTrue(data.Exists(x => (x.Name == "GILD" && x.Description == "Yahoo! Finance Equity")));
             Assert.IsTrue(data.Exists(x => (x.Name == "GLD" && x.Description == "Yahoo! Finance ETF")));
-            Assert.IsTrue(data.Exists(x => (x.Name == "GME" && x.Description == "Yahoo! Finance Equity")));
         }
     }
 }
