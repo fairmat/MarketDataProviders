@@ -181,7 +181,7 @@ namespace MarketDataProviders.Tests.MEEFIntegration
 
             // Fields missing from this format.
             Assert.AreEqual(quote.ContractSubgroupCode, null);
-            Assert.AreEqual(quote.CFICode, null);
+            Assert.AreEqual(quote.CFICode, "F");
             Assert.AreEqual(quote.SettlDelta, 0.0f, 0.0001);
             Assert.AreEqual(quote.NumberOfTrades, 0);
         }
@@ -212,7 +212,7 @@ namespace MarketDataProviders.Tests.MEEFIntegration
 
             // Fields missing from this format.
             Assert.AreEqual(quote.ContractSubgroupCode, null);
-            Assert.AreEqual(quote.CFICode, null);
+            Assert.AreEqual(quote.CFICode, "OC");
             Assert.AreEqual(quote.SettlDelta, 0.0f, 0.0001);
             Assert.AreEqual(quote.NumberOfTrades, 0);
         }
