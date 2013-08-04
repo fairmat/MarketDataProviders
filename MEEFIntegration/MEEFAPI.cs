@@ -149,7 +149,7 @@ namespace MEEFIntegration
         /// <param name="actions">
         /// Whathever actions or the IBEX should be searched for the data.
         /// </param>
-        private static void GetData(int year, int month, Action<MEEFHistoricalQuote> handleParsedQuote, bool actions = true)
+        private static void GetData(int year, int month, Action<MEEFHistoricalQuote> handleParsedQuote, bool actions)
         {
             // Check which format is going to be used.
             // All data from before 2007 is using the old format, while from 2007
@@ -231,7 +231,7 @@ namespace MEEFIntegration
         /// An InvalidDataException might be parsed if the CSV
         /// has different fields than expected.
         /// </exception>
-        private static void GetMonthData(string ticker, DateTime startDate, DateTime endDate, int year, int month, List<MEEFHistoricalQuote> quotes, bool actions = true)
+        private static void GetMonthData(string ticker, DateTime startDate, DateTime endDate, int year, int month, List<MEEFHistoricalQuote> quotes, bool actions)
         {
             // Handles the filtering of the quotes while being gathered.
             Action<MEEFHistoricalQuote> handleParsedQuote = (quote) =>
