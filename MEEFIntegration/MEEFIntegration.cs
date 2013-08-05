@@ -403,11 +403,15 @@ namespace MEEFIntegration
                         if (atm.ContainsKey(data.Strike[si]))
                             element = atm[data.Strike[si]];
                         else
+                        {
                             element = new Tuple<List<double>, List<double>, List<double>>(new List<double>(), new List<double>(), new List<double>());
+                            atm.Add(data.Strike[si], element);
+                        }
 
                         element.Item1.Add(data.Maturity[mi]);
                         element.Item2.Add(cQuote.SettlPrice);
-                        element.Item3.Add(cQuote.SettlPrice);
+                        element.Item3.Add(pQuote.SettlPrice);
+                        
                     }
                 }
             Console.WriteLine("CallPrices");

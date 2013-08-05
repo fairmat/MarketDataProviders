@@ -134,9 +134,11 @@ namespace MarketDataProviders.Tests.MEEFIntegration
             mdq.Ticker="BBVA";
             mdq.Date= new DateTime(2013,07,01);
             mdq.Market="EU";
+            mdq.Field = "close";
             mdq.MarketDataType=typeof(Fairmat.MarketData.CallPriceMarketData).ToString();
             IMarketData marketData;
             var status=wrapper.GetMarketData(mdq, out marketData);
+            Assert.IsFalse(status.HasErrors);
         }
 
 
