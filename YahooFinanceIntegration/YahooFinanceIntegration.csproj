@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CoreExtensions">
+      <HintPath>..\..\DVPLReferences\CoreExtensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="DVPLI">
       <HintPath>..\..\DVPLReferences\DVPLI.dll</HintPath>
       <Private>False</Private>
@@ -49,6 +53,12 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\MEEFIntegration\IOptionQuote.cs">
+      <Link>IOptionQuote.cs</Link>
+    </Compile>
+    <Compile Include="..\MEEFIntegration\OptionQuotesUtility.cs">
+      <Link>OptionQuotesUtility.cs</Link>
+    </Compile>
     <Compile Include="YahooFinanceAPI.cs" />
     <Compile Include="YahooFinanceIntegration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

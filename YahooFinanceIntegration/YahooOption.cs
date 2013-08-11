@@ -12,7 +12,7 @@ namespace YahooFinanceIntegration
     /// This is used to deserialize messages from Yahoo! QML.
     /// </remarks>
     [Serializable]
-    public class YahooOption
+    public class YahooOption : MEEFIntegration.IOptionQuote
     {
         /// <summary>
         /// Gets or sets the ticker symbol this options is referred to.
@@ -73,5 +73,38 @@ namespace YahooFinanceIntegration
         /// </summary>
         [System.Xml.Serialization.XmlElement("openInt")]
         public int OpenInt { get; set; }
+
+        #region IOptionQuote implementation
+
+        public double Price
+        {
+            get { return this.LastPrice; }
+        }
+
+        public double Strike
+        {
+            get { return this.StrikePrice; }
+        }
+
+        
+        /// <summary>
+        /// Option Expiration. This field is loaded from option chain.
+        /// </summary>
+        public DateTime Maturity { get; set; }
+       
+        MEEFIntegration.OptionQuoteType MEEFIntegration.IOptionQuote.Type
+        {
+            get {
+                switch (this.Type)
+                {
+                    case "C":
+                        return MEEFIntegration.OptionQuoteType.Call;
+                    case "P":
+                        return MEEFIntegration.OptionQuoteType.Put;
+                }
+                throw new NotImplementedException();
+            }
+        }
+        #endregion
     }
 }
