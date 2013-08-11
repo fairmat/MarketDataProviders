@@ -353,116 +353,19 @@ namespace MEEFIntegration
             foreach(MEEFHistoricalQuote q in options)
                     Console.WriteLine(q.ContractCode+" "+q.StrikePrice+" "+q.MaturityDate+" "+q.SettlPrice);
 
-
-            //Gets call options
-            var calls = options.FindAll(x => x.ContractCode.StartsWith("C"));
-            var puts = options.FindAll(x => x.ContractCode.StartsWith("P"));
-           
-
-
-            //get maturities and strikes
-            var maturtiesDates = options.Select(item => item.MaturityDate).Distinct().OrderBy(x => x).ToList();
-            var strikes = options.Select(item => item.StrikePrice).Distinct().OrderBy(x=>x).ToList();
-            data.Strike = (Vector)strikes.ToArray();
-            //var callMaturtiesDates = calls.Select(item => item.MaturityDate).Distinct().ToList();
-
-            Console.WriteLine("Maturities");
-            data.Maturity= new Vector(maturtiesDates.Count);
-            for (int z = 0; z < maturtiesDates.Count; z++)
-                data.Maturity[z] = RightValueDate.DatesDifferenceCalculator(mdq.Date, maturtiesDates[z]);
-
-
-            data.CallPrice = new Matrix(data.Strike.Length, data.Maturity.Length);
-            var PutPrices = new Matrix(data.Strike.Length, data.Maturity.Length);
-
-
-                //find the strike which maximize the number of quoted options
-                //List<double> atmMaturities = new List<double>();
-                //List<double> atmStrikes = new List<double>();
-                //List<double> atmCalls = new List<double>();
-                //List<double> atmPuts = new List<double>();
-
-                //Group maturities,call,put w.r.t. strikes 
-            Dictionary<double, Tuple<List<double>, List<double>, List<double>>> atm = new Dictionary<double, Tuple<List<double>, List<double>, List<double>>>();
-
-                for (int si = 0; si < data.Strike.Length; si++)
-                for (int mi = 0; mi < maturtiesDates.Count; mi++)
-                {
-                    MEEFHistoricalQuote cQuote=calls.Find(x => x.StrikePrice == data.Strike[si] && x.MaturityDate == maturtiesDates[mi]);
-                    if(cQuote!=null)
-                        data.CallPrice[si, mi] = cQuote.SettlPrice;
-
-                    MEEFHistoricalQuote pQuote = puts.Find(x => x.StrikePrice == data.Strike[si] && x.MaturityDate == maturtiesDates[mi]);
-                    if (pQuote != null)
-                        PutPrices[si, mi] = pQuote.SettlPrice;
-
-                    if (cQuote != null && pQuote != null)
-                    {
-                        Tuple<List<double>, List<double>, List<double>> element=null;
-
-                        if (atm.ContainsKey(data.Strike[si]))
-                            element = atm[data.Strike[si]];
-                        else
-                        {
-                            element = new Tuple<List<double>, List<double>, List<double>>(new List<double>(), new List<double>(), new List<double>());
-                            atm.Add(data.Strike[si], element);
-                        }
-
-                        element.Item1.Add(data.Maturity[mi]);
-                        element.Item2.Add(cQuote.SettlPrice);
-                        element.Item3.Add(pQuote.SettlPrice);
-                        
-                    }
-                }
-            Console.WriteLine("CallPrices");
-            Console.WriteLine(data.CallPrice);
-            Console.WriteLine("Putprices");
-            Console.WriteLine(PutPrices);
-
-            //loads atm info (get the strike with the higher number of elements)
-            int maxElements = -1;
-            double argMax = -1;
-            foreach (double strike in atm.Keys)
-            {
-                if (atm[strike].Item1.Count > maxElements)
-                {
-                    maxElements = atm[strike].Item1.Count;
-                    argMax = strike;
-                }
-            }
-
-            if (maxElements != -1)
-            {
-                data.StrikeATM = argMax;
-                data.MaturityATM = (Vector)atm[argMax].Item1.ToArray();
-                data.CallPriceATM = (Vector)atm[argMax].Item2.ToArray();
-                data.PutPriceATM = (Vector)atm[argMax].Item3.ToArray();
-            }
-            else
-            {
-                Console.WriteLine("Cannot find atm information");
-            }
-
-            //Request the starting value for process
-            var mdq2= DVPLI.ObjectSerialization.CloneObject(mdq) as MarketDataQuery;
-            mdq2.MarketDataType= typeof(Scalar).ToString();
-            IMarketData s0;
-            var s0Result = this.GetMarketData(mdq2, out s0);
-            if (s0Result.HasErrors)
-                return s0Result;
+            var status=OptionQuotesUtility.GetCallPriceMarketData(this, mdq, options.ConvertAll(x => (IOptionQuote)x), data);
+            if (status.HasErrors)
+                return status;
 
            
-            data.S0 = (s0 as Scalar).Value;
-            data.Ticker = mdq.Ticker;
-            data.Market = mdq.Market;
-            data.Date = mdq.Date;
-        
 
             marketData = data;
             Console.WriteLine(data);
-            return new RefreshStatus();
+            return status;
         }
 
         #endregion IMarketDataProvider Implementation
     }
+
+
 }

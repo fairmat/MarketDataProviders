@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DVPLI;
 using DVPLI.MarketDataTypes;
 using DVPLI.Interfaces;
@@ -137,6 +138,11 @@ namespace YahooFinanceIntegration
         /// </returns>
         public RefreshStatus GetMarketData(MarketDataQuery mdq, out IMarketData marketData)
         {
+            if (mdq.MarketDataType == typeof(Fairmat.MarketData.CallPriceMarketData).ToString())
+            {
+                return GetCallPriceMarketData(mdq, out marketData);
+            }
+            
             // Reuse the Historical time series to get the single quote
             // (Equal start/end date = get the quote of the day).
             DateTime[] dates;
@@ -346,5 +352,62 @@ namespace YahooFinanceIntegration
         }
 
         #endregion IMarketDataProvider Implementation
+
+
+        #region Support methods
+
+        /// <summary>
+        /// Retrieves available call and put options for a given ticker.
+        /// </summary>
+        /// <param name="mdq">The market data query</param>
+        /// <param name="marketData"></param>
+        /// <returns></returns>
+        RefreshStatus GetCallPriceMarketData(MarketDataQuery mdq, out IMarketData marketData)
+        {
+            Console.WriteLine(mdq);
+
+            marketData = null;
+            string fname=@"C:\tmp\GOOG.bin";
+            List<YahooOptionChain> opt=null;
+            Fairmat.MarketData.CallPriceMarketData data = new Fairmat.MarketData.CallPriceMarketData();
+
+            
+            if (!System.IO.File.Exists(fname))
+            {
+                /*
+                 *  Request options does not seems to give the option effectively tradaded at a given
+                 *  date but the options that are still being traded.
+                 */
+                opt = YahooFinanceAPI.RequestOptions(mdq.Ticker);
+                DVPLI.ObjectSerialization.WriteToFile(fname, opt);
+            }
+            else
+                opt = (List<YahooOptionChain>)DVPLI.ObjectSerialization.ReadFromFile(fname);
+            
+
+            //From the YahooOptionChain List, extracts a List of YahooOption
+            List<YahooOption> options = new List<YahooOption>();
+            foreach (YahooOptionChain q in opt)
+            {
+                Console.WriteLine(q.Symbol + " " + q.Expiration);
+                foreach (YahooOption o in q.Options)
+                {
+                    //Loads into YahooOption the needed information
+                    o.Maturity = q.Expiration;
+                    options.Add(o);
+                }
+            }
+            // Populate CallPriceMarketData data structure
+            var status = MEEFIntegration.OptionQuotesUtility.GetCallPriceMarketData(this, mdq, options.ConvertAll(x => (MEEFIntegration.IOptionQuote)x), data);
+            if (status.HasErrors)
+                return status;
+
+            marketData = data;
+            Console.WriteLine(data);
+            return status;
+             
+        }
+
+        #endregion
     }
 }

@@ -21,10 +21,12 @@ using System.IO;
 
 namespace MEEFIntegration
 {
+   
+
     /// <summary>
     /// Represents a single historical quote from MEEF.
     /// </summary>
-    internal class MEEFHistoricalQuote
+    internal class MEEFHistoricalQuote: IOptionQuote
     {
         #region Constructors
 
@@ -269,5 +271,30 @@ namespace MEEFIntegration
             this.NumberOfTrades = Convert.ToInt32(rows[16]);
             this.OpenInterest = Convert.ToInt32(rows[17]);
         }
+
+        #region IOptionQuote
+        public double Price
+        {
+            get { return this.SettlPrice; }
+        }
+
+        public double Strike
+        {
+            get { return this.StrikePrice; }
+        }
+
+        public DateTime Maturity
+        {
+            get { return this.MaturityDate; }
+        }
+        public OptionQuoteType Type
+        {
+            get { 
+                if (this.ContractCode.StartsWith("C")) return OptionQuoteType.Call;
+                if (this.ContractCode.StartsWith("P")) return OptionQuoteType.Put;
+                throw new Exception("MEFF quote is not an option!");
+            }
+        }
+        #endregion
     }
 }
