@@ -279,6 +279,7 @@ namespace YahooFinanceIntegration
 
                                 // Obtain the stream of the response and initialize a reader.
                                 Stream receiveStream = response.GetResponseStream();
+                               
                                 XmlReader reader = XmlReader.Create(receiveStream);
 
                                 if (!reader.ReadToDescendant("optionsChain")) throw new Exception();
@@ -298,6 +299,7 @@ namespace YahooFinanceIntegration
                         }
                         catch (Exception e)
                         {
+
                             if (attempts == 0)
                             {
                                 // just try for a while not always.
@@ -311,6 +313,11 @@ namespace YahooFinanceIntegration
 
                             Console.WriteLine("Error during fetching attempt (" + e.Message +
                                               "). Retrying (left " + attempts + ")...");
+                            
+                        }
+                        finally
+                        {
+                            System.Threading.Thread.Sleep(3000);
                         }
                     }
                     while (failed);
