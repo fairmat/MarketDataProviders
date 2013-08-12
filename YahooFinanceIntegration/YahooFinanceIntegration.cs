@@ -372,7 +372,7 @@ namespace YahooFinanceIntegration
             Fairmat.MarketData.CallPriceMarketData data = new Fairmat.MarketData.CallPriceMarketData();
 
             
-            if (!System.IO.File.Exists(fname))
+            //if (!System.IO.File.Exists(fname))
             {
                 /*
                  *  Request options does not seems to give the option effectively tradaded at a given
@@ -381,8 +381,8 @@ namespace YahooFinanceIntegration
                 opt = YahooFinanceAPI.RequestOptions(mdq.Ticker);
                 DVPLI.ObjectSerialization.WriteToFile(fname, opt);
             }
-            else
-                opt = (List<YahooOptionChain>)DVPLI.ObjectSerialization.ReadFromFile(fname);
+            //else
+            //    opt = (List<YahooOptionChain>)DVPLI.ObjectSerialization.ReadFromFile(fname);
             
 
             //From the YahooOptionChain List, extracts a List of YahooOption

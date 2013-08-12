@@ -152,5 +152,45 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
             Assert.IsTrue(data.Exists(x => (x.Name == "GE" && x.Description == "Yahoo! Finance Equity")));
             Assert.IsTrue(data.Exists(x => (x.Name == "GLD" && x.Description == "Yahoo! Finance ETF")));
         }
+
+
+        [Test]
+        public void TestGetCallPriceMarketData()
+        {
+            var wrapper = new global::YahooFinanceIntegration.YahooFinanceIntegration();
+            
+            MarketDataQuery query = new MarketDataQuery();
+            query.Ticker = "GOOG";
+            query.Date = new DateTime(2011, 1, 31);
+            query.MarketDataType = typeof(Fairmat.MarketData.CallPriceMarketData).ToString();
+            query.Field = "close";
+            
+            IMarketData data;
+            var status=wrapper.GetMarketData(query, out data);
+            Assert.IsFalse(status.HasErrors);
+        }
+
+        /// <summary>
+        /// This test tests the realibily of the system by trying to extract data for an entire week
+        /// </summary>
+        [Test]
+        public void TestGetCallPriceMarketDataSeries()
+        {
+            var wrapper = new global::YahooFinanceIntegration.YahooFinanceIntegration();
+            var Date0= new DateTime(2011, 1, 31);
+            for (int d = 0; d < 5; d++)
+            {
+                MarketDataQuery query = new MarketDataQuery();
+                query.Ticker = "GOOG";
+                query.Date = Date0.AddDays(d);
+                query.MarketDataType = typeof(Fairmat.MarketData.CallPriceMarketData).ToString();
+                query.Field = "close";
+
+                IMarketData data;
+                var status = wrapper.GetMarketData(query, out data);
+                Assert.IsFalse(status.HasErrors);
+            }
+        }
+
     }
 }
