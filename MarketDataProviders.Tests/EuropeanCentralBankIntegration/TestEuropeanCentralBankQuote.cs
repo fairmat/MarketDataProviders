@@ -16,8 +16,8 @@
  */
 
 using System;
-using NUnit.Framework;
 using EuropeanCentralBankIntegration;
+using NUnit.Framework;
 
 namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
 {
@@ -36,7 +36,6 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
         {
             TestCommon.TestInitialization.CommonInitialization();
         }
-
 
         /// <summary>
         /// Gets a simple date string to be used for testing the parser.

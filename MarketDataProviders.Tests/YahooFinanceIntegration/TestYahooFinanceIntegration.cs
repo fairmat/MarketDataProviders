@@ -106,7 +106,7 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
             Assert.AreEqual(2, dates.Length);
 
             Assert.AreEqual(new DateTime(2011, 2, 1), data[0].TimeStamp);
-            Assert.AreEqual( new DateTime(2011, 1, 31), data[1].TimeStamp);
+            Assert.AreEqual(new DateTime(2011, 1, 31), data[1].TimeStamp);
             Assert.That(data[0] is Scalar);
             Assert.That(data[1] is Scalar);
 
@@ -126,7 +126,7 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
             Assert.That(data[0] is Scalar);
             Assert.That(data[1] is Scalar);
 
-            Assert.AreEqual(611,(data[0] as Scalar).Value, 1);
+            Assert.AreEqual(611, (data[0] as Scalar).Value, 1);
             Assert.AreEqual(600, (data[1] as Scalar).Value, 1);
         }
 
@@ -186,7 +186,7 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
         /// <remarks>
         /// It seems the output of Yahoo! Finance is quite variable and might give different
         /// results from time to time. So in case this fails check with
-        /// http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=G&callback=YAHOO.Finance.SymbolSuggest.ssCallback
+        /// http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=G&amp;callback=YAHOO.Finance.SymbolSuggest.ssCallback
         /// if it has the same elements.
         /// </remarks>
         [Test]
@@ -202,36 +202,39 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
             Assert.IsTrue(data.Exists(x => (x.Name == "GLD" && x.Description == "Yahoo! Finance ETF")));
         }
 
-
+        /// <summary>
+        /// Gets the Call price market data and checks if the request was succesful.
+        /// </summary>
         [Test]
         public void TestGetCallPriceMarketData()
         {
             var wrapper = new global::YahooFinanceIntegration.YahooFinanceIntegration();
-            
+
             MarketDataQuery query = new MarketDataQuery();
             query.Ticker = "GOOG";
             query.Date = new DateTime(2011, 1, 31);
             query.MarketDataType = typeof(Fairmat.MarketData.CallPriceMarketData).ToString();
             query.Field = "close";
-            
+
             IMarketData data;
-            var status=wrapper.GetMarketData(query, out data);
+            var status = wrapper.GetMarketData(query, out data);
             Assert.IsFalse(status.HasErrors);
         }
 
         /// <summary>
-        /// This test tests the realibily of the system by trying to extract data for an entire week
+        /// This test tests the reliability of the system
+        /// by trying to extract data for an entire week.
         /// </summary>
         [Test]
         public void TestGetCallPriceMarketDataSeries()
         {
             var wrapper = new global::YahooFinanceIntegration.YahooFinanceIntegration();
-            var Date0= new DateTime(2011, 1, 31);
+            var date0 = new DateTime(2011, 1, 31);
             for (int d = 0; d < 5; d++)
             {
                 MarketDataQuery query = new MarketDataQuery();
                 query.Ticker = "GOOG";
-                query.Date = Date0.AddDays(d);
+                query.Date = date0.AddDays(d);
                 query.MarketDataType = typeof(Fairmat.MarketData.CallPriceMarketData).ToString();
                 query.Field = "close";
 
@@ -240,6 +243,5 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
                 Assert.IsFalse(status.HasErrors);
             }
         }
-
     }
 }

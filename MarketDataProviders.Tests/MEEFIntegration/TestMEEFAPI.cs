@@ -17,8 +17,8 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using MEEFIntegration;
+using NUnit.Framework;
 
 namespace MarketDataProviders.Tests.MEEFIntegration
 {

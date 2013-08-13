@@ -1,4 +1,22 @@
-﻿using System;
+﻿/* Copyright (C) 2013 Fairmat SRL (info@fairmat.com, http://www.fairmat.com/)
+ * Author(s): Stefano Angeleri (stefano.angeleri@fairmat.com)
+ *            Matteo Tesser (matteo.tesser@fairmat.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -77,35 +95,58 @@ namespace YahooFinanceIntegration
 
         #region IOptionQuote implementation
 
+        /// <summary>
+        /// Gets the price of the option.
+        /// </summary>
         public double Price
         {
-            get { return this.LastPrice; }
+            get
+            {
+                return this.LastPrice;
+            }
         }
 
+        /// <summary>
+        /// Gets the strike value of the option.
+        /// </summary>
         public double Strike
         {
-            get { return this.StrikePrice; }
+            get
+            {
+                return this.StrikePrice;
+            }
         }
 
-        
         /// <summary>
-        /// Option Expiration. This field is loaded from option chain.
+        /// Gets or sets the option Expiration.
+        /// This field is loaded from option chain.
         /// </summary>
         public DateTime Maturity { get; set; }
-       
+
+        /// <summary>
+        /// Gets the type of this option quote.
+        /// </summary>
         OptionQuoteType IOptionQuote.Type
         {
-            get {
+            get
+            {
                 switch (this.Type)
                 {
                     case "C":
-                        return OptionQuoteType.Call;
+                        {
+                            return OptionQuoteType.Call;
+                        }
+
                     case "P":
-                        return OptionQuoteType.Put;
+                        {
+                            return OptionQuoteType.Put;
+                        }
                 }
+
                 throw new NotImplementedException();
             }
         }
-        #endregion
+
+        #endregion IOptionQuote implementation
     }
 }

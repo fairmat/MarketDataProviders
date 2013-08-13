@@ -82,7 +82,7 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
         /// </summary>
         /// <remarks>
         /// There is no check on the output data as it seems the service
-        /// times out after 2 requests suceeded.
+        /// times out after 2 requests succeeded.
         /// </remarks>
         [Test]
         public void TestOptionDataGathering()

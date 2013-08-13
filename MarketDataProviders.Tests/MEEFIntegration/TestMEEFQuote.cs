@@ -16,8 +16,8 @@
  */
 
 using System;
-using NUnit.Framework;
 using MEEFIntegration;
+using NUnit.Framework;
 
 namespace MarketDataProviders.Tests.MEEFIntegration
 {
@@ -141,7 +141,7 @@ namespace MarketDataProviders.Tests.MEEFIntegration
             Assert.AreEqual("12", quote.ContractSubgroupCode);
             Assert.AreEqual("XIINAA", quote.CFICode);
             Assert.AreEqual(0.0f, quote.StrikePrice, 0.0001);
-            Assert.AreEqual( new DateTime(2030, 12, 31), quote.MaturityDate);
+            Assert.AreEqual(new DateTime(2030, 12, 31), quote.MaturityDate);
             Assert.AreEqual(6.7895f, quote.BidPrice, 0.0001);
             Assert.AreEqual(9.147f, quote.AskPrice, 0.0001);
             Assert.AreEqual(12.2542f, quote.HighPrice, 0.0001);
@@ -164,9 +164,9 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         public void TestParsingResultOldFormat()
         {
             MEEFHistoricalQuote quote = new MEEFHistoricalQuote(GetSampleCSVLineOldFormat(), true);
-            Assert.AreEqual( new DateTime(2004, 07, 01), quote.SessionDate);
-            Assert.AreEqual("AAB",quote.ContractGroup);
-            Assert.AreEqual( new DateTime(2004, 07, 02), quote.MaturityDate);
+            Assert.AreEqual(new DateTime(2004, 07, 01), quote.SessionDate);
+            Assert.AreEqual("AAB", quote.ContractGroup);
+            Assert.AreEqual(new DateTime(2004, 07, 02), quote.MaturityDate);
             Assert.AreEqual(0.0f, quote.StrikePrice, 0.0001);
             Assert.AreEqual("AAAAAEXE", quote.ContractCode);
             Assert.AreEqual(0.0f, quote.BidPrice, 0.0001);
@@ -216,6 +216,5 @@ namespace MarketDataProviders.Tests.MEEFIntegration
             Assert.AreEqual(0.0f, quote.SettlDelta, 0.0001);
             Assert.AreEqual(0, quote.NumberOfTrades);
         }
-
     }
 }

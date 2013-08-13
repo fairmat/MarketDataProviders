@@ -28,7 +28,7 @@ namespace MEEFIntegration
 {
     /// <summary>
     /// Provides a simple interface to the MEEF API.
-    /// http://www.meff.es/aspx/Comun/Pagina.aspx?l1=Financiero&f=Ddescarga
+    /// http://www.meff.es/aspx/Comun/Pagina.aspx?l1=Financiero&amp;f=Ddescarga
     /// http://www.meff.es/aspx/Financiero/DescargaFicheros.aspx?id=esp.
     /// </summary>
     internal static class MEEFAPI
@@ -39,12 +39,12 @@ namespace MEEFIntegration
         /// A dictionary containing the request URI for the Market Data Provider.
         /// The data is the actual downloaded data, when available.
         /// </summary>
-        static Dictionary<string, byte[]> downloadedData = new Dictionary<string, byte[]>();
+        private static Dictionary<string, byte[]> downloadedData = new Dictionary<string, byte[]>();
 
         /// <summary>
         /// A cached list of the available tickers on this Market Data Provider.
         /// </summary>
-        static List<string> availableTickers = null;
+        private static List<string> availableTickers = null;
 
         #endregion Cached Static Data
 
@@ -174,7 +174,7 @@ namespace MEEFIntegration
         }
 
         /// <summary>
-        /// Gets a list of tickers available from the Market Data Provider
+        /// Gets a list of tickers available from the Market Data Provider.
         /// </summary>
         /// <returns>A string array of the available tickers.</returns>
         internal static List<string> GetTickerList()
@@ -182,7 +182,6 @@ namespace MEEFIntegration
             // Get the data if the cache is not available.
             if (availableTickers == null)
             {
-
                 // Used to keep unique entries for all tickers.
                 HashSet<string> tickers = new HashSet<string>();
 
@@ -206,7 +205,7 @@ namespace MEEFIntegration
                 }
 
                 // Store a copy for caching.
-                availableTickers = new List<string>(tickers); ;
+                availableTickers = new List<string>(tickers);
             }
 
             return availableTickers;
@@ -226,11 +225,8 @@ namespace MEEFIntegration
         /// An Action taking as argument a <see cref="MEEFHistoricalQuote"/> which
         /// decides what to do with all the parsed objects.
         /// </param>
-        /// <param name="oldFormat">
-        /// Whathever the parsing should be done with the new or old format.
-        /// </param>
         /// <param name="actions">
-        /// Whathever actions or the IBEX should be searched for the data.
+        /// Whatever actions or the IBEX should be searched for the data.
         /// </param>
         private static void GetData(int year, int month, Action<MEEFHistoricalQuote> handleParsedQuote, bool actions)
         {
@@ -267,7 +263,7 @@ namespace MEEFIntegration
                         if (entryCSV[0] != '\n')
                         {
                             // As we have a CSV line to parse go through  after cleaning it up.
-                            MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", ""), oldFormat);
+                            MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", string.Empty), oldFormat);
 
                             handleParsedQuote(quote);
                         }
@@ -303,8 +299,9 @@ namespace MEEFIntegration
         /// the market open days from startDate to endDate.
         /// If any data is found it's appended to the list (call this function
         /// with progressive dates only).
-        /// <param name="oldFormat">
-        /// Whathever to parse the CSV from the server with the older format.
+        /// </param>
+        /// <param name="actions">
+        /// Whatever to get actions or the IBEX.
         /// </param>
         /// <exception cref="Exception">
         /// A generic Exception can be thrown in case there are problems
@@ -334,14 +331,11 @@ namespace MEEFIntegration
         /// Prepares the request string starting from the provided
         /// variables and handles the request.
         /// </summary>
-        /// <param name="ticker">
-        /// The symbol of the ticker to look for quotes.
+        /// <param name="date">
+        /// The date to look for quotes, the date is considered only for year and month.
         /// </param>
-        /// <param name="startDate">
-        /// The start date to look for quotes, the date is inclusive.
-        /// </param>
-        /// <param name="endDate">
-        /// The ending date to look for quotes, the date is inclusive.
+        /// <param name="actions">
+        /// Whatever actions or the IBEX should be gathered.
         /// </param>
         /// <returns>A <see cref="ZipInputStream"/> ready for reading the request result.</returns>
         private static ZipInputStream MakeRequest(DateTime date, bool actions = false)
@@ -359,7 +353,7 @@ namespace MEEFIntegration
             {
                 // Data before 2007 is stored incosistently so there is need to do several
                 // checks in order to ensure the presence of the data.
-                // This code is optimized to the actual structure of data on the site, which 
+                // This code is optimized to the actual structure of data on the site, which
                 // isn't supposed to change for the passed dates.
                 if (date.Year < 1993)
                 {
@@ -422,6 +416,7 @@ namespace MEEFIntegration
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                 {
                     Console.WriteLine(response.LastModified);
+
                     // If this point is reached the response is instanced with something.
                     // Check if it was successful.
                     if (response.StatusCode != HttpStatusCode.OK)

@@ -17,10 +17,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using DVPLI;
-using DVPLI.MarketDataTypes;
 using DVPLI.Interfaces;
+using DVPLI.MarketDataTypes;
 using OptionQuotes;
 
 namespace YahooFinanceIntegration
@@ -56,6 +55,7 @@ namespace YahooFinanceIntegration
         /// <summary>
         /// Returns the list of the tickers currently supported by this market data provider.
         /// </summary>
+        /// <param name="filter">The filter to use to choose which symbols to return.</param>
         /// <returns>The supported ticker array.</returns>
         /// <remarks>
         /// For Yahoo! Finance it's not possible to get the full list, so queries will return
@@ -73,7 +73,8 @@ namespace YahooFinanceIntegration
                 }
             }
             catch (Exception)
-            { }
+            {
+            }
 
             return new ISymbolDefinition[0];
         }
@@ -95,10 +96,12 @@ namespace YahooFinanceIntegration
                     {
                         return MarketDataAccessType.Local;
                     }
+
                 case MarketDataCategory.EquityVolatilitySurface:
                     {
                         return MarketDataAccessType.Local;
                     }
+
                 default:
                     {
                         return MarketDataAccessType.NotAvailable;
@@ -143,7 +146,7 @@ namespace YahooFinanceIntegration
             {
                 return GetCallPriceMarketData(mdq, out marketData);
             }
-            
+
             // Reuse the Historical time series to get the single quote
             // (Equal start/end date = get the quote of the day).
             DateTime[] dates;
@@ -424,55 +427,53 @@ namespace YahooFinanceIntegration
         /// <summary>
         /// Retrieves available call and put options for a given ticker.
         /// </summary>
-        /// <param name="mdq">The market data query</param>
-        /// <param name="marketData"></param>
-        /// <returns></returns>
-        RefreshStatus GetCallPriceMarketData(MarketDataQuery mdq, out IMarketData marketData)
+        /// <param name="mdq">The market data query.</param>
+        /// <param name="marketData">The requested market data.</param>
+        /// <returns>A <see cref="RefreshStatus"/> with the status of the result.</returns>
+        private RefreshStatus GetCallPriceMarketData(MarketDataQuery mdq, out IMarketData marketData)
         {
             Console.WriteLine(mdq);
 
             marketData = null;
-            string fname=@"C:\tmp\GOOG.bin";
-            List<YahooOptionChain> opt=null;
+            string fname = @"C:\tmp\GOOG.bin";
+            List<YahooOptionChain> optionChains = null;
             Fairmat.MarketData.CallPriceMarketData data = new Fairmat.MarketData.CallPriceMarketData();
 
-            
             //if (!System.IO.File.Exists(fname))
             {
-                /*
-                 *  Request options does not seems to give the option effectively tradaded at a given
-                 *  date but the options that are still being traded.
-                 */
-                opt = YahooFinanceAPI.RequestOptions(mdq.Ticker);
-                DVPLI.ObjectSerialization.WriteToFile(fname, opt);
+                // Request options does not seems to give the option effectively
+                // tradaded at a given date but the options that are still being traded.
+                optionChains = YahooFinanceAPI.RequestOptions(mdq.Ticker);
+                DVPLI.ObjectSerialization.WriteToFile(fname, optionChains);
             }
             //else
             //    opt = (List<YahooOptionChain>)DVPLI.ObjectSerialization.ReadFromFile(fname);
-            
 
-            //From the YahooOptionChain List, extracts a List of YahooOption
+            // Extract a list of YahooOption from the YahooOptionChain List.
             List<YahooOption> options = new List<YahooOption>();
-            foreach (YahooOptionChain q in opt)
+            foreach (YahooOptionChain q in optionChains)
             {
                 Console.WriteLine(q.Symbol + " " + q.Expiration);
                 foreach (YahooOption o in q.Options)
                 {
-                    //Loads into YahooOption the needed information
+                    // Loads into YahooOption the needed information.
                     o.Maturity = q.Expiration;
                     options.Add(o);
                 }
             }
-            // Populate CallPriceMarketData data structure
+
+            // Populate the CallPriceMarketData data structure
             var status = OptionQuotesUtility.GetCallPriceMarketData(this, mdq, options.ConvertAll(x => (IOptionQuote)x), data);
             if (status.HasErrors)
+            {
                 return status;
+            }
 
             marketData = data;
             Console.WriteLine(data);
             return status;
-             
         }
 
-        #endregion
+        #endregion Support methods
     }
 }

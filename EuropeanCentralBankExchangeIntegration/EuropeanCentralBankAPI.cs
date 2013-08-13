@@ -26,7 +26,7 @@ namespace EuropeanCentralBankIntegration
     /// <summary>
     /// Provides a simple interface to the Central European Bank data.
     /// http://www.ecb.europa.eu/stats/exchange/eurofxref/html/index.en.html
-    /// http://www.ecb.int/stats/exchange/eurofxref/html/eurofxref-graph-zar.en.html
+    /// http://www.ecb.int/stats/exchange/eurofxref/html/eurofxref-graph-zar.en.html.
     /// </summary>
     internal static class EuropeanCentralBankAPI
     {
@@ -136,7 +136,6 @@ namespace EuropeanCentralBankIntegration
                 // Actually attempt the request to the European Central Bank.
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                 {
-
                     // If this point is reached the response is instanced with something.
                     // Check if it was successful.
                     if (response.StatusCode != HttpStatusCode.OK)
@@ -164,7 +163,7 @@ namespace EuropeanCentralBankIntegration
                         return XmlReader.Create(memoryStream);
                     }
                 }
-           }
+            }
             catch (Exception e)
             {
                 throw new Exception("There was an error while attempting " +

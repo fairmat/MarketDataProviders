@@ -160,7 +160,7 @@ namespace EuropeanCentralBankIntegration
                 // Extract the target currency name as that's used to request the data.
                 currency = mdq.Ticker.Remove(0, 4);
             }
-            else if(mdq.Ticker.StartsWith("EUR"))
+            else if (mdq.Ticker.StartsWith("EUR"))
             {
                 // Extract the target currency name as that's used to request the data.
                 currency = mdq.Ticker.Remove(0, 3);
@@ -303,44 +303,46 @@ namespace EuropeanCentralBankIntegration
         /// <summary>
         /// Gets the list of the tickers currently supported by this market data provider.
         /// </summary>
+        /// <param name="filter">The filter to use to choose which symbols to return.</param>
+        /// <returns>The list of supported tickers, if requested filtered.</returns>
         public ISymbolDefinition[] SupportedTickers(string filter = null)
         {
-            string[] currencies = new string[]{"USD",
-                                               "JPY",
-                                               "BGN",
-                                               "CZK",
-                                               "DKK",
-                                               "GBP",
-                                               "HUF",
-                                               "LTL",
-                                               "LVL",
-                                               "PLN",
-                                               "RON",
-                                               "SEK",
-                                               "CHF",
-                                               "NOK",
-                                               "HRK",
-                                               "RUB",
-                                               "TRY",
-                                               "AUD",
-                                               "BRL",
-                                               "CAD",
-                                               "CNY",
-                                               "HKD",
-                                               "IDR",
-                                               "ILS",
-                                               "INR",
-                                               "KRW",
-                                               "MXN",
-                                               "MYR",
-                                               "NZD",
-                                               "PHP",
-                                               "SGD",
-                                               "THB",
-                                               "ZAR"};
+            string[] currencies = new string[] { "USD",
+                                                 "JPY",
+                                                 "BGN",
+                                                 "CZK",
+                                                 "DKK",
+                                                 "GBP",
+                                                 "HUF",
+                                                 "LTL",
+                                                 "LVL",
+                                                 "PLN",
+                                                 "RON",
+                                                 "SEK",
+                                                 "CHF",
+                                                 "NOK",
+                                                 "HRK",
+                                                 "RUB",
+                                                 "TRY",
+                                                 "AUD",
+                                                 "BRL",
+                                                 "CAD",
+                                                 "CNY",
+                                                 "HKD",
+                                                 "IDR",
+                                                 "ILS",
+                                                 "INR",
+                                                 "KRW",
+                                                 "MXN",
+                                                 "MYR",
+                                                 "NZD",
+                                                 "PHP",
+                                                 "SGD",
+                                                 "THB",
+                                                 "ZAR" };
 
             List<ISymbolDefinition> tickers = new List<ISymbolDefinition>();
-            foreach(string currency in currencies)
+            foreach (string currency in currencies)
             {
                 // Generate the string for output.
                 string fullName = "EUCF" + currency;
@@ -373,9 +375,11 @@ namespace EuropeanCentralBankIntegration
             {
                 case MarketDataCategory.EquityPrice:
                     {
-                        // Exchange rate series are considered equities becuase they share the same undelying type 
+                        // Exchange rate series are considered equities
+                        // becuase they share the same undelying type.
                         return MarketDataAccessType.Local;
                     }
+
                 default:
                     {
                         return MarketDataAccessType.NotAvailable;

@@ -22,12 +22,10 @@ using OptionQuotes;
 
 namespace MEEFIntegration
 {
-   
-
     /// <summary>
     /// Represents a single historical quote from MEEF.
     /// </summary>
-    internal class MEEFHistoricalQuote: IOptionQuote
+    internal class MEEFHistoricalQuote : IOptionQuote
     {
         #region Constructors
 
@@ -84,22 +82,22 @@ namespace MEEFIntegration
         public DateTime SessionDate { get; private set; }
 
         /// <summary>
-        /// The group of this item.
+        /// Gets the group of this item.
         /// </summary>
         public string ContractGroup { get; private set; }
 
         /// <summary>
-        /// The code of this contact, also regarded as its name.
+        /// Gets the code of this contact, also regarded as its name.
         /// </summary>
         public string ContractCode { get; private set; }
 
         /// <summary>
-        /// The code of the subgroup of this item.
+        /// Gets the code of the subgroup of this item.
         /// </summary>
         public string ContractSubgroupCode { get; private set; }
 
         /// <summary>
-        /// Code of the financial instrument following ISO 10962.
+        /// Gets the Code of the financial instrument following ISO 10962.
         /// </summary>
         public string CFICode { get; private set; }
 
@@ -200,6 +198,7 @@ namespace MEEFIntegration
             // Format has a succession of dates, strings, doubles (prices) and integers values.
             this.SessionDate = DateTime.ParseExact(rows[0], "yyyyMMdd", CultureInfo.InvariantCulture);
             this.ContractGroup = rows[1].Trim();
+
             // row 2 maps to? instrument call put futuro
 
             // Row 2 is mapped to CFICODES OPASPS, OCASPS or F. To be checked if correct.
@@ -273,29 +272,54 @@ namespace MEEFIntegration
             this.OpenInterest = Convert.ToInt32(rows[17]);
         }
 
-        #region IOptionQuote
+        #region IOptionQuote implementation
+
+        /// <summary>
+        /// Gets the price of the option.
+        /// </summary>
         public double Price
         {
-            get { return this.SettlPrice; }
+            get
+            {
+                return this.SettlPrice;
+            }
         }
 
+        /// <summary>
+        /// Gets the strike value of the option.
+        /// </summary>
         public double Strike
         {
-            get { return this.StrikePrice; }
+            get
+            {
+                return this.StrikePrice;
+            }
         }
 
+        /// <summary>
+        /// Gets the expiration date of this option.
+        /// </summary>
         public DateTime Maturity
         {
-            get { return this.MaturityDate; }
+            get
+            {
+                return this.MaturityDate;
+            }
         }
+
+        /// <summary>
+        /// Gets the type of this option quote.
+        /// </summary>
         public OptionQuoteType Type
         {
-            get { 
+            get
+            {
                 if (this.ContractCode.StartsWith("C")) return OptionQuoteType.Call;
                 if (this.ContractCode.StartsWith("P")) return OptionQuoteType.Put;
                 throw new Exception("MEFF quote is not an option!");
             }
         }
-        #endregion
+
+        #endregion IOptionQuote
     }
 }

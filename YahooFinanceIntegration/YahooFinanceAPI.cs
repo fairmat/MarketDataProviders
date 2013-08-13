@@ -123,7 +123,6 @@ namespace YahooFinanceIntegration
                 // Actually attempt the request to Yahoo.
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                 {
-
                     // If this point is reached the response is instanced with something.
                     // Check if it was successful.
                     if (response.StatusCode != HttpStatusCode.OK)
@@ -132,7 +131,6 @@ namespace YahooFinanceIntegration
                                                            response.StatusCode,
                                                            response.StatusDescription));
                     }
-
 
                     // Obtain the stream of the response and initialize a reader.
                     using (Stream receiveStream = response.GetResponseStream())
@@ -182,7 +180,6 @@ namespace YahooFinanceIntegration
                 // Actually attempt the request to the Yahoo! servers.
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                 {
-
                     // If this point is reached the response is instanced with something.
                     // Check if it was successful.
                     if (response.StatusCode != HttpStatusCode.OK)
@@ -267,7 +264,6 @@ namespace YahooFinanceIntegration
                             // Actually attempt the request to the Yahoo! servers.
                             using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                             {
-
                                 // If this point is reached the response is instanced with something.
                                 // Check if it was successful.
                                 if (response.StatusCode != HttpStatusCode.OK)
@@ -279,7 +275,7 @@ namespace YahooFinanceIntegration
 
                                 // Obtain the stream of the response and initialize a reader.
                                 Stream receiveStream = response.GetResponseStream();
-                               
+
                                 XmlReader reader = XmlReader.Create(receiveStream);
 
                                 if (!reader.ReadToDescendant("optionsChain")) throw new Exception();
@@ -299,7 +295,6 @@ namespace YahooFinanceIntegration
                         }
                         catch (Exception e)
                         {
-
                             if (attempts == 0)
                             {
                                 // just try for a while not always.
@@ -313,7 +308,6 @@ namespace YahooFinanceIntegration
 
                             Console.WriteLine("Error during fetching attempt (" + e.Message +
                                               "). Retrying (left " + attempts + ")...");
-                            
                         }
                         finally
                         {

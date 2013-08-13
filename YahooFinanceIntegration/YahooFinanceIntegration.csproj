@@ -59,6 +59,9 @@
     <Compile Include="..\MEEFIntegration\OptionQuotesUtility.cs">
       <Link>OptionQuotesUtility.cs</Link>
     </Compile>
+    <Compile Include="..\MEEFIntegration\OptionQuoteType.cs">
+      <Link>OptionQuoteType.cs</Link>
+    </Compile>
     <Compile Include="YahooFinanceAPI.cs" />
     <Compile Include="YahooFinanceIntegration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -17,8 +17,8 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using EuropeanCentralBankIntegration;
+using NUnit.Framework;
 
 namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
 {

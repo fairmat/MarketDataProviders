@@ -54,6 +54,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OptionQuoteType.cs" />
     <Compile Include="IOptionQuote.cs" />
     <Compile Include="MEEFAPI.cs" />
     <Compile Include="MEEFIntegration.cs" />

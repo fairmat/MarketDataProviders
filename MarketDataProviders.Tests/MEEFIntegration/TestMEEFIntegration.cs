@@ -117,30 +117,30 @@ namespace MarketDataProviders.Tests.MEEFIntegration
 
             // Should contain GAS, GAM, GRF. So 3 elements.
             Assert.AreEqual(data.Count, 3);
-            
+
             // Check the actual elements.
             Assert.IsTrue(data.Exists(x => (x.Name == "GAS" && x.Description == "MEEF Market Equity")));
             Assert.IsTrue(data.Exists(x => (x.Name == "GAM" && x.Description == "MEEF Market Equity")));
             Assert.IsTrue(data.Exists(x => (x.Name == "GRF" && x.Description == "MEEF Market Equity")));
         }
 
-
+        /// <summary>
+        /// Gets the Call price market data and checks if the request was succesful.
+        /// </summary>
         [Test]
         public void TestGetCallPriceMarketData()
         {
             global::MEEFIntegration.MEEFIntegration wrapper = new global::MEEFIntegration.MEEFIntegration();
-                
-            MarketDataQuery mdq= new MarketDataQuery();
-            mdq.Ticker="BBVA";
-            mdq.Date= new DateTime(2013,07,01);
-            mdq.Market="EU";
+
+            MarketDataQuery mdq = new MarketDataQuery();
+            mdq.Ticker = "BBVA";
+            mdq.Date = new DateTime(2013, 07, 01);
+            mdq.Market = "EU";
             mdq.Field = "close";
-            mdq.MarketDataType=typeof(Fairmat.MarketData.CallPriceMarketData).ToString();
+            mdq.MarketDataType = typeof(Fairmat.MarketData.CallPriceMarketData).ToString();
             IMarketData marketData;
-            var status=wrapper.GetMarketData(mdq, out marketData);
+            var status = wrapper.GetMarketData(mdq, out marketData);
             Assert.IsFalse(status.HasErrors);
         }
-
-
     }
 }

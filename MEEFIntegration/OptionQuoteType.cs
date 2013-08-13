@@ -15,34 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
-using OptionQuotes;
-
 namespace OptionQuotes
 {
     /// <summary>
-    /// Includes basic information about traded options.
+    /// Describes traded options types: call, put.
     /// </summary>
-    public interface IOptionQuote
+    public enum OptionQuoteType
     {
         /// <summary>
-        /// Gets the price of the option.
+        /// The option Quote is a Call.
         /// </summary>
-        double Price { get; }
+        Call,
 
         /// <summary>
-        /// Gets the strike value of the option.
+        /// The option Quote is a Put.
         /// </summary>
-        double Strike { get; }
-
-        /// <summary>
-        /// Gets the expiration date of this option.
-        /// </summary>
-        DateTime Maturity { get; }
-
-        /// <summary>
-        /// Gets the type of this option quote.
-        /// </summary>
-        OptionQuoteType Type { get; }
+        Put
     }
 }

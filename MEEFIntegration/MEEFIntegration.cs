@@ -1,7 +1,7 @@
 ﻿/* Copyright (C) 2013 Fairmat SRL (info@fairmat.com, http://www.fairmat.com/)
  * Author(s): Stefano Angeleri (stefano.angeleri@fairmat.com)
  *            Matteo Tesser (matteo.tesser@fairmat.com)
- *            
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using DVPLI;
 using DVPLI.Interfaces;
 using DVPLI.MarketDataTypes;
@@ -57,6 +56,7 @@ namespace MEEFIntegration
         /// <summary>
         /// Returns the list of the tickers currently supported by this market data provider.
         /// </summary>
+        /// <param name="filter">The filter to use to choose which symbols to return.</param>
         /// <returns>The supported ticker array.</returns>
         public ISymbolDefinition[] SupportedTickers(string filter = null)
         {
@@ -70,7 +70,7 @@ namespace MEEFIntegration
             }
 
             // Put all in Symbol Definition Entries.
-            tickers.ForEach( x => symbols.Add(new SymbolDefinition(x, "MEEF Market Equity")));
+            tickers.ForEach(x => symbols.Add(new SymbolDefinition(x, "MEEF Market Equity")));
 
             return symbols.ToArray();
         }
@@ -92,10 +92,12 @@ namespace MEEFIntegration
                     {
                         return MarketDataAccessType.Local;
                     }
+
                 case MarketDataCategory.EquityVolatilitySurface:
                     {
                         return MarketDataAccessType.Local;
                     }
+
                 default:
                     {
                         return MarketDataAccessType.NotAvailable;
@@ -342,23 +344,26 @@ namespace MEEFIntegration
         /// <summary>
         /// Retrieves available call and put options for a given ticker.
         /// </summary>
-        /// <param name="mdq">The market data query</param>
-        /// <param name="marketData"></param>
-        /// <returns></returns>
-        RefreshStatus GetCallPriceMarketData(MarketDataQuery mdq, out IMarketData marketData)
+        /// <param name="mdq">The market data query.</param>
+        /// <param name="marketData">The requested market data.</param>
+        /// <returns>The result of the query.</returns>
+        private RefreshStatus GetCallPriceMarketData(MarketDataQuery mdq, out IMarketData marketData)
         {
             marketData = null;
             Fairmat.MarketData.CallPriceMarketData data = new Fairmat.MarketData.CallPriceMarketData();
 
-            List<MEEFHistoricalQuote> options= MEEFAPI.GetOptions(mdq.Ticker, mdq.Date);
-            foreach(MEEFHistoricalQuote q in options)
-                    Console.WriteLine(q.ContractCode+" "+q.StrikePrice+" "+q.MaturityDate+" "+q.SettlPrice);
+            List<MEEFHistoricalQuote> options = MEEFAPI.GetOptions(mdq.Ticker, mdq.Date);
 
-            var status=OptionQuotesUtility.GetCallPriceMarketData(this, mdq, options.ConvertAll(x => (IOptionQuote)x), data);
+            foreach (MEEFHistoricalQuote q in options)
+            {
+                Console.WriteLine(q.ContractCode + " " + q.StrikePrice + " " + q.MaturityDate + " " + q.SettlPrice);
+            }
+
+            var status = OptionQuotesUtility.GetCallPriceMarketData(this, mdq, options.ConvertAll(x => (IOptionQuote)x), data);
             if (status.HasErrors)
+            {
                 return status;
-
-           
+            }
 
             marketData = data;
             Console.WriteLine(data);
@@ -367,6 +372,4 @@ namespace MEEFIntegration
 
         #endregion IMarketDataProvider Implementation
     }
-
-
 }
