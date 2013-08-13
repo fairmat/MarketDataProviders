@@ -49,9 +49,9 @@ namespace MarketDataProviders.Tests.MEEFIntegration
                                                                             new DateTime(2013, 6, 3),
                                                                             new DateTime(2013, 6, 3));
 
-            Assert.AreEqual(quotes.Count, 1);
-            Assert.AreEqual(quotes[0].SessionDate, new DateTime(2013, 6, 03));
-            Assert.AreEqual(quotes[0].SettlPrice, 28, 1);
+            Assert.AreEqual(1, quotes.Count);
+            Assert.AreEqual(new DateTime(2013, 6, 03), quotes[0].SessionDate);
+            Assert.AreEqual(28, quotes[0].SettlPrice, 1);
         }
 
         /// <summary>
@@ -65,13 +65,13 @@ namespace MarketDataProviders.Tests.MEEFIntegration
                                                                            new DateTime(2013, 6, 3),
                                                                            new DateTime(2013, 6, 4));
 
-            Assert.AreEqual(quotes.Count, 2);
+            Assert.AreEqual(2, quotes.Count);
 
-            Assert.AreEqual(quotes[0].SessionDate, new DateTime(2013, 6, 3));
-            Assert.AreEqual(quotes[0].SettlPrice, 28, 1);
+            Assert.AreEqual(new DateTime(2013, 6, 3), quotes[0].SessionDate);
+            Assert.AreEqual(28, quotes[0].SettlPrice, 1);
 
-            Assert.AreEqual(quotes[1].SessionDate, new DateTime(2013, 6, 4));
-            Assert.AreEqual(quotes[1].SettlPrice, 29, 1);
+            Assert.AreEqual(new DateTime(2013, 6, 4), quotes[1].SessionDate);
+            Assert.AreEqual(29, quotes[1].SettlPrice, 1);
         }
     }
 }

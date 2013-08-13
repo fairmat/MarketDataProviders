@@ -49,10 +49,10 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
                                                                                    new DateTime(2011, 1, 31),
                                                                                    new DateTime(2011, 1, 31));
 
-            Assert.AreEqual(quotes.Count, 1);
-            Assert.AreEqual(quotes[0].Date, new DateTime(2011, 1, 31));
-            Assert.AreEqual(quotes[0].Open, 603, 1);
-            Assert.AreEqual(quotes[0].Close, 600, 1);
+            Assert.AreEqual(1, quotes.Count);
+            Assert.AreEqual(new DateTime(2011, 1, 31), quotes[0].Date);
+            Assert.AreEqual(603, quotes[0].Open, 1);
+            Assert.AreEqual(600, quotes[0].Close, 1);
         }
 
         /// <summary>
@@ -66,15 +66,15 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
                                                                                    new DateTime(2011, 1, 31),
                                                                                    new DateTime(2011, 2, 1));
 
-            Assert.AreEqual(quotes.Count, 2);
+            Assert.AreEqual(2, quotes.Count);
 
-            Assert.AreEqual(quotes[0].Date, new DateTime(2011, 2, 1));
-            Assert.AreEqual(quotes[0].Open, 604, 1);
-            Assert.AreEqual(quotes[0].Close, 611, 1);
+            Assert.AreEqual(new DateTime(2011, 2, 1), quotes[0].Date);
+            Assert.AreEqual(604, quotes[0].Open, 1);
+            Assert.AreEqual(611, quotes[0].Close, 1);
 
-            Assert.AreEqual(quotes[1].Date, new DateTime(2011, 1, 31));
-            Assert.AreEqual(quotes[1].Open, 603, 1);
-            Assert.AreEqual(quotes[1].Close, 600, 1);
+            Assert.AreEqual(new DateTime(2011, 1, 31), quotes[1].Date);
+            Assert.AreEqual(603, quotes[1].Open, 1);
+            Assert.AreEqual(600, quotes[1].Close, 1);
         }
 
         /// <summary>

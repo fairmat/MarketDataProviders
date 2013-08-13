@@ -48,9 +48,9 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
                                                                                    new DateTime(2011, 1, 31),
                                                                                    new DateTime(2011, 1, 31));
 
-            Assert.AreEqual(quotes.Count, 1);
-            Assert.AreEqual(quotes[0].Date, new DateTime(2011, 1, 31));
-            Assert.AreEqual(quotes[0].Value, 9.8458, 0.0001);
+            Assert.AreEqual(1, quotes.Count);
+            Assert.AreEqual(new DateTime(2011, 1, 31), quotes[0].Date);
+            Assert.AreEqual(9.8458, quotes[0].Value, 0.0001);
         }
 
         /// <summary>
@@ -63,14 +63,13 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
                                                                                    new DateTime(2011, 1, 31),
                                                                                    new DateTime(2011, 2, 1));
 
-            Assert.AreEqual(quotes.Count, 2);
+            Assert.AreEqual(2, quotes.Count);
 
-            Assert.AreEqual(quotes[1].Date, new DateTime(2011, 2, 1));
-            Assert.AreEqual(quotes[1].Value, 9.8480, 0.0001);
+            Assert.AreEqual(new DateTime(2011, 2, 1), quotes[1].Date);
+            Assert.AreEqual(9.8480, quotes[1].Value, 0.0001);
 
-            Assert.AreEqual(quotes[0].Date, new DateTime(2011, 1, 31));
-            Assert.AreEqual(quotes[0].Value, 9.8458, 0.0001);
-
+            Assert.AreEqual(new DateTime(2011, 1, 31), quotes[0].Date);
+            Assert.AreEqual(9.8458, quotes[0].Value, 0.0001);
         }
     }
 }

@@ -76,13 +76,13 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
         public void TestParsingResult()
         {
             YahooHistoricalQuote quote = new YahooHistoricalQuote(GetSampleCSVLine());
-            Assert.AreEqual(quote.Date, new DateTime(2010, 1, 25));
-            Assert.AreEqual(quote.Open, 123.45);
-            Assert.AreEqual(quote.High, 321.45);
-            Assert.AreEqual(quote.Low, 121.45);
-            Assert.AreEqual(quote.Close, 320.21);
-            Assert.AreEqual(quote.Volume, 999);
-            Assert.AreEqual(quote.AdjClose, 321.22);
+            Assert.AreEqual(new DateTime(2010, 1, 25), quote.Date);
+            Assert.AreEqual(123.45f, quote.Open, 0.0001);
+            Assert.AreEqual(321.45f, quote.High, 0.0001);
+            Assert.AreEqual(121.45f, quote.Low, 0.0001);
+            Assert.AreEqual(320.21f, quote.Close, 0.0001);
+            Assert.AreEqual(999, quote.Volume);
+            Assert.AreEqual(321.22f, quote.AdjClose, 0.0001);
         }
     }
 }

@@ -85,8 +85,8 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
         public void TestParsingResult()
         {
             EuropeanCentralBankQuote quote = new EuropeanCentralBankQuote(GetSampleDate(), GetSampleValue());
-            Assert.AreEqual(quote.Date, new DateTime(2010, 1, 25));
-            Assert.AreEqual(quote.Value, 123.45);
+            Assert.AreEqual(new DateTime(2010, 1, 25), quote.Date);
+            Assert.AreEqual(123.45, quote.Value);
         }
     }
 }

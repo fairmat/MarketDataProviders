@@ -69,9 +69,9 @@ namespace MarketDataProviders.Tests.MEEFIntegration
             Status status = wrapper.GetMarketData(query, out data);
 
             Assert.That(!status.HasErrors, status.ErrorMessage);
-            Assert.AreEqual(data.TimeStamp, new DateTime(2013, 6, 3));
+            Assert.AreEqual(new DateTime(2013, 6, 3), data.TimeStamp);
             Assert.That(data is Scalar);
-            Assert.AreEqual((data as Scalar).Value, 28, 1);
+            Assert.AreEqual(28, (data as Scalar).Value, 1);
         }
 
         /// <summary>
@@ -93,16 +93,16 @@ namespace MarketDataProviders.Tests.MEEFIntegration
             Status status = wrapper.GetTimeSeries(query, new DateTime(2013, 6, 4), out dates, out data);
 
             Assert.That(!status.HasErrors, status.ErrorMessage);
-            Assert.AreEqual(data.Length, 2);
-            Assert.AreEqual(dates.Length, 2);
+            Assert.AreEqual(2, data.Length);
+            Assert.AreEqual(2, dates.Length);
 
-            Assert.AreEqual(data[0].TimeStamp, new DateTime(2013, 6, 3));
-            Assert.AreEqual(data[1].TimeStamp, new DateTime(2013, 6, 4));
+            Assert.AreEqual(new DateTime(2013, 6, 3), data[0].TimeStamp);
+            Assert.AreEqual(new DateTime(2013, 6, 4), data[1].TimeStamp);
             Assert.That(data[0] is Scalar);
             Assert.That(data[1] is Scalar);
 
-            Assert.AreEqual((data[0] as Scalar).Value, 28, 1);
-            Assert.AreEqual((data[1] as Scalar).Value, 29, 1);
+            Assert.AreEqual(28, (data[0] as Scalar).Value, 1);
+            Assert.AreEqual(29, (data[1] as Scalar).Value, 1);
         }
 
         /// <summary>

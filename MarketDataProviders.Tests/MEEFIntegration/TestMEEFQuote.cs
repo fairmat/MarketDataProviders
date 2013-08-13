@@ -135,24 +135,24 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         public void TestParsingResult()
         {
             MEEFHistoricalQuote quote = new MEEFHistoricalQuote(GetSampleCSVLine());
-            Assert.AreEqual(quote.SessionDate, new DateTime(2013, 07, 01));
-            Assert.AreEqual(quote.ContractGroup, "C2");
-            Assert.AreEqual(quote.ContractCode, "AAABC");
-            Assert.AreEqual(quote.ContractSubgroupCode, "12");
-            Assert.AreEqual(quote.CFICode, "XIINAA");
-            Assert.AreEqual(quote.StrikePrice, 0.0f, 0.0001);
-            Assert.AreEqual(quote.MaturityDate, new DateTime(2030, 12, 31));
-            Assert.AreEqual(quote.BidPrice, 6.7895f, 0.0001);
-            Assert.AreEqual(quote.AskPrice, 9.147f, 0.0001);
-            Assert.AreEqual(quote.HighPrice, 12.2542f, 0.0001);
-            Assert.AreEqual(quote.LowPrice, 1.8745f, 0.0001);
-            Assert.AreEqual(quote.LastPrice, 9.1254f, 0.0001);
-            Assert.AreEqual(quote.SettlPrice, 9.1254f, 0.0001);
-            Assert.AreEqual(quote.SettlVolatility, 0.0f, 0.0001);
-            Assert.AreEqual(quote.SettlDelta, 1.0f, 0.0001);
-            Assert.AreEqual(quote.TotalRegVolume, 0);
-            Assert.AreEqual(quote.NumberOfTrades, 0);
-            Assert.AreEqual(quote.OpenInterest, 0);
+            Assert.AreEqual(new DateTime(2013, 07, 01), quote.SessionDate);
+            Assert.AreEqual("C2", quote.ContractGroup);
+            Assert.AreEqual("AAABC", quote.ContractCode);
+            Assert.AreEqual("12", quote.ContractSubgroupCode);
+            Assert.AreEqual("XIINAA", quote.CFICode);
+            Assert.AreEqual(0.0f, quote.StrikePrice, 0.0001);
+            Assert.AreEqual( new DateTime(2030, 12, 31), quote.MaturityDate);
+            Assert.AreEqual(6.7895f, quote.BidPrice, 0.0001);
+            Assert.AreEqual(9.147f, quote.AskPrice, 0.0001);
+            Assert.AreEqual(12.2542f, quote.HighPrice, 0.0001);
+            Assert.AreEqual(1.8745f, quote.LowPrice, 0.0001);
+            Assert.AreEqual(9.1254f, quote.LastPrice, 0.0001);
+            Assert.AreEqual(9.1254f, quote.SettlPrice, 0.0001);
+            Assert.AreEqual(0.0f, quote.SettlVolatility, 0.0001);
+            Assert.AreEqual(1.0f, quote.SettlDelta, 0.0001);
+            Assert.AreEqual(0, quote.TotalRegVolume);
+            Assert.AreEqual(0, quote.NumberOfTrades);
+            Assert.AreEqual(0, quote.OpenInterest);
         }
 
         /// <summary>
@@ -164,26 +164,26 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         public void TestParsingResultOldFormat()
         {
             MEEFHistoricalQuote quote = new MEEFHistoricalQuote(GetSampleCSVLineOldFormat(), true);
-            Assert.AreEqual(quote.SessionDate, new DateTime(2004, 07, 01));
-            Assert.AreEqual(quote.ContractGroup, "AAB");
-            Assert.AreEqual(quote.MaturityDate, new DateTime(2004, 07, 02));
-            Assert.AreEqual(quote.StrikePrice, 0.0f, 0.0001);
-            Assert.AreEqual(quote.ContractCode, "AAAAAEXE");
-            Assert.AreEqual(quote.BidPrice, 0.0f, 0.0001);
-            Assert.AreEqual(quote.AskPrice, 0.0f, 0.0001);
-            Assert.AreEqual(quote.HighPrice, 0.0f, 0.0001);
-            Assert.AreEqual(quote.LowPrice, 0.0f, 0.0001);
-            Assert.AreEqual(quote.LastPrice, 0.0f, 0.0001);
-            Assert.AreEqual(quote.TotalRegVolume, 0);
-            Assert.AreEqual(quote.SettlPrice, 34.44f, 0.0001);
-            Assert.AreEqual(quote.OpenInterest, 0);
-            Assert.AreEqual(quote.SettlVolatility, 15.75f, 0.0001);
+            Assert.AreEqual( new DateTime(2004, 07, 01), quote.SessionDate);
+            Assert.AreEqual("AAB",quote.ContractGroup);
+            Assert.AreEqual( new DateTime(2004, 07, 02), quote.MaturityDate);
+            Assert.AreEqual(0.0f, quote.StrikePrice, 0.0001);
+            Assert.AreEqual("AAAAAEXE", quote.ContractCode);
+            Assert.AreEqual(0.0f, quote.BidPrice, 0.0001);
+            Assert.AreEqual(0.0f, quote.AskPrice, 0.0001);
+            Assert.AreEqual(0.0f, quote.HighPrice, 0.0001);
+            Assert.AreEqual(0.0f, quote.LowPrice, 0.0001);
+            Assert.AreEqual(0.0f, quote.LastPrice, 0.0001);
+            Assert.AreEqual(0, quote.TotalRegVolume);
+            Assert.AreEqual(34.44f, quote.SettlPrice, 0.0001);
+            Assert.AreEqual(0, quote.OpenInterest);
+            Assert.AreEqual(15.75f, quote.SettlVolatility, 0.0001);
 
             // Fields missing from this format.
-            Assert.AreEqual(quote.ContractSubgroupCode, null);
-            Assert.AreEqual(quote.CFICode, "F");
-            Assert.AreEqual(quote.SettlDelta, 0.0f, 0.0001);
-            Assert.AreEqual(quote.NumberOfTrades, 0);
+            Assert.AreEqual(null, quote.ContractSubgroupCode);
+            Assert.AreEqual("F", quote.CFICode);
+            Assert.AreEqual(0.0f, quote.SettlDelta, 0.0001);
+            Assert.AreEqual(0, quote.NumberOfTrades);
         }
 
         /// <summary>
@@ -195,26 +195,26 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         public void TestParsingResultOldestFormat()
         {
             MEEFHistoricalQuote quote = new MEEFHistoricalQuote(GetSampleCSVLineOldestFormat(), true);
-            Assert.AreEqual(quote.SessionDate, new DateTime(1999, 01, 04));
-            Assert.AreEqual(quote.ContractGroup, "AAB");
-            Assert.AreEqual(quote.MaturityDate, new DateTime(1999, 01, 05));
-            Assert.AreEqual(quote.StrikePrice, 22.02f, 0.0001);
-            Assert.AreEqual(quote.ContractCode, "AC 4578C");
-            Assert.AreEqual(quote.BidPrice, 0.0f, 0.0001);
-            Assert.AreEqual(quote.AskPrice, 0.0f, 0.0001);
-            Assert.AreEqual(quote.HighPrice, 0.0f, 0.0001);
-            Assert.AreEqual(quote.LowPrice, 0.0f, 0.0001);
-            Assert.AreEqual(quote.LastPrice, 0.0f, 0.0001);
-            Assert.AreEqual(quote.TotalRegVolume, 0);
-            Assert.AreEqual(quote.SettlPrice, 22.32f, 0.0001);
-            Assert.AreEqual(quote.OpenInterest, 0);
-            Assert.AreEqual(quote.SettlVolatility, 19.00f, 0.0001);
+            Assert.AreEqual(new DateTime(1999, 01, 04), quote.SessionDate);
+            Assert.AreEqual("AAB", quote.ContractGroup);
+            Assert.AreEqual(new DateTime(1999, 01, 05), quote.MaturityDate);
+            Assert.AreEqual(22.02f, quote.StrikePrice, 0.0001);
+            Assert.AreEqual("AC 4578C", quote.ContractCode);
+            Assert.AreEqual(0.0f, quote.BidPrice, 0.0001);
+            Assert.AreEqual(0.0f, quote.AskPrice, 0.0001);
+            Assert.AreEqual(0.0f, quote.HighPrice, 0.0001);
+            Assert.AreEqual(0.0f, quote.LowPrice, 0.0001);
+            Assert.AreEqual(0.0f, quote.LastPrice, 0.0001);
+            Assert.AreEqual(0, quote.TotalRegVolume);
+            Assert.AreEqual(22.32f, quote.SettlPrice, 0.0001);
+            Assert.AreEqual(0, quote.OpenInterest);
+            Assert.AreEqual(19.00f, quote.SettlVolatility, 0.0001);
 
             // Fields missing from this format.
-            Assert.AreEqual(quote.ContractSubgroupCode, null);
-            Assert.AreEqual(quote.CFICode, "OC");
-            Assert.AreEqual(quote.SettlDelta, 0.0f, 0.0001);
-            Assert.AreEqual(quote.NumberOfTrades, 0);
+            Assert.AreEqual(null, quote.ContractSubgroupCode);
+            Assert.AreEqual("OC", quote.CFICode);
+            Assert.AreEqual(0.0f, quote.SettlDelta, 0.0001);
+            Assert.AreEqual(0, quote.NumberOfTrades);
         }
 
     }
