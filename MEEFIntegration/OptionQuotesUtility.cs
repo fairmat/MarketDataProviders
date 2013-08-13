@@ -55,8 +55,8 @@ namespace MEEFIntegration
                 data.Maturity[z] = RightValueDate.DatesDifferenceCalculator(mdq.Date, maturtiesDates[z]);
 
 
-            data.CallPrice = new Matrix(data.Strike.Length, data.Maturity.Length);
-            var PutPrices = new Matrix(data.Strike.Length, data.Maturity.Length);
+            data.CallPrice = new Matrix(data.Maturity.Length, data.Strike.Length);
+            var PutPrices = new Matrix(data.Maturity.Length, data.Strike.Length);
 
 
 
@@ -69,11 +69,11 @@ namespace MEEFIntegration
                 {
                     IOptionQuote cQuote = calls.Find(x => x.Strike == data.Strike[si] && x.Maturity == maturtiesDates[mi]);
                     if (cQuote != null)
-                        data.CallPrice[si, mi] = cQuote.Price;
+                        data.CallPrice[mi, si] = cQuote.Price;
 
                     IOptionQuote pQuote = puts.Find(x => x.Strike == data.Strike[si] && x.Maturity == maturtiesDates[mi]);
                     if (pQuote != null)
-                        PutPrices[si, mi] = pQuote.Price;
+                        PutPrices[mi, si] = pQuote.Price;
 
                     if (cQuote != null && pQuote != null)
                     {
