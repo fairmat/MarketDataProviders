@@ -147,8 +147,8 @@ namespace YahooFinanceIntegration
             // Reuse the Historical time series to get the single quote
             // (Equal start/end date = get the quote of the day).
             DateTime[] dates;
-            IMarketData[] marketDatas;
-            RefreshStatus status = GetTimeSeries(mdq, mdq.Date, out dates, out marketDatas);
+            IMarketData[] marketDataArray;
+            RefreshStatus status = GetTimeSeries(mdq, mdq.Date, out dates, out marketDataArray);
 
             // If there were errors already just report them back.
             if (status.HasErrors)
@@ -161,7 +161,7 @@ namespace YahooFinanceIntegration
                 status = new RefreshStatus();
 
                 // Do some sanity check on the gathered data.
-                if (marketDatas.Length != 1 && dates.Length != 1 && dates[0] != mdq.Date)
+                if (marketDataArray.Length != 1 && dates.Length != 1 && dates[0] != mdq.Date)
                 {
                     status.HasErrors = true;
                     status.ErrorMessage += "GetMarketData: Requested date " +
@@ -172,7 +172,7 @@ namespace YahooFinanceIntegration
                 {
                     // If they pass just take the first element as result
                     // (which must be also the only one).
-                    marketData = marketDatas[0];
+                    marketData = marketDataArray[0];
                 }
             }
 

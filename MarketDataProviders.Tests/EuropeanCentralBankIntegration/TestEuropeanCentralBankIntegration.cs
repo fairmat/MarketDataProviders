@@ -88,7 +88,7 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
         public void TestRequestMultipleEntry()
         {
             global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration wrapper = new global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration();
-            IMarketData[] datas;
+            IMarketData[] data;
             DateTime[] dates;
             MarketDataQuery query = new MarketDataQuery();
             query.Ticker = "EUCFZAR";
@@ -96,35 +96,35 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
             query.MarketDataType = typeof(Scalar).ToString();
             query.Field = "close";
 
-            Status status = wrapper.GetTimeSeries(query, new DateTime(2011, 2, 1), out dates, out datas);
+            Status status = wrapper.GetTimeSeries(query, new DateTime(2011, 2, 1), out dates, out data);
 
             Assert.That(!status.HasErrors, status.ErrorMessage);
-            Assert.AreEqual(datas.Length, 2);
+            Assert.AreEqual(data.Length, 2);
             Assert.AreEqual(dates.Length, 2);
 
-            Assert.AreEqual(datas[1].TimeStamp, new DateTime(2011, 2, 1));
-            Assert.AreEqual(datas[0].TimeStamp, new DateTime(2011, 1, 31));
-            Assert.That(datas[1] is Scalar);
-            Assert.That(datas[0] is Scalar);
+            Assert.AreEqual(data[1].TimeStamp, new DateTime(2011, 2, 1));
+            Assert.AreEqual(data[0].TimeStamp, new DateTime(2011, 1, 31));
+            Assert.That(data[1] is Scalar);
+            Assert.That(data[0] is Scalar);
 
-            Assert.AreEqual((datas[1] as Scalar).Value, 9.8480, 0.0001);
-            Assert.AreEqual((datas[0] as Scalar).Value, 9.8458, 0.0001);
+            Assert.AreEqual((data[1] as Scalar).Value, 9.8480, 0.0001);
+            Assert.AreEqual((data[0] as Scalar).Value, 9.8458, 0.0001);
 
             query.Ticker = "EURZAR";
 
-            status = wrapper.GetTimeSeries(query, new DateTime(2011, 2, 1), out dates, out datas);
+            status = wrapper.GetTimeSeries(query, new DateTime(2011, 2, 1), out dates, out data);
 
             Assert.That(!status.HasErrors, status.ErrorMessage);
-            Assert.AreEqual(datas.Length, 2);
+            Assert.AreEqual(data.Length, 2);
             Assert.AreEqual(dates.Length, 2);
 
-            Assert.AreEqual(datas[1].TimeStamp, new DateTime(2011, 2, 1));
-            Assert.AreEqual(datas[0].TimeStamp, new DateTime(2011, 1, 31));
-            Assert.That(datas[1] is Scalar);
-            Assert.That(datas[0] is Scalar);
+            Assert.AreEqual(data[1].TimeStamp, new DateTime(2011, 2, 1));
+            Assert.AreEqual(data[0].TimeStamp, new DateTime(2011, 1, 31));
+            Assert.That(data[1] is Scalar);
+            Assert.That(data[0] is Scalar);
 
-            Assert.AreEqual((datas[1] as Scalar).Value, 9.8480, 0.0001);
-            Assert.AreEqual((datas[0] as Scalar).Value, 9.8458, 0.0001);
+            Assert.AreEqual((data[1] as Scalar).Value, 9.8480, 0.0001);
+            Assert.AreEqual((data[0] as Scalar).Value, 9.8458, 0.0001);
         }
     }
 }
