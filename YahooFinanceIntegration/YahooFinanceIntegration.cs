@@ -206,6 +206,10 @@ namespace YahooFinanceIntegration
             // Holds whathever we should take market close or market open values.
             bool closeRequest;
 
+            // Holds the currency conversion target in case a market different than
+            // US is choosen. This handles conversion from USD values provided by yahoo.
+            string targetMarket = null;
+
             // Check if open or close value was requested.
             switch (mdq.Field)
             {
@@ -234,15 +238,70 @@ namespace YahooFinanceIntegration
                     }
             }
 
+            // Gather in which currency to get the data, this will require
+            // an additional data fetching for the target currency for the same time period.
+            if (mdq.Market.Length > 0 && mdq.Market != "US")
+            {
+                // Try to convert the entries in the Fairmat drop down box,
+                // for the rest rely on the user.
+                switch (mdq.Market)
+                {
+                    case "EU":
+                        {
+                            targetMarket = "EUR";
+                            break;
+                        }
+
+                    case "GB":
+                        {
+                            targetMarket = "GBP";
+                            break;
+                        }
+
+                    case "JP":
+                        {
+                            targetMarket = "JPY";
+                            break;
+                        }
+
+                    case "CH":
+                        {
+                            targetMarket = "CHF";
+                            break;
+                        }
+
+                    case "HK":
+                        {
+                            targetMarket = "HKD";
+                            break;
+                        }
+
+                    default:
+                        {
+                            // In the fallback scenario just use directly the provided string.
+                            targetMarket = mdq.Market;
+                            break;
+                        }
+                }
+            }
+
             // For now only Scalar requests are handled.
             if (mdq.MarketDataType == typeof(Scalar).ToString())
             {
                 List<YahooHistoricalQuote> quotes = null;
+                List<YahooHistoricalQuote> currencyQuotes = null;
 
                 try
                 {
                     // Request the data to the Market Data Provider.
                     quotes = YahooFinanceAPI.GetHistoricalQuotes(mdq.Ticker, mdq.Date, end);
+
+                    if (targetMarket != null)
+                    {
+                        // If we need currency quotes in order to handle currency conversions
+                        // fetch them now.
+                        currencyQuotes = YahooFinanceAPI.GetHistoricalQuotes(targetMarket + "=X", mdq.Date, end);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -273,6 +332,12 @@ namespace YahooFinanceIntegration
                         Scalar val = new Scalar();
                         val.TimeStamp = quotes[i].Date;
                         val.Value = (closeRequest == true) ? quotes[i].Close : quotes[i].Open;
+
+                        // Handle currency conversions if needed.
+                        if (currencyQuotes != null)
+                        {
+                            val.Value *= (closeRequest == true) ? currencyQuotes[i].Close : currencyQuotes[i].Open;
+                        }
 
                         // Put it in the output structure.
                         marketData[i] = val;
@@ -353,7 +418,6 @@ namespace YahooFinanceIntegration
         }
 
         #endregion IMarketDataProvider Implementation
-
 
         #region Support methods
 

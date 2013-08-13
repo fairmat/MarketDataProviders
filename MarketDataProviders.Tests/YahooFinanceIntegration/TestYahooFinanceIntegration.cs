@@ -131,6 +131,55 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
         }
 
         /// <summary>
+        /// Tests requesting more than one entry and checks values correspond.
+        /// The values of the ticker are approximate.
+        /// This function checks also conversions from USD to EUR.
+        /// </summary>
+        [Test]
+        public void TestRequestMultipleEntryCurrencyConversion()
+        {
+            global::YahooFinanceIntegration.YahooFinanceIntegration wrapper = new global::YahooFinanceIntegration.YahooFinanceIntegration();
+            IMarketData[] data;
+            DateTime[] dates;
+            MarketDataQuery query = new MarketDataQuery();
+            query.Ticker = "GOOG";
+            query.Date = new DateTime(2011, 1, 31);
+            query.MarketDataType = typeof(Scalar).ToString();
+            query.Field = "open";
+            query.Market = "EU";
+
+            Status status = wrapper.GetTimeSeries(query, new DateTime(2011, 2, 1), out dates, out data);
+
+            Assert.That(!status.HasErrors, status.ErrorMessage);
+            Assert.AreEqual(data.Length, 2);
+            Assert.AreEqual(dates.Length, 2);
+
+            Assert.AreEqual(data[0].TimeStamp, new DateTime(2011, 2, 1));
+            Assert.AreEqual(data[1].TimeStamp, new DateTime(2011, 1, 31));
+            Assert.That(data[0] is Scalar);
+            Assert.That(data[1] is Scalar);
+
+            Assert.AreEqual((data[0] as Scalar).Value, 441, 1);
+            Assert.AreEqual((data[1] as Scalar).Value, 446, 1);
+
+            query.Field = "close";
+
+            status = wrapper.GetTimeSeries(query, new DateTime(2011, 2, 1), out dates, out data);
+
+            Assert.That(!status.HasErrors, status.ErrorMessage);
+            Assert.AreEqual(data.Length, 2);
+            Assert.AreEqual(dates.Length, 2);
+
+            Assert.AreEqual(data[0].TimeStamp, new DateTime(2011, 2, 1));
+            Assert.AreEqual(data[1].TimeStamp, new DateTime(2011, 1, 31));
+            Assert.That(data[0] is Scalar);
+            Assert.That(data[1] is Scalar);
+
+            Assert.AreEqual((data[0] as Scalar).Value, 446, 1);
+            Assert.AreEqual((data[1] as Scalar).Value, 444, 1);
+        }
+
+        /// <summary>
         /// Tests the ticker list request. This test might change
         /// if symbols starting with G are added or removed.
         /// </summary>
