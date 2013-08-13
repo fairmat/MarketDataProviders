@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using OptionQuotes;
 
 namespace YahooFinanceIntegration
 {
@@ -12,7 +13,7 @@ namespace YahooFinanceIntegration
     /// This is used to deserialize messages from Yahoo! QML.
     /// </remarks>
     [Serializable]
-    public class YahooOption : MEEFIntegration.IOptionQuote
+    public class YahooOption : IOptionQuote
     {
         /// <summary>
         /// Gets or sets the ticker symbol this options is referred to.
@@ -92,15 +93,15 @@ namespace YahooFinanceIntegration
         /// </summary>
         public DateTime Maturity { get; set; }
        
-        MEEFIntegration.OptionQuoteType MEEFIntegration.IOptionQuote.Type
+        OptionQuoteType IOptionQuote.Type
         {
             get {
                 switch (this.Type)
                 {
                     case "C":
-                        return MEEFIntegration.OptionQuoteType.Call;
+                        return OptionQuoteType.Call;
                     case "P":
-                        return MEEFIntegration.OptionQuoteType.Put;
+                        return OptionQuoteType.Put;
                 }
                 throw new NotImplementedException();
             }

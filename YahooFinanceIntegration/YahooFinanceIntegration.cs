@@ -21,6 +21,7 @@ using System.Linq;
 using DVPLI;
 using DVPLI.MarketDataTypes;
 using DVPLI.Interfaces;
+using OptionQuotes;
 
 namespace YahooFinanceIntegration
 {
@@ -398,7 +399,7 @@ namespace YahooFinanceIntegration
                 }
             }
             // Populate CallPriceMarketData data structure
-            var status = MEEFIntegration.OptionQuotesUtility.GetCallPriceMarketData(this, mdq, options.ConvertAll(x => (MEEFIntegration.IOptionQuote)x), data);
+            var status = OptionQuotesUtility.GetCallPriceMarketData(this, mdq, options.ConvertAll(x => (IOptionQuote)x), data);
             if (status.HasErrors)
                 return status;
 

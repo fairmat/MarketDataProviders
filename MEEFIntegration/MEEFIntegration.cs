@@ -22,6 +22,7 @@ using System.Linq;
 using DVPLI;
 using DVPLI.Interfaces;
 using DVPLI.MarketDataTypes;
+using OptionQuotes;
 
 namespace MEEFIntegration
 {

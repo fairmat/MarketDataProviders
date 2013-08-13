@@ -21,7 +21,7 @@ using System.Text;
 using DVPLI;
 using DVPLI.MarketDataTypes;
 
-namespace MEEFIntegration
+namespace OptionQuotes
 {
     /// <summary>
     /// Retrieves information from Option Quote lists
