@@ -1,5 +1,6 @@
 ﻿/* Copyright (C) 2013 Fairmat SRL (info@fairmat.com, http://www.fairmat.com/)
  * Author(s): Stefano Angeleri (stefano.angeleri@fairmat.com)
+ *            Matteo Tesser (matteo.tesser@fairmat.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -20,6 +21,7 @@ using System.Collections.Generic;
 using DVPLI;
 using DVPLI.Interfaces;
 using DVPLI.MarketDataTypes;
+using System.IO;
 using OptionQuotes;
 
 namespace YahooFinanceIntegration
@@ -432,23 +434,54 @@ namespace YahooFinanceIntegration
         /// <returns>A <see cref="RefreshStatus"/> with the status of the result.</returns>
         private RefreshStatus GetCallPriceMarketData(MarketDataQuery mdq, out IMarketData marketData)
         {
-            Console.WriteLine(mdq);
-
             marketData = null;
-            string fname = @"C:\tmp\GOOG.bin";
-            List<YahooOptionChain> optionChains = null;
-            Fairmat.MarketData.CallPriceMarketData data = new Fairmat.MarketData.CallPriceMarketData();
 
-            //if (!System.IO.File.Exists(fname))
+            //Check if the market data is in cache
+            string cachedName = Path.Combine(Path.GetTempPath(), "CallPrices" + mdq.Ticker + mdq.Date.Year + mdq.Date.Month + mdq.Date.Day);
+            List<YahooOptionChain> optionChains = null;
+            if (System.IO.File.Exists(cachedName))
             {
+                try
+                {
+                    optionChains= (List<YahooOptionChain>)DVPLI.ObjectSerialization.ReadFromFile(cachedName);
+                }
+                catch
+                {
+                    //Failed to read from cache
+                }
+            }
+
+            //if not found in cache try to get from the Yahoo service
+            if (optionChains == null)
+            {
+                //Yahoo returns only last traded options hence, we assume that the only
+                //valid dates are Today and Yesterday
+
+                DateTime tMax = DateTime.Today;
+                DateTime tMin = tMax.AddDays(-1);
+                if (tMax.DayOfWeek == DayOfWeek.Monday)
+                    tMin = tMax.AddDays(-3);
+
+                if (mdq.Date.Date < tMin || mdq.Date.Date > tMax)
+                {
+                    return new RefreshStatus("Options are not available for the requested period. Set the valuation date to Yesterday");
+                }
+
                 // Request options does not seems to give the option effectively
                 // tradaded at a given date but the options that are still being traded.
                 optionChains = YahooFinanceAPI.RequestOptions(mdq.Ticker);
-                DVPLI.ObjectSerialization.WriteToFile(fname, optionChains);
+                try
+                {
+                    DVPLI.ObjectSerialization.WriteToFile(cachedName, optionChains);
+                }
+                catch
+                {
+                }
             }
-            //else
-            //    opt = (List<YahooOptionChain>)DVPLI.ObjectSerialization.ReadFromFile(fname);
-
+           
+            Fairmat.MarketData.CallPriceMarketData data = new Fairmat.MarketData.CallPriceMarketData();
+              
+            
             // Extract a list of YahooOption from the YahooOptionChain List.
             List<YahooOption> options = new List<YahooOption>();
             foreach (YahooOptionChain q in optionChains)
