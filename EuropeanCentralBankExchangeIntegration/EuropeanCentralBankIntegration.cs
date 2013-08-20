@@ -342,10 +342,12 @@ namespace EuropeanCentralBankIntegration
                                                  "ZAR" };
 
             List<ISymbolDefinition> tickers = new List<ISymbolDefinition>();
+            string[] eurBasis={"EUR","EUCF"};//enumerate the two version of the exchange rate name 
+            foreach(string basis in eurBasis)
             foreach (string currency in currencies)
             {
                 // Generate the string for output.
-                string fullName = "EUCF" + currency;
+                string fullName = basis + currency;
 
                 // Check if the string is ok with the current filter if any.
                 if (filter != null && !fullName.StartsWith(filter))
@@ -354,7 +356,7 @@ namespace EuropeanCentralBankIntegration
                     continue;
                 }
 
-                tickers.Add(new SymbolDefinition(fullName, "EBC exchange rate"));
+                tickers.Add(new SymbolDefinition(fullName, "EBC EUR-"+currency+" exchange rate"));
             }
 
             return tickers.ToArray();
