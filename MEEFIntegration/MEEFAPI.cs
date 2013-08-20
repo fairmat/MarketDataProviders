@@ -132,6 +132,8 @@ namespace MEEFIntegration
                 }
             }
 
+            //Order quotes by decreasing date.
+            quotes.Reverse(); 
             return quotes;
         }
 

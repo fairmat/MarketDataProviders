@@ -65,11 +65,11 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
 
             Assert.AreEqual(2, quotes.Count);
 
-            Assert.AreEqual(new DateTime(2011, 2, 1), quotes[1].Date);
-            Assert.AreEqual(9.8480, quotes[1].Value, 0.0001);
+            Assert.AreEqual(new DateTime(2011, 2, 1), quotes[0].Date);
+            Assert.AreEqual(9.8480, quotes[0].Value, 0.0001);
 
-            Assert.AreEqual(new DateTime(2011, 1, 31), quotes[0].Date);
-            Assert.AreEqual(9.8458, quotes[0].Value, 0.0001);
+            Assert.AreEqual(new DateTime(2011, 1, 31), quotes[1].Date);
+            Assert.AreEqual(9.8458, quotes[1].Value, 0.0001);
         }
     }
 }

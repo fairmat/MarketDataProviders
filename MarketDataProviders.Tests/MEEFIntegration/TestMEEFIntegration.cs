@@ -96,13 +96,13 @@ namespace MarketDataProviders.Tests.MEEFIntegration
             Assert.AreEqual(2, data.Length);
             Assert.AreEqual(2, dates.Length);
 
-            Assert.AreEqual(new DateTime(2013, 6, 3), data[0].TimeStamp);
-            Assert.AreEqual(new DateTime(2013, 6, 4), data[1].TimeStamp);
+            Assert.AreEqual(new DateTime(2013, 6, 3), data[1].TimeStamp);
+            Assert.AreEqual(new DateTime(2013, 6, 4), data[0].TimeStamp);
             Assert.That(data[0] is Scalar);
             Assert.That(data[1] is Scalar);
 
-            Assert.AreEqual(28, (data[0] as Scalar).Value, 1);
-            Assert.AreEqual(29, (data[1] as Scalar).Value, 1);
+            Assert.AreEqual(28, (data[1] as Scalar).Value, 1);
+            Assert.AreEqual(29, (data[0] as Scalar).Value, 1);
         }
 
         /// <summary>

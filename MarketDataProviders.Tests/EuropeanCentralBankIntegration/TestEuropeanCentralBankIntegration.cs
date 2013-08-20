@@ -102,13 +102,13 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
             Assert.AreEqual(2, data.Length);
             Assert.AreEqual(2, dates.Length);
 
-            Assert.AreEqual(new DateTime(2011, 2, 1), data[1].TimeStamp);
-            Assert.AreEqual(new DateTime(2011, 1, 31), data[0].TimeStamp);
-            Assert.That(data[1] is Scalar);
+            Assert.AreEqual(new DateTime(2011, 2, 1), data[0].TimeStamp);
+            Assert.AreEqual(new DateTime(2011, 1, 31), data[1].TimeStamp);
             Assert.That(data[0] is Scalar);
+            Assert.That(data[1] is Scalar);
 
-            Assert.AreEqual(9.8480, (data[1] as Scalar).Value, 0.0001);
-            Assert.AreEqual(9.8458, (data[0] as Scalar).Value, 0.0001);
+            Assert.AreEqual(9.8480, (data[0] as Scalar).Value, 0.0001);
+            Assert.AreEqual(9.8458, (data[1] as Scalar).Value, 0.0001);
 
             query.Ticker = "EURZAR";
 
@@ -118,13 +118,13 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
             Assert.AreEqual(2, data.Length);
             Assert.AreEqual(2, dates.Length);
 
-            Assert.AreEqual(new DateTime(2011, 2, 1), data[1].TimeStamp);
-            Assert.AreEqual(new DateTime(2011, 1, 31), data[0].TimeStamp);
+            Assert.AreEqual(new DateTime(2011, 2, 1), data[0].TimeStamp);
+            Assert.AreEqual(new DateTime(2011, 1, 31), data[1].TimeStamp);
             Assert.That(data[1] is Scalar);
             Assert.That(data[0] is Scalar);
 
-            Assert.AreEqual(9.8480, (data[1] as Scalar).Value, 0.0001);
-            Assert.AreEqual(9.8458, (data[0] as Scalar).Value, 0.0001);
+            Assert.AreEqual(9.8480, (data[0] as Scalar).Value, 0.0001);
+            Assert.AreEqual(9.8458, (data[1] as Scalar).Value, 0.0001);
         }
     }
 }

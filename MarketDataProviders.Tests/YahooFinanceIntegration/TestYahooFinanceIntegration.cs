@@ -154,13 +154,13 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
             Assert.AreEqual(2, data.Length);
             Assert.AreEqual(2, dates.Length);
 
-            Assert.AreEqual(new DateTime(2011, 2, 1), data[0].TimeStamp);
-            Assert.AreEqual(new DateTime(2011, 1, 31), data[1].TimeStamp);
+            Assert.AreEqual(new DateTime(2011, 2, 1), data[1].TimeStamp);
+            Assert.AreEqual(new DateTime(2011, 1, 31), data[0].TimeStamp);
             Assert.That(data[0] is Scalar);
             Assert.That(data[1] is Scalar);
 
-            Assert.AreEqual(441, (data[0] as Scalar).Value, 1);
-            Assert.AreEqual(446, (data[1] as Scalar).Value, 1);
+            Assert.AreEqual(441, (data[1] as Scalar).Value, 1);
+            Assert.AreEqual(446, (data[0] as Scalar).Value, 1);
 
             query.Field = "close";
 
@@ -170,13 +170,13 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
             Assert.AreEqual(2, data.Length);
             Assert.AreEqual(2, dates.Length);
 
-            Assert.AreEqual(new DateTime(2011, 2, 1), data[0].TimeStamp);
-            Assert.AreEqual(new DateTime(2011, 1, 31), data[1].TimeStamp);
+            Assert.AreEqual(new DateTime(2011, 2, 1), data[1].TimeStamp);
+            Assert.AreEqual(new DateTime(2011, 1, 31), data[0].TimeStamp);
             Assert.That(data[0] is Scalar);
             Assert.That(data[1] is Scalar);
 
-            Assert.AreEqual(446, (data[0] as Scalar).Value, 1);
-            Assert.AreEqual(444, (data[1] as Scalar).Value, 1);
+            Assert.AreEqual(446, (data[1] as Scalar).Value, 1);
+            Assert.AreEqual(444, (data[0] as Scalar).Value, 1);
         }
 
         /// <summary>

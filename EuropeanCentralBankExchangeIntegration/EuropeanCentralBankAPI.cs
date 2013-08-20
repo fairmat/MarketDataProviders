@@ -94,7 +94,8 @@ namespace EuropeanCentralBankIntegration
                                     "to parse the data from the European Central Bank servers: " +
                                     e.Message);
             }
-
+            //Quotes must be passed in decreasing date order
+            quotes.Reverse();
             return quotes;
         }
 
@@ -132,6 +133,7 @@ namespace EuropeanCentralBankIntegration
             {
                 // Prepare the object to handle the request to the European Central Bank servers.
                 HttpWebRequest request = WebRequest.Create(requestUrl) as HttpWebRequest;
+                
 
                 // Actually attempt the request to the European Central Bank.
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)

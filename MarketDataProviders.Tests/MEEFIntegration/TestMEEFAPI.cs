@@ -67,11 +67,11 @@ namespace MarketDataProviders.Tests.MEEFIntegration
 
             Assert.AreEqual(2, quotes.Count);
 
-            Assert.AreEqual(new DateTime(2013, 6, 3), quotes[0].SessionDate);
-            Assert.AreEqual(28, quotes[0].SettlPrice, 1);
+            Assert.AreEqual(new DateTime(2013, 6, 3), quotes[1].SessionDate);
+            Assert.AreEqual(28, quotes[1].SettlPrice, 1);
 
-            Assert.AreEqual(new DateTime(2013, 6, 4), quotes[1].SessionDate);
-            Assert.AreEqual(29, quotes[1].SettlPrice, 1);
+            Assert.AreEqual(new DateTime(2013, 6, 4), quotes[0].SessionDate);
+            Assert.AreEqual(29, quotes[0].SettlPrice, 1);
         }
     }
 }
