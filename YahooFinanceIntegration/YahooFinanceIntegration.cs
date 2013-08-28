@@ -65,12 +65,15 @@ namespace YahooFinanceIntegration
         /// </remarks>
         public ISymbolDefinition[] SupportedTickers(string filter = null)
         {
+            // Normalization of =X to strings without them.
+            Func<string, string> cleanCurrency = x => x.EndsWith("=X") ? x.Remove(x.Length-2) : x;
+
             try
             {
                 if (filter != null && filter.Length > 0)
                 {
                     List<ISymbolDefinition> symbols = new List<ISymbolDefinition>();
-                    YahooFinanceAPI.GetTickersWithFilter(filter).ForEach(x => symbols.Add(new SymbolDefinition((string)x["symbol"], "Yahoo! Finance " + (string)x["typeDisp"])));
+                    YahooFinanceAPI.GetTickersWithFilter(filter).ForEach(x => symbols.Add(new SymbolDefinition(cleanCurrency((string)x["symbol"]) , "Yahoo! Finance " + cleanCurrency((string)x["typeDisp"]))));
                     return symbols.ToArray();
                 }
             }
@@ -215,6 +218,10 @@ namespace YahooFinanceIntegration
             // US is choosen. This handles conversion from USD values provided by yahoo.
             string targetMarket = null;
 
+            string ticker = mdq.Ticker;
+            bool divisionTransformation = false;
+            bool inverseTransformation = false;
+
             // Check if open or close value was requested.
             switch (mdq.Field)
             {
@@ -290,6 +297,50 @@ namespace YahooFinanceIntegration
                 }
             }
 
+            // Check for currencies and handle them in a special way.
+            // Check the single currency only (eg: EUR for USDEUR).
+            if (GetCurrencyList().Contains(ticker))
+            {
+                ticker += "=X";
+
+                // Disable the feature for this for now.
+                targetMarket = null;
+            }
+            else
+            {
+                // Attempt a more throughout parsing. Check for <currency><currency> formats.
+                foreach (string currency in GetCurrencyList())
+                {
+                    if (ticker.StartsWith(currency))
+                    {
+                        if(currency == "USD")
+                        {
+                            // If usd is in the ticker name it's a special case due to the way
+                            // Yahoo! Finance keeps currencies.
+                            ticker = ticker.Remove(0, 3) + "=X";
+                            targetMarket = null;
+                        }
+                        else if (ticker.Remove(0, 3) == "USD")
+                        {
+                            // This is the inverse of the previous case.
+                            // From other currency to USD. Similarly to above it's a special case.
+                            ticker = currency + "=X";
+                            targetMarket = null;
+                            inverseTransformation = true;
+                        }
+                        else
+                        {
+                            // Normal not USD to not USD currency conversions.
+                            targetMarket = currency;
+                            ticker = ticker.Remove(0, 3) + "=X";
+                            divisionTransformation = true;
+                        }
+
+                        break;
+                    }
+                }
+            }
+
             // For now only Scalar requests are handled.
             if (mdq.MarketDataType == typeof(Scalar).ToString())
             {
@@ -299,7 +350,7 @@ namespace YahooFinanceIntegration
                 try
                 {
                     // Request the data to the Market Data Provider.
-                    quotes = YahooFinanceAPI.GetHistoricalQuotes(mdq.Ticker, mdq.Date, end);
+                    quotes = YahooFinanceAPI.GetHistoricalQuotes(ticker, mdq.Date, end);
 
                     if (targetMarket != null)
                     {
@@ -341,7 +392,21 @@ namespace YahooFinanceIntegration
                         // Handle currency conversions if needed.
                         if (currencyQuotes != null)
                         {
-                            val.Value *= (closeRequest == true) ? currencyQuotes[i].Close : currencyQuotes[i].Open;
+                            if (divisionTransformation)
+                            {
+                                val.Value /= (closeRequest == true) ? currencyQuotes[i].Close : currencyQuotes[i].Open;
+                            }
+                            else
+                            {
+                                val.Value *= (closeRequest == true) ? currencyQuotes[i].Close : currencyQuotes[i].Open;
+                            }
+                        }
+
+                        // Apply an inverse transformation, used for currency values when going
+                        // from a not USD currency to USD.
+                        if (inverseTransformation)
+                        {
+                            val.Value = 1 / val.Value;
                         }
 
                         // Put it in the output structure.
@@ -505,6 +570,45 @@ namespace YahooFinanceIntegration
             marketData = data;
             Console.WriteLine(data);
             return status;
+        }
+
+        private List<string> GetCurrencyList()
+        {
+            List<string> currencies = new List<string>{ "USD",
+                                                        "JPY",
+                                                        "BGN",
+                                                        "CZK",
+                                                        "DKK",
+                                                        "GBP",
+                                                        "HUF",
+                                                        "LTL",
+                                                        "LVL",
+                                                        "PLN",
+                                                        "RON",
+                                                        "SEK",
+                                                        "CHF",
+                                                        "NOK",
+                                                        "HRK",
+                                                        "RUB",
+                                                        "TRY",
+                                                        "AUD",
+                                                        "BRL",
+                                                        "CAD",
+                                                        "CNY",
+                                                        "HKD",
+                                                        "IDR",
+                                                        "ILS",
+                                                        "INR",
+                                                        "KRW",
+                                                        "MXN",
+                                                        "MYR",
+                                                        "NZD",
+                                                        "PHP",
+                                                        "SGD",
+                                                        "THB",
+                                                        "ZAR",
+                                                        "EUR" };
+            return currencies;
         }
 
         #endregion Support methods
