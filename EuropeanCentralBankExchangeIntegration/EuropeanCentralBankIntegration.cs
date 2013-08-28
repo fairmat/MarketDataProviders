@@ -343,21 +343,37 @@ namespace EuropeanCentralBankIntegration
 
             List<ISymbolDefinition> tickers = new List<ISymbolDefinition>();
             string[] eurBasis={"EUR","EUCF"};//enumerate the two version of the exchange rate name 
-            foreach(string basis in eurBasis)
-            foreach (string currency in currencies)
-            {
-                // Generate the string for output.
-                string fullName = basis + currency;
-
-                // Check if the string is ok with the current filter if any.
-                if (filter != null && !fullName.StartsWith(filter))
+            string[] postFixs = { " Curncy", " Index" };//enumerate the two possible postfixs
+            bool[] allowInverse = { true, false };
+            for(int b=0;b<eurBasis.Length;b++)
+                foreach (string currency in currencies)
                 {
-                    // If it's not skip this currency.
-                    continue;
-                }
+                    string basis = eurBasis[b];
+                    string postFix = postFixs[b];
+                    // Generate the string for output.
+                    string fullName = basis + currency;
+                
+                    // Check if the string is ok with the current filter if any.
+                    if ((filter != null && (fullName+postFix).StartsWith(filter))||filter==null)
+                    {
+                        tickers.Add(new SymbolDefinition(fullName, "EBC EUR-" + currency + " exchange rate"));
+                        // Add the version with the postifx
+                        tickers.Add(new SymbolDefinition(fullName + postFix, "EBC EUR-" + currency + " exchange rate"));
+                    }
 
-                tickers.Add(new SymbolDefinition(fullName, "EBC EUR-"+currency+" exchange rate"));
-            }
+                    if (allowInverse[b])
+                    {
+                        fullName = currency+basis;
+                        if ((filter != null && (fullName + postFix).StartsWith(filter)) || filter == null)
+                        {
+                            tickers.Add(new SymbolDefinition(fullName, "EBC "+currency+"-" + basis+ " exchange rate"));
+                            // Add the version with the postifx
+                            tickers.Add(new SymbolDefinition(fullName + postFix, "EBC "+currency+"-" + basis+ " exchange rate"));
+                        }
+                    }
+
+
+                }
 
             return tickers.ToArray();
         }
