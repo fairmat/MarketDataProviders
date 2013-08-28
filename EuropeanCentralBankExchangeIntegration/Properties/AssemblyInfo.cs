@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 using Mono.Addins;
 
 // The following lines tell that the assembly is an addin.
-[assembly: Addin("European Central Bank Integration", "1.0.0", Category = "Market Data Provider")]
+[assembly: Addin("European Central Bank Integration", "1.0.1", Category = "Market Data Provider")]
 [assembly: AddinDependency("Fairmat", "1.0")]
 [assembly: AddinAuthor("Fairmat SRL")]
 [assembly: AddinDescription("Provides access to the European Central Bank Exchange Data.")]

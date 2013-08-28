@@ -33,6 +33,8 @@ namespace EuropeanCentralBankIntegration
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
     public class EuropeanCentralBankIntegration : IMarketDataProvider, IDescription, ITickersInfo, IMarketDataProviderInfo
     {
+        static string[] currencyPostfixs = { " Curncy", " Index" };//enumerate the two possible postfixs
+
         #region IDescription Implementation
 
         /// <summary>
@@ -155,22 +157,24 @@ namespace EuropeanCentralBankIntegration
                 return status;
             }
 
+            string ticker = RemoveTrailers(mdq.Ticker);
+
             // Check that the requested value is available.
-            if (mdq.Ticker.StartsWith("EUCF"))
+            if (ticker.StartsWith("EUCF"))
             {
                 // Extract the target currency name as that's used to request the data.
-                currency = mdq.Ticker.Remove(0, 4);
+                currency = ticker.Remove(0, 4);
             }
-            else if (mdq.Ticker.StartsWith("EUR"))
+            else if (ticker.StartsWith("EUR"))
             {
                 // Extract the target currency name as that's used to request the data.
-                currency = mdq.Ticker.Remove(0, 3);
+                currency = ticker.Remove(0, 3);
             }
-            else if (mdq.Ticker.EndsWith("EUR"))
+            else if (ticker.EndsWith("EUR"))
             {
                 // As EUR is the target currency this request is inverted compared to ECB data.
                 invertedRequest = true;
-                currency = mdq.Ticker.Remove(mdq.Ticker.LastIndexOf("EUR"), 3);
+                currency = ticker.Remove(ticker.LastIndexOf("EUR"), 3);
             }
             else
             {
@@ -313,6 +317,20 @@ namespace EuropeanCentralBankIntegration
 
             return state;
         }
+
+        /// <summary>
+        /// Remove optional currenct trailers ' Index' or ' Cuncy'
+        /// </summary>
+        /// <param name="ticker">The extended ticker (i.e. 'EURCHF Curncy').</param>
+        /// <returns>The shortened ticker (i.e. 'EURCHF').</returns>
+        string RemoveTrailers(string ticker)
+        {
+           string t=ticker;
+           foreach (string trailer in currencyPostfixs)
+               t = t.Replace(trailer, "");
+           return t;
+        }
+
         #endregion IMarketDataProvider Implementation
 
         #region ITickersInfo Implementation
@@ -359,14 +377,13 @@ namespace EuropeanCentralBankIntegration
 
             List<ISymbolDefinition> tickers = new List<ISymbolDefinition>();
             string[] eurBasis = { "EUR", "EUCF" };//enumerate the two version of the exchange rate name 
-            string[] postFixs = { " Curncy", " Index" };//enumerate the two possible postfixs
             bool[] allowInverse = { true, false };
             for (int b = 0; b < eurBasis.Length; b++)
             {
                 foreach (string currency in currencies)
                 {
                     string basis = eurBasis[b];
-                    string postFix = postFixs[b];
+                    string postFix = currencyPostfixs[b];
                     // Generate the string for output.
                     string fullName = basis + currency;
 
