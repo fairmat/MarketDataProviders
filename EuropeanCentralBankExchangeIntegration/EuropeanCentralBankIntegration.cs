@@ -140,6 +140,7 @@ namespace EuropeanCentralBankIntegration
             RefreshStatus status = new RefreshStatus();
 
             string currency;
+            bool invertedRequest = false;
 
             // Check if it's a close request.
             if (mdq.Field != "close")
@@ -164,6 +165,12 @@ namespace EuropeanCentralBankIntegration
             {
                 // Extract the target currency name as that's used to request the data.
                 currency = mdq.Ticker.Remove(0, 3);
+            }
+            else if (mdq.Ticker.EndsWith("EUR"))
+            {
+                // As EUR is the target currency this request is inverted compared to ECB data.
+                invertedRequest = true;
+                currency = mdq.Ticker.Remove(mdq.Ticker.LastIndexOf("EUR"), 3);
             }
             else
             {
@@ -216,7 +223,16 @@ namespace EuropeanCentralBankIntegration
                         // Prepare the single scalar data.
                         Scalar val = new Scalar();
                         val.TimeStamp = quotes[i].Date;
-                        val.Value = quotes[i].Value;
+
+                        if (invertedRequest)
+                        {
+                            // Handle the conversion from other currencies to EUR.
+                            val.Value = 1 / quotes[i].Value;
+                        }
+                        else
+                        {
+                            val.Value = quotes[i].Value;
+                        }
 
                         // Put it in the output structure.
                         marketData[i] = val;
@@ -342,21 +358,26 @@ namespace EuropeanCentralBankIntegration
                                                  "ZAR" };
 
             List<ISymbolDefinition> tickers = new List<ISymbolDefinition>();
-            string[] eurBasis={"EUR","EUCF"};//enumerate the two version of the exchange rate name 
-            foreach(string basis in eurBasis)
-            foreach (string currency in currencies)
+
+            // Enumerate the possible combinations of EUR and
+            // the currency for the exchange rate name.
+            string[] eurBasis = { "EUR{1}", "EUCF{1}", "{1}EUR" };
+            foreach (string basis in eurBasis)
             {
-                // Generate the string for output.
-                string fullName = basis + currency;
-
-                // Check if the string is ok with the current filter if any.
-                if (filter != null && !fullName.StartsWith(filter))
+                foreach (string currency in currencies)
                 {
-                    // If it's not skip this currency.
-                    continue;
-                }
+                    // Generate the string for output.
+                    string fullName = string.Format(basis, currency);
 
-                tickers.Add(new SymbolDefinition(fullName, "EBC EUR-"+currency+" exchange rate"));
+                    // Check if the string is ok with the current filter if any.
+                    if (filter != null && !fullName.StartsWith(filter))
+                    {
+                        // If it's not skip this currency.
+                        continue;
+                    }
+
+                    tickers.Add(new SymbolDefinition(fullName, "EBC EUR-" + currency + " exchange rate"));
+                }
             }
 
             return tickers.ToArray();
