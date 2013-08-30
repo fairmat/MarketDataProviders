@@ -73,7 +73,7 @@ namespace YahooFinanceIntegration
                 if (filter != null && filter.Length > 0)
                 {
                     List<ISymbolDefinition> symbols = new List<ISymbolDefinition>();
-                    YahooFinanceAPI.GetTickersWithFilter(filter).ForEach(x => symbols.Add(new SymbolDefinition(cleanCurrency((string)x["symbol"]) , "Yahoo! Finance " + cleanCurrency((string)x["typeDisp"]))));
+                    YahooFinanceAPI.GetTickersWithFilter(filter).ForEach(x => symbols.Add(new SymbolDefinition(cleanCurrency((string)x["symbol"]) , "Yahoo! Finance " + (string)x["typeDisp"] + " (" + (string)x["name"] + ")")));
                     return symbols.ToArray();
                 }
             }
