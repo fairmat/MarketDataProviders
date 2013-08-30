@@ -15,11 +15,20 @@ Currently the the models which can benefit from this data providers the Geometri
 
 \section{How to use the \pluginName { } plug-in}
 \begin{itemize}
-\item Choose \textbf{\pluginName} in Settings / Fairmat Preferences / Market Data Provider
-
 \item Connect the project underlying asset to Market Data: when a data provider is present the \textbf{Data Source} tab is available on the stochastic processes editing forms. 
-This tab is used to bind the process to the market and to specify how the process must be calibrated. Relevant fields are the ticker name, in this case the equity or the index, the reference market
-and how the process must be calibrated (Calibration Options).
+This tab is used to bind the process to the market and to specify how the process must be calibrated. 
+\item Relevant fields are the ticker name, in this case the equity or the index, the reference market
+and how the process must be calibrated (Calibration Options). Use the standard symbol for indicating a security  (i.e. AMZN, GOOG, MSFT, AAPL, etc), and remember that you can use the Fairmat auto-complete option (CTRL+SPACE) for receiving indication on how to complete the symbols along with a long description of the security.
+\item Choose \textbf{\pluginName} or (\textbf{Fairmat.com/ Data-Link})  in Settings / Fairmat Preferences / Market Data Provider.  
+Risk neutral process calibration  is available only when selecting \textbf{Fairmat.com / Data-Link}. Data-Link will use  the \pluginName {} plug-in when appropriate. 
+\end{itemize}
+
+\section{Limitations}
+\begin{itemize}
+\item Risk neutral / option chains calibration of equity models is available only if the valuation date is the day before the current day. 
+\item Check the term of services of Yahoo! Finance (\url{http://finance.yahoo.com/badges/tos}).
+\end{itemize}
+
 \begin{figure}[h]
 \begin{center}
 \includegraphics[width=0.7\textwidth]{./Figures/DataSourcesTab.png}
@@ -27,8 +36,23 @@ and how the process must be calibrated (Calibration Options).
 \label{fig.DataSourceTab}
 \end{center}
 \end{figure}
-\end{itemize}
 
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{./Figures/Autocomplete.png}
+\caption{By pressing CTRL+SPACE, it possible to  retrieve information and auto-complete tickers.}
+\label{fig.DataSourceTab}
+\end{center}
+\end{figure}
+
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{./Figures/HistoricalCalibration.png}
+\caption{Example of calibration of a GBM model to the historical series of General Electric (GE) stock prices.}
+\label{fig.DataSourceTab}
+\end{center}
+\end{figure}
 
 
 \end{document}
