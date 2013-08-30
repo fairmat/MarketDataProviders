@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 using Mono.Addins;
 
 // The following lines tell that the assembly is an addin.
-[assembly: Addin("Yahoo! Finance Integration", "1.0.1", Category = "Market Data Provider")]
+[assembly: Addin("Yahoo! Finance Integration", "1.0.2", Category = "Market Data Provider")]
 [assembly: AddinDependency("Fairmat", "1.0")]
 [assembly: AddinAuthor("Fairmat SRL")]
 [assembly: AddinDescription("Provides access to Yahoo! Finance Market Data.")]
