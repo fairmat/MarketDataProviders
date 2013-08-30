@@ -1,7 +1,7 @@
 MEEFIntegration
 ===================
 
-This plugin provides access to the MEEF CSV Historical IBEX and Action Data in order to gather data for use by Fairmat.
+This plugin provides access to the MEFF CSV Historical IBEX and Action Data in order to gather data for use by Fairmat.
 
 The plugin currently supports only Scalar data requests of market close ticker price.
 
