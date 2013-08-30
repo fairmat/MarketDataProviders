@@ -53,13 +53,13 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\MEEFIntegration\IOptionQuote.cs">
+    <Compile Include="..\MEFFIntegration\IOptionQuote.cs">
       <Link>IOptionQuote.cs</Link>
     </Compile>
-    <Compile Include="..\MEEFIntegration\OptionQuotesUtility.cs">
+    <Compile Include="..\MEFFIntegration\OptionQuotesUtility.cs">
       <Link>OptionQuotesUtility.cs</Link>
     </Compile>
-    <Compile Include="..\MEEFIntegration\OptionQuoteType.cs">
+    <Compile Include="..\MEFFIntegration\OptionQuoteType.cs">
       <Link>OptionQuoteType.cs</Link>
     </Compile>
     <Compile Include="YahooFinanceAPI.cs" />

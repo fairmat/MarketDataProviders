@@ -24,14 +24,14 @@ using System.Xml;
 using System.Xml.Serialization;
 using ICSharpCode.SharpZipLib.Zip;
 
-namespace MEEFIntegration
+namespace MEFFIntegration
 {
     /// <summary>
-    /// Provides a simple interface to the MEEF API.
+    /// Provides a simple interface to the MEFF API.
     /// http://www.meff.es/aspx/Comun/Pagina.aspx?l1=Financiero&amp;f=Ddescarga
     /// http://www.meff.es/aspx/Financiero/DescargaFicheros.aspx?id=esp.
     /// </summary>
-    internal static class MEEFAPI
+    internal static class MEFFAPI
     {
         #region Cached Static Data
 
@@ -51,7 +51,7 @@ namespace MEEFIntegration
         #region API visible methods
 
         /// <summary>
-        /// Gets a List of <see cref="MEEFHistoricalQuote"/> containing the requested data.
+        /// Gets a List of <see cref="MEFFHistoricalQuote"/> containing the requested data.
         /// </summary>
         /// <param name="ticker">
         /// The symbol of the ticker to look for quotes.
@@ -63,22 +63,22 @@ namespace MEEFIntegration
         /// The ending date to look for quotes, the date is inclusive.
         /// </param>
         /// <returns>
-        /// A list of <see cref="MEEFHistoricalQuote"/> containing all
+        /// A list of <see cref="MEFFHistoricalQuote"/> containing all
         /// the market open days from startDate to endDate.
         /// The list can be empty if the requested filters yield no results.
         /// </returns>
         /// <exception cref="Exception">
         /// A generic Exception can be thrown in case there are problems
-        /// contacting MEEF servers, like timeout or HTTP errors.
+        /// contacting MEFF servers, like timeout or HTTP errors.
         /// </exception>
         /// <exception cref="InvalidDataException">
         /// An InvalidDataException might be parsed if the CSV
         /// has different fields than expected.
         /// </exception>
-        internal static List<MEEFHistoricalQuote> GetHistoricalQuotes(string ticker, DateTime startDate, DateTime endDate)
+        internal static List<MEFFHistoricalQuote> GetHistoricalQuotes(string ticker, DateTime startDate, DateTime endDate)
         {
             bool actions = true;
-            List<MEEFHistoricalQuote> quotes = new List<MEEFHistoricalQuote>();
+            List<MEFFHistoricalQuote> quotes = new List<MEFFHistoricalQuote>();
 
             // Scan through months and years in order to gather all needed data.
             for (int year = startDate.Year; year <= endDate.Year; year++)
@@ -145,12 +145,12 @@ namespace MEEFIntegration
         /// <returns>
         /// A list of all PUT and CALL options related to the ticker at a certain date.
         /// </returns>
-        internal static List<MEEFHistoricalQuote> GetOptions(string ticker, DateTime date)
+        internal static List<MEFFHistoricalQuote> GetOptions(string ticker, DateTime date)
         {
-            List<MEEFHistoricalQuote> quotes = new List<MEEFHistoricalQuote>();
+            List<MEFFHistoricalQuote> quotes = new List<MEFFHistoricalQuote>();
 
             // Handles the filtering of the quotes while being gathered.
-            Action<MEEFHistoricalQuote> handleParsedQuote = (quote) =>
+            Action<MEFFHistoricalQuote> handleParsedQuote = (quote) =>
             {
                 // Check that the quote which was just parsed is what was asked.
                 if (quote.SessionDate == date &&
@@ -192,7 +192,7 @@ namespace MEEFIntegration
                 DateTime referenceDate = DateTime.Now.AddMonths(-1);
 
                 // Handles the filtering of quotes while being gathered.
-                Action<MEEFHistoricalQuote> handleParsedQuote = (quote) =>
+                Action<MEFFHistoricalQuote> handleParsedQuote = (quote) =>
                 {
                     // Add the name of the contract to the list of available tickers, if of type ESXXXA.
                     if (quote.CFICode.StartsWith("ES"))
@@ -224,13 +224,13 @@ namespace MEEFIntegration
         /// <param name="year">The year to request data from.</param>
         /// <param name="month">The month to request data from.</param>
         /// <param name="handleParsedQuote">
-        /// An Action taking as argument a <see cref="MEEFHistoricalQuote"/> which
+        /// An Action taking as argument a <see cref="MEFFHistoricalQuote"/> which
         /// decides what to do with all the parsed objects.
         /// </param>
         /// <param name="actions">
         /// Whatever actions or the IBEX should be searched for the data.
         /// </param>
-        private static void GetData(int year, int month, Action<MEEFHistoricalQuote> handleParsedQuote, bool actions)
+        private static void GetData(int year, int month, Action<MEFFHistoricalQuote> handleParsedQuote, bool actions)
         {
             // Check which format is going to be used.
             // All data from before 2007 is using the old format, while from 2007
@@ -265,7 +265,7 @@ namespace MEEFIntegration
                         if (entryCSV[0] != '\n')
                         {
                             // As we have a CSV line to parse go through  after cleaning it up.
-                            MEEFHistoricalQuote quote = new MEEFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", string.Empty), oldFormat);
+                            MEFFHistoricalQuote quote = new MEFFHistoricalQuote(entryCSV.Substring(0, entryCSV.IndexOf("\n")).Replace("\r", string.Empty), oldFormat);
 
                             handleParsedQuote(quote);
                         }
@@ -297,7 +297,7 @@ namespace MEEFIntegration
         /// <param name="year">The specific year which is being looked now.</param>
         /// <param name="month">The specific month which is being looked now.</param>
         /// <param name="quotes">
-        /// A list of <see cref="MEEFHistoricalQuote"/> which will contain all
+        /// A list of <see cref="MEFFHistoricalQuote"/> which will contain all
         /// the market open days from startDate to endDate.
         /// If any data is found it's appended to the list (call this function
         /// with progressive dates only).
@@ -307,16 +307,16 @@ namespace MEEFIntegration
         /// </param>
         /// <exception cref="Exception">
         /// A generic Exception can be thrown in case there are problems
-        /// contacting MEEF servers, like timeout or HTTP errors.
+        /// contacting MEFF servers, like timeout or HTTP errors.
         /// </exception>
         /// <exception cref="InvalidDataException">
         /// An InvalidDataException might be parsed if the CSV
         /// has different fields than expected.
         /// </exception>
-        private static void GetMonthData(string ticker, DateTime startDate, DateTime endDate, int year, int month, List<MEEFHistoricalQuote> quotes, bool actions)
+        private static void GetMonthData(string ticker, DateTime startDate, DateTime endDate, int year, int month, List<MEFFHistoricalQuote> quotes, bool actions)
         {
             // Handles the filtering of the quotes while being gathered.
-            Action<MEEFHistoricalQuote> handleParsedQuote = (quote) =>
+            Action<MEFFHistoricalQuote> handleParsedQuote = (quote) =>
             {
                 // Check that the quote which was just parsed is what was asked.
                 if (quote.ContractCode == ticker && quote.SessionDate >= startDate && quote.SessionDate <= endDate)
@@ -342,7 +342,7 @@ namespace MEEFIntegration
         /// <returns>A <see cref="ZipInputStream"/> ready for reading the request result.</returns>
         private static ZipInputStream MakeRequest(DateTime date, bool actions = false)
         {
-            // Generate the request to be sent to MEEF site.
+            // Generate the request to be sent to MEFF site.
             string year = date.Year.ToString();
             string request;
 
@@ -397,7 +397,7 @@ namespace MEEFIntegration
             }
 
             // Prepare some data used to handle the file cache.
-            string folder = Path.Combine(DVPLI.UserSettingFolder.GetBaseSettingsPath(), "MEEFCACHE");
+            string folder = Path.Combine(DVPLI.UserSettingFolder.GetBaseSettingsPath(), "MEFFCACHE");
 
             DirectoryInfo directoryInfo = new DirectoryInfo(folder);
             if (!directoryInfo.Exists)
@@ -411,10 +411,10 @@ namespace MEEFIntegration
             // Else fetch it from the web server.
             try
             {
-                // Prepare the object to handle the request to the MEEF servers.
+                // Prepare the object to handle the request to the MEFF servers.
                 HttpWebRequest request = WebRequest.Create(requestUrl) as HttpWebRequest;
 
-                // Actually attempt the request to meef.
+                // Actually attempt the request to MEFF.
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                 {
                     Console.WriteLine(response.LastModified);
@@ -477,7 +477,7 @@ namespace MEEFIntegration
             catch (Exception e)
             {
                 throw new Exception("There was an error while attempting " +
-                                    "to contact MEEF servers: " + e.Message);
+                                    "to contact MEFF servers: " + e.Message);
             }
         }
 

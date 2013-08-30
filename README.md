@@ -7,6 +7,6 @@ YahooFinanceIntegration: Provides access to the Yahoo! Finance CSV Historical Da
 
 EuropeanCentralBankIntegration: Provides access to the European Central Bank (ECB) Historical exchange rates in order to gather data for use by Fairmat.
 
-MEEFIntegration: Provides access to the MEEF CSV Historical IBEX and Action Data in order to gather data for use by Fairmat.
+MEFFIntegration: Provides access to the MEFF CSV Historical IBEX and Action Data in order to gather data for use by Fairmat.
 
 Notice that in order to use the MarketDataProviders you must aknownledge and accept their own terms of use.

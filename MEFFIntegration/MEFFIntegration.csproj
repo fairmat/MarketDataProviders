@@ -7,7 +7,7 @@
     <ProjectGuid>{576D1D97-5EB9-4F5D-9A52-EA60158BE1DE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MEEFIntegration</RootNamespace>
+    <RootNamespace>MEFFIntegration</RootNamespace>
     <AssemblyName>MEEFIntegration</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -56,11 +56,11 @@
   <ItemGroup>
     <Compile Include="OptionQuoteType.cs" />
     <Compile Include="IOptionQuote.cs" />
-    <Compile Include="MEEFAPI.cs" />
-    <Compile Include="MEEFIntegration.cs" />
+    <Compile Include="MEFFAPI.cs" />
+    <Compile Include="MEFFIntegration.cs" />
     <Compile Include="OptionQuotesUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MEEFHistoricalQuote.cs" />
+    <Compile Include="MEFFHistoricalQuote.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

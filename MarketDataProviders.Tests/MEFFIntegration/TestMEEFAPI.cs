@@ -17,17 +17,17 @@
 
 using System;
 using System.Collections.Generic;
-using MEEFIntegration;
+using MEFFIntegration;
 using NUnit.Framework;
 
-namespace MarketDataProviders.Tests.MEEFIntegration
+namespace MarketDataProviders.Tests.MEFFIntegration
 {
     /// <summary>
-    /// Tests the MEEF request APIs provided
-    /// by <see cref="MEEFAPI"/>.
+    /// Tests the MEFF request APIs provided
+    /// by <see cref="MEFFAPI"/>.
     /// </summary>
     [TestFixture]
-    public class TestMEEFAPI
+    public class TestMEFFAPI
     {
         /// <summary>
         /// Initializes the backend to run the tests.
@@ -45,7 +45,7 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         [Test]
         public void TestRequestOneEntry()
         {
-            List<MEEFHistoricalQuote> quotes = MEEFAPI.GetHistoricalQuotes("GRF",
+            List<MEFFHistoricalQuote> quotes = MEFFAPI.GetHistoricalQuotes("GRF",
                                                                             new DateTime(2013, 6, 3),
                                                                             new DateTime(2013, 6, 3));
 
@@ -61,7 +61,7 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         [Test]
         public void TestRequestMultipleEntry()
         {
-            List<MEEFHistoricalQuote> quotes = MEEFAPI.GetHistoricalQuotes("GRF",
+            List<MEFFHistoricalQuote> quotes = MEFFAPI.GetHistoricalQuotes("GRF",
                                                                            new DateTime(2013, 6, 3),
                                                                            new DateTime(2013, 6, 4));
 

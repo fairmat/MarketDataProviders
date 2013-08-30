@@ -20,19 +20,19 @@ using System.Globalization;
 using System.IO;
 using OptionQuotes;
 
-namespace MEEFIntegration
+namespace MEFFIntegration
 {
     /// <summary>
-    /// Represents a single historical quote from MEEF.
+    /// Represents a single historical quote from MEFF.
     /// </summary>
-    internal class MEEFHistoricalQuote : IOptionQuote
+    internal class MEFFHistoricalQuote : IOptionQuote
     {
         #region Constructors
 
         /// <summary>
         /// Default constructor. It just sets default values.
         /// </summary>
-        public MEEFHistoricalQuote()
+        public MEFFHistoricalQuote()
         {
             this.SessionDate = new DateTime();
             this.ContractGroup = string.Empty;
@@ -55,11 +55,11 @@ namespace MEEFIntegration
         }
 
         /// <summary>
-        /// Constructs a new instance starting from the provided line from a MEEF csv.
+        /// Constructs a new instance starting from the provided line from a MEFF csv.
         /// </summary>
-        /// <param name="csvLine">A line from a MEEF csv.</param>
-        /// <param name="oldFormat">If the csvLine is in the MEEF old format.</param>
-        public MEEFHistoricalQuote(string csvLine, bool oldFormat = false)
+        /// <param name="csvLine">A line from a MEFF csv.</param>
+        /// <param name="oldFormat">If the csvLine is in the MEFF old format.</param>
+        public MEFFHistoricalQuote(string csvLine, bool oldFormat = false)
         {
             if (oldFormat)
             {
@@ -171,16 +171,16 @@ namespace MEEFIntegration
         #endregion Properties
 
         /// <summary>
-        /// Populates the data starting from a provided line from a MEEF Historical csv
+        /// Populates the data starting from a provided line from a MEFF Historical csv
         /// using the pre-2006 format.
         /// </summary>
-        /// <param name="csvLine">The line from a MEEF Historical csv to parse.</param>
+        /// <param name="csvLine">The line from a MEFF Historical csv to parse.</param>
         /// <remarks>
         /// This format lacks some data, so that will remain to its default value.
         /// </remarks>
         public void ParseOldFormatCSVLine(string csvLine)
         {
-            // We take for granted the MEEF format doesn't change.
+            // We take for granted the MEFF format doesn't change.
             // This means rows must be of 16 elements.
             string[] rows = csvLine.Split(',');
 
@@ -190,7 +190,7 @@ namespace MEEFIntegration
                 throw new InvalidDataException("The csv line has a wrong number of items 16 expected, " + rows.Length + " found");
             }
 
-            // Format used by MEEF for doubles.
+            // Format used by MEFF for doubles.
             NumberFormatInfo doubleFormat = new NumberFormatInfo();
             doubleFormat.NumberDecimalSeparator = ".";
             doubleFormat.NumberGroupSeparator = ",";
@@ -223,14 +223,14 @@ namespace MEEFIntegration
         }
 
         /// <summary>
-        /// Populates the data starting from a provided line from a MEEF Historical csv.
+        /// Populates the data starting from a provided line from a MEFF Historical csv.
         /// </summary>
-        /// <param name="csvLine">The line from a MEEF Historical csv to parse.</param>
+        /// <param name="csvLine">The line from a MEFF Historical csv to parse.</param>
         public void ParseCSVLine(string csvLine)
         {
             Func<string, string> cleanString = (str) => { return str.Substring(1, str.Length - 2); };
 
-            // We take for granted the MEEF format doesn't change.
+            // We take for granted the MEFF format doesn't change.
             // This means rows must be of 18 elements.
             string[] rows = csvLine.Split(';');
 
@@ -240,10 +240,10 @@ namespace MEEFIntegration
                 throw new InvalidDataException("The csv line has a wrong number of items 18 expected, " + rows.Length + " found");
             }
 
-            // Format used by MEEF for dates
+            // Format used by MEFF for dates
             string dateFormat = "yyyyMMdd";
 
-            // Format used by MEEF for doubles.
+            // Format used by MEFF for doubles.
             NumberFormatInfo doubleFormat = new NumberFormatInfo();
             doubleFormat.NumberDecimalSeparator = ",";
             doubleFormat.NumberGroupSeparator = ".";

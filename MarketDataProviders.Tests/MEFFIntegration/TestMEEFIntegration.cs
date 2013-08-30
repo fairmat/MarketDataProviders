@@ -21,14 +21,14 @@ using DVPLI;
 using DVPLI.MarketDataTypes;
 using NUnit.Framework;
 
-namespace MarketDataProviders.Tests.MEEFIntegration
+namespace MarketDataProviders.Tests.MEFFIntegration
 {
     /// <summary>
-    /// Tests the Fairmat interface to MEEF API provided by
-    /// <see cref="MEEFIntegration"/>.
+    /// Tests the Fairmat interface to MEFF API provided by
+    /// <see cref="MEFFIntegration"/>.
     /// </summary>
     [TestFixture]
-    public class TestMEEFIntegration
+    public class TestMEFFIntegration
     {
         /// <summary>
         /// Initializes the backend to run the tests.
@@ -46,7 +46,7 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         [Test]
         public void TestConnectivity()
         {
-            global::MEEFIntegration.MEEFIntegration wrapper = new global::MEEFIntegration.MEEFIntegration();
+            global::MEFFIntegration.MEFFIntegration wrapper = new global::MEFFIntegration.MEFFIntegration();
             Status status = wrapper.TestConnectivity();
             Assert.That(!status.HasErrors, status.ErrorMessage);
         }
@@ -58,7 +58,7 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         [Test]
         public void TestRequestOneEntry()
         {
-            global::MEEFIntegration.MEEFIntegration wrapper = new global::MEEFIntegration.MEEFIntegration();
+            global::MEFFIntegration.MEFFIntegration wrapper = new global::MEFFIntegration.MEFFIntegration();
             IMarketData data;
             MarketDataQuery query = new MarketDataQuery();
             query.Ticker = "GRF";
@@ -81,7 +81,7 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         [Test]
         public void TestRequestMultipleEntry()
         {
-            global::MEEFIntegration.MEEFIntegration wrapper = new global::MEEFIntegration.MEEFIntegration();
+            global::MEFFIntegration.MEFFIntegration wrapper = new global::MEFFIntegration.MEFFIntegration();
             IMarketData[] data;
             DateTime[] dates;
             MarketDataQuery query = new MarketDataQuery();
@@ -112,16 +112,16 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         [Test]
         public void TestTickerList()
         {
-            global::MEEFIntegration.MEEFIntegration wrapper = new global::MEEFIntegration.MEEFIntegration();
+            global::MEFFIntegration.MEFFIntegration wrapper = new global::MEFFIntegration.MEFFIntegration();
             List<ISymbolDefinition> data = new List<ISymbolDefinition>(wrapper.SupportedTickers("G"));
 
             // Should contain GAS, GAM, GRF. So 3 elements.
             Assert.AreEqual(data.Count, 3);
 
             // Check the actual elements.
-            Assert.IsTrue(data.Exists(x => (x.Name == "GAS" && x.Description == "MEEF Market Equity")));
-            Assert.IsTrue(data.Exists(x => (x.Name == "GAM" && x.Description == "MEEF Market Equity")));
-            Assert.IsTrue(data.Exists(x => (x.Name == "GRF" && x.Description == "MEEF Market Equity")));
+            Assert.IsTrue(data.Exists(x => (x.Name == "GAS" && x.Description == "MEFF Market Equity")));
+            Assert.IsTrue(data.Exists(x => (x.Name == "GAM" && x.Description == "MEFF Market Equity")));
+            Assert.IsTrue(data.Exists(x => (x.Name == "GRF" && x.Description == "MEFF Market Equity")));
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         [Test]
         public void TestGetCallPriceMarketData()
         {
-            global::MEEFIntegration.MEEFIntegration wrapper = new global::MEEFIntegration.MEEFIntegration();
+            global::MEFFIntegration.MEFFIntegration wrapper = new global::MEFFIntegration.MEFFIntegration();
 
             MarketDataQuery mdq = new MarketDataQuery();
             mdq.Ticker = "BBVA";

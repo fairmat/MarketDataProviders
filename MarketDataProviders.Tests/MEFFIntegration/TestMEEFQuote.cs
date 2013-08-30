@@ -16,17 +16,17 @@
  */
 
 using System;
-using MEEFIntegration;
+using MEFFIntegration;
 using NUnit.Framework;
 
-namespace MarketDataProviders.Tests.MEEFIntegration
+namespace MarketDataProviders.Tests.MEFFIntegration
 {
     /// <summary>
-    /// Tests the functionalities provided by <see cref="MEEFHistoricalQuote"/>.
+    /// Tests the functionalities provided by <see cref="MEFFHistoricalQuote"/>.
     /// Primarily it's construction and parsing are tested.
     /// </summary>
     [TestFixture]
-    public class TestMEEFHistoricalQuote
+    public class TestMEFFHistoricalQuote
     {
         /// <summary>
         /// Initializes the backend to run the tests.
@@ -65,76 +65,76 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         }
 
         /// <summary>
-        /// Tries to construct an empty <see cref="MEEFHistoricalQuote"/>
+        /// Tries to construct an empty <see cref="MEFFHistoricalQuote"/>
         /// and parse a string.
         /// </summary>
         [Test]
         public void TestParsing()
         {
-            MEEFHistoricalQuote quote = new MEEFHistoricalQuote();
+            MEFFHistoricalQuote quote = new MEFFHistoricalQuote();
             quote.ParseCSVLine(GetSampleCSVLine());
         }
 
         /// <summary>
-        /// Tries to construct a <see cref="MEEFHistoricalQuote"/>
+        /// Tries to construct a <see cref="MEFFHistoricalQuote"/>
         /// with the data to be parsed.
         /// </summary>
         [Test]
         public void TestConstruction()
         {
-            new MEEFHistoricalQuote(GetSampleCSVLine());
+            new MEFFHistoricalQuote(GetSampleCSVLine());
         }
 
         /// <summary>
-        /// Tries to construct an empty <see cref="MEEFHistoricalQuote"/>
+        /// Tries to construct an empty <see cref="MEFFHistoricalQuote"/>
         /// and parse a string. Uses the old format.
         /// </summary>
         [Test]
         public void TestParsingOldFormat()
         {
-            MEEFHistoricalQuote quote = new MEEFHistoricalQuote();
+            MEFFHistoricalQuote quote = new MEFFHistoricalQuote();
             quote.ParseOldFormatCSVLine(GetSampleCSVLineOldFormat());
         }
 
         /// <summary>
-        /// Tries to construct a <see cref="MEEFHistoricalQuote"/>
+        /// Tries to construct a <see cref="MEFFHistoricalQuote"/>
         /// with the data to be parsed. Uses the old format.
         /// </summary>
         [Test]
         public void TestConstructionOldFormat()
         {
-            new MEEFHistoricalQuote(GetSampleCSVLineOldFormat(), true);
+            new MEFFHistoricalQuote(GetSampleCSVLineOldFormat(), true);
         }
 
         /// <summary>
-        /// Tries to construct an empty <see cref="MEEFHistoricalQuote"/>
+        /// Tries to construct an empty <see cref="MEFFHistoricalQuote"/>
         /// and parse a string. Uses the old format with strings causing issues.
         /// </summary>
         [Test]
         public void TestParsingOldestFormat()
         {
-            MEEFHistoricalQuote quote = new MEEFHistoricalQuote();
+            MEFFHistoricalQuote quote = new MEFFHistoricalQuote();
             quote.ParseOldFormatCSVLine(GetSampleCSVLineOldestFormat());
         }
 
         /// <summary>
-        /// Tries to construct a <see cref="MEEFHistoricalQuote"/>
+        /// Tries to construct a <see cref="MEFFHistoricalQuote"/>
         /// with the data to be parsed. Uses the old format with strings causing issues.
         /// </summary>
         [Test]
         public void TestConstructionOldestFormat()
         {
-            new MEEFHistoricalQuote(GetSampleCSVLineOldestFormat(), true);
+            new MEFFHistoricalQuote(GetSampleCSVLineOldestFormat(), true);
         }
 
         /// <summary>
-        /// Tries to construct a <see cref="MEEFHistoricalQuote"/>,
+        /// Tries to construct a <see cref="MEFFHistoricalQuote"/>,
         /// parse a string and check that values correspond.
         /// </summary>
         [Test]
         public void TestParsingResult()
         {
-            MEEFHistoricalQuote quote = new MEEFHistoricalQuote(GetSampleCSVLine());
+            MEFFHistoricalQuote quote = new MEFFHistoricalQuote(GetSampleCSVLine());
             Assert.AreEqual(new DateTime(2013, 07, 01), quote.SessionDate);
             Assert.AreEqual("C2", quote.ContractGroup);
             Assert.AreEqual("AAABC", quote.ContractCode);
@@ -156,14 +156,14 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         }
 
         /// <summary>
-        /// Tries to construct a <see cref="MEEFHistoricalQuote"/>,
+        /// Tries to construct a <see cref="MEFFHistoricalQuote"/>,
         /// parse a string and check that values correspond.
         /// Uses the old format.
         /// </summary>
         [Test]
         public void TestParsingResultOldFormat()
         {
-            MEEFHistoricalQuote quote = new MEEFHistoricalQuote(GetSampleCSVLineOldFormat(), true);
+            MEFFHistoricalQuote quote = new MEFFHistoricalQuote(GetSampleCSVLineOldFormat(), true);
             Assert.AreEqual(new DateTime(2004, 07, 01), quote.SessionDate);
             Assert.AreEqual("AAB", quote.ContractGroup);
             Assert.AreEqual(new DateTime(2004, 07, 02), quote.MaturityDate);
@@ -187,14 +187,14 @@ namespace MarketDataProviders.Tests.MEEFIntegration
         }
 
         /// <summary>
-        /// Tries to construct a <see cref="MEEFHistoricalQuote"/>,
+        /// Tries to construct a <see cref="MEFFHistoricalQuote"/>,
         /// parse a string and check that values correspond.
         /// Uses the old format with strings causing issues.
         /// </summary>
         [Test]
         public void TestParsingResultOldestFormat()
         {
-            MEEFHistoricalQuote quote = new MEEFHistoricalQuote(GetSampleCSVLineOldestFormat(), true);
+            MEFFHistoricalQuote quote = new MEFFHistoricalQuote(GetSampleCSVLineOldestFormat(), true);
             Assert.AreEqual(new DateTime(1999, 01, 04), quote.SessionDate);
             Assert.AreEqual("AAB", quote.ContractGroup);
             Assert.AreEqual(new DateTime(1999, 01, 05), quote.MaturityDate);

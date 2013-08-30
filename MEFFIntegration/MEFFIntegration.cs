@@ -23,29 +23,29 @@ using DVPLI.Interfaces;
 using DVPLI.MarketDataTypes;
 using OptionQuotes;
 
-namespace MEEFIntegration
+namespace MEFFIntegration
 {
     /// <summary>
     /// Implements the interface to provide Fairmat access to the
-    /// MEEF Market Data Provider.
+    /// MEFF Market Data Provider.
     /// </summary>
     /// <remarks>
     /// This Data Market Provider supports only Scalar requests.
     /// </remarks>
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
-    public class MEEFIntegration : IMarketDataProvider, IDescription, ITickersInfo, IMarketDataProviderInfo
+    public class MEFFIntegration : IMarketDataProvider, IDescription, ITickersInfo, IMarketDataProviderInfo
     {
         #region IDescription Implementation
 
         /// <summary>
         /// Gets an user friendly description of the service provided by this class.
-        /// In this case "MEEF".
+        /// In this case "MEFF".
         /// </summary>
         public string Description
         {
             get
             {
-                return "MEEF";
+                return "MEFF";
             }
         }
 
@@ -60,7 +60,7 @@ namespace MEEFIntegration
         /// <returns>The supported ticker array.</returns>
         public ISymbolDefinition[] SupportedTickers(string filter = null)
         {
-            List<string> tickers = new List<string>(MEEFAPI.GetTickerList());
+            List<string> tickers = new List<string>(MEFFAPI.GetTickerList());
             List<ISymbolDefinition> symbols = new List<ISymbolDefinition>();
 
             // Apply a filter if requested.
@@ -70,7 +70,7 @@ namespace MEEFIntegration
             }
 
             // Put all in Symbol Definition Entries.
-            tickers.ForEach(x => symbols.Add(new SymbolDefinition(x, "MEEF Market Equity")));
+            tickers.ForEach(x => symbols.Add(new SymbolDefinition(x, "MEFF Market Equity")));
 
             return symbols.ToArray();
         }
@@ -226,12 +226,12 @@ namespace MEEFIntegration
             // For now only Scalar requests are handled.
             if (mdq.MarketDataType == typeof(Scalar).ToString())
             {
-                List<MEEFHistoricalQuote> quotes = null;
+                List<MEFFHistoricalQuote> quotes = null;
 
                 try
                 {
                     // Request the data to the Market Data Provider.
-                    quotes = MEEFAPI.GetHistoricalQuotes(mdq.Ticker, mdq.Date, end);
+                    quotes = MEFFAPI.GetHistoricalQuotes(mdq.Ticker, mdq.Date, end);
                 }
                 catch (Exception e)
                 {
@@ -241,7 +241,7 @@ namespace MEEFIntegration
                     dates = null;
                     status.HasErrors = true;
                     status.ErrorMessage += "GetTimeSeries: Market data not available due " +
-                                           "to problems with MEEF service: " + e.Message;
+                                           "to problems with MEFF service: " + e.Message;
                     return status;
                 }
 
@@ -294,7 +294,7 @@ namespace MEEFIntegration
         }
 
         /// <summary>
-        /// Checks if the MEEF service is reachable
+        /// Checks if the MEFF service is reachable
         /// and answers to requests correctly.
         /// </summary>
         /// <remarks>
@@ -303,7 +303,7 @@ namespace MEEFIntegration
         /// </remarks>
         /// <returns>
         /// A <see cref="Status"/> indicating if the
-        /// MEEF service is working.
+        /// MEFF service is working.
         /// </returns>
         public Status TestConnectivity()
         {
@@ -316,7 +316,7 @@ namespace MEEFIntegration
             {
                 // Try simply requesting a single data series known to exist
                 // and to produce 1 result (we use GRF at 31 jan 2011).
-                List<MEEFHistoricalQuote> quotes = MEEFAPI.GetHistoricalQuotes("GRF",
+                List<MEFFHistoricalQuote> quotes = MEFFAPI.GetHistoricalQuotes("GRF",
                                                                                new DateTime(2011, 1, 31),
                                                                                new DateTime(2011, 1, 31));
 
@@ -326,16 +326,16 @@ namespace MEEFIntegration
                     // it means the service is not answering as expected,
                     // so fail the test.
                     state.HasErrors = true;
-                    state.ErrorMessage = "Data from MEEF not available or unreliable.";
+                    state.ErrorMessage = "Data from MEFF not available or unreliable.";
                 }
             }
             catch (Exception e)
             {
                 // If an exception was thrown during data fetching it means
                 // there is a problem with the service (either timeout,
-                // connection failure, or MEEF changed data format).
+                // connection failure, or MEFF changed data format).
                 state.HasErrors = true;
-                state.ErrorMessage = "Unable to connect to MEEF service: " + e.Message;
+                state.ErrorMessage = "Unable to connect to MEFF service: " + e.Message;
             }
 
             return state;
@@ -352,9 +352,9 @@ namespace MEEFIntegration
             marketData = null;
             Fairmat.MarketData.CallPriceMarketData data = new Fairmat.MarketData.CallPriceMarketData();
 
-            List<MEEFHistoricalQuote> options = MEEFAPI.GetOptions(mdq.Ticker, mdq.Date);
+            List<MEFFHistoricalQuote> options = MEFFAPI.GetOptions(mdq.Ticker, mdq.Date);
 
-            foreach (MEEFHistoricalQuote q in options)
+            foreach (MEFFHistoricalQuote q in options)
             {
                 Console.WriteLine(q.ContractCode + " " + q.StrikePrice + " " + q.MaturityDate + " " + q.SettlPrice);
             }
