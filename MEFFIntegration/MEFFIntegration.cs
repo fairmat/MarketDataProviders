@@ -22,6 +22,7 @@ using DVPLI;
 using DVPLI.Interfaces;
 using DVPLI.MarketDataTypes;
 using OptionQuotes;
+using TickersUtils;
 
 namespace MEFFIntegration
 {
@@ -70,7 +71,7 @@ namespace MEFFIntegration
             }
 
             // Put all in Symbol Definition Entries.
-            tickers.ForEach(x => symbols.Add(new SymbolDefinition(x, "MEFF Market Equity")));
+            tickers.ForEach(x => TickerUtility.AddSymbols(symbols, x, "MEFF Market Equity"));
 
             return symbols.ToArray();
         }
@@ -231,7 +232,7 @@ namespace MEFFIntegration
                 try
                 {
                     // Request the data to the Market Data Provider.
-                    quotes = MEFFAPI.GetHistoricalQuotes(mdq.Ticker, mdq.Date, end);
+                    quotes = MEFFAPI.GetHistoricalQuotes(TickerUtility.PreparseSymbol(mdq.Ticker), mdq.Date, end);
                 }
                 catch (Exception e)
                 {

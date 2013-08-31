@@ -23,6 +23,7 @@ using DVPLI.Interfaces;
 using DVPLI.MarketDataTypes;
 using System.IO;
 using OptionQuotes;
+using TickersUtils;
 
 namespace YahooFinanceIntegration
 {
@@ -73,7 +74,7 @@ namespace YahooFinanceIntegration
                 if (filter != null && filter.Length > 0)
                 {
                     List<ISymbolDefinition> symbols = new List<ISymbolDefinition>();
-                    YahooFinanceAPI.GetTickersWithFilter(filter).ForEach(x => symbols.Add(new SymbolDefinition(cleanCurrency((string)x["symbol"]) , "Yahoo! Finance " + (string)x["typeDisp"] + " (" + (string)x["name"] + ")")));
+                    YahooFinanceAPI.GetTickersWithFilter(filter).ForEach(x => TickerUtility.AddSymbols(symbols, cleanCurrency((string)x["symbol"]), "Yahoo! Finance " + (string)x["typeDisp"] + " (" + (string)x["name"] + ")"));
                     return symbols.ToArray();
                 }
             }
@@ -218,7 +219,7 @@ namespace YahooFinanceIntegration
             // US is choosen. This handles conversion from USD values provided by yahoo.
             string targetMarket = null;
 
-            string ticker = mdq.Ticker;
+            string ticker = TickerUtility.PreparseSymbol(mdq.Ticker);
             bool divisionTransformation = false;
             bool inverseTransformation = false;
 

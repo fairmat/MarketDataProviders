@@ -62,6 +62,9 @@
     <Compile Include="..\MEFFIntegration\OptionQuoteType.cs">
       <Link>OptionQuoteType.cs</Link>
     </Compile>
+    <Compile Include="..\MEFFIntegration\TickerUtility.cs">
+      <Link>TickerUtility.cs</Link>
+    </Compile>
     <Compile Include="YahooFinanceAPI.cs" />
     <Compile Include="YahooFinanceIntegration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
