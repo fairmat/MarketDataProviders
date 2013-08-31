@@ -71,7 +71,7 @@ namespace MEFFIntegration
             }
 
             // Put all in Symbol Definition Entries.
-            tickers.ForEach(x => TickerUtility.AddSymbols(symbols, x, "MEFF Market Equity"));
+            tickers.ForEach(x => symbols.Add(new SymbolDefinition(x, "MEFF Market Equity")));
 
             return symbols.ToArray();
         }
