@@ -357,7 +357,7 @@ namespace MEFFIntegration
 
             foreach (MEFFHistoricalQuote q in options)
             {
-                Console.WriteLine(q.ContractCode + " " + q.StrikePrice + " " + q.MaturityDate + " " + q.SettlPrice);
+                Console.WriteLine(q.ContractCode + "\t" + q.StrikePrice + "\t" + q.MaturityDate.ToShortDateString() + "\t" + q.SettlPrice);
             }
 
             var status = OptionQuotesUtility.GetCallPriceMarketData(this, mdq, options.ConvertAll(x => (OptionQuotes.IOptionQuote)x), data);
