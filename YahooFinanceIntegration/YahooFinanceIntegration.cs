@@ -346,7 +346,7 @@ namespace YahooFinanceIntegration
             if (mdq.MarketDataType == typeof(Scalar).ToString())
             {
                 List<YahooHistoricalQuote> quotes = null;
-                List<YahooHistoricalQuote> currencyQuotes = null;
+                Dictionary<DateTime, YahooHistoricalQuote> currencyQuotes = new Dictionary<DateTime,YahooHistoricalQuote>();
 
                 try
                 {
@@ -357,7 +357,10 @@ namespace YahooFinanceIntegration
                     {
                         // If we need currency quotes in order to handle currency conversions
                         // fetch them now.
-                        currencyQuotes = YahooFinanceAPI.GetHistoricalQuotes(targetMarket + "=X", mdq.Date, end);
+                        List<YahooHistoricalQuote> fetchedCurrencyQuotes = YahooFinanceAPI.GetHistoricalQuotes(targetMarket + "=X", mdq.Date, end);
+
+                        // Put all items in a dictionary for easy fetching.
+                        fetchedCurrencyQuotes.ForEach(x => currencyQuotes.Add(x.Date, x));
                     }
                 }
                 catch (Exception e)
@@ -376,15 +379,12 @@ namespace YahooFinanceIntegration
                 if (quotes.Count >= 1)
                 {
                     // Allocate the structures for the output.
-                    marketData = new Scalar[quotes.Count];
-                    dates = new DateTime[quotes.Count];
+                    List<Scalar> readyMarketData = new List<Scalar>();
+                    List<DateTime> readyDates = new List<DateTime>();
 
                     // Scan the list of quotes to prepare the data for Fairmat.
                     for (int i = 0; i < quotes.Count; i++)
                     {
-                        // Fill the dates array from the date field of each quote.
-                        dates[i] = quotes[i].Date;
-
                         // Prepare the single scalar data.
                         Scalar val = new Scalar();
                         val.TimeStamp = quotes[i].Date;
@@ -393,13 +393,23 @@ namespace YahooFinanceIntegration
                         // Handle currency conversions if needed.
                         if (currencyQuotes != null)
                         {
+                            // Check if the entry in a date exists also for the
+                            // currency conversion, if not discard the data.
+                            if (!currencyQuotes.ContainsKey(quotes[i].Date))
+                            {
+                                // We skip this entry.
+                                continue;
+                            }
+
+                            YahooHistoricalQuote currencyQuote = currencyQuotes[quotes[i].Date];
+
                             if (divisionTransformation)
                             {
-                                val.Value /= (closeRequest == true) ? currencyQuotes[i].Close : currencyQuotes[i].Open;
+                                val.Value /= (closeRequest == true) ? currencyQuote.Close : currencyQuote.Open;
                             }
                             else
                             {
-                                val.Value *= (closeRequest == true) ? currencyQuotes[i].Close : currencyQuotes[i].Open;
+                                val.Value *= (closeRequest == true) ? currencyQuote.Close : currencyQuote.Open;
                             }
                         }
 
@@ -411,8 +421,15 @@ namespace YahooFinanceIntegration
                         }
 
                         // Put it in the output structure.
-                        marketData[i] = val;
+                        readyMarketData.Add(val);
+
+                        // Fill the dates array from the date field of each quote.
+                        readyDates.Add(quotes[i].Date);
                     }
+
+                    // Put in the output data.
+                    marketData = readyMarketData.ToArray();
+                    dates = readyDates.ToArray();
 
                     return status;
                 }
