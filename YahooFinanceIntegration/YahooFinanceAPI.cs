@@ -100,7 +100,7 @@ namespace YahooFinanceIntegration
         private static StreamReader MakeRequest(string ticker, DateTime startDate, DateTime endDate)
         {
             // Generate the request to be sent to Yahoo Finance.
-            string request = string.Format("http://ichart.yahoo.com/table.csv?s={0}&a={1}&b={2}&c={3}&d={4}&e={5}&f={6}&ignore=.csv",
+            string request = string.Format("http://ichart.finance.yahoo.com/table.csv?s={0}&a={1}&b={2}&c={3}&d={4}&e={5}&f={6}&ignore=.csv",
                                            ticker, startDate.Month - 1, startDate.Day,
                                            startDate.Year, endDate.Month - 1,
                                            endDate.Day, endDate.Year);

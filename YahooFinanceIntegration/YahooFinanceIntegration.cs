@@ -403,22 +403,22 @@ namespace YahooFinanceIntegration
 
                             YahooHistoricalQuote currencyQuote = currencyQuotes[quotes[i].Date];
 
-                            if (divisionTransformation)
-                            {
-                                val.Value /= (closeRequest == true) ? currencyQuote.Close : currencyQuote.Open;
-                            }
-                            else
-                            {
-                                val.Value *= (closeRequest == true) ? currencyQuote.Close : currencyQuote.Open;
-                            }
+                            //if (divisionTransformation)
+                            //{
+                            //    val.Value /= (closeRequest == true) ? currencyQuote.Close : currencyQuote.Open;
+                            //}
+                            //else
+                            //{
+                            //    val.Value *= (closeRequest == true) ? currencyQuote.Close : currencyQuote.Open;
+                            //}
                         }
 
                         // Apply an inverse transformation, used for currency values when going
                         // from a not USD currency to USD.
-                        if (inverseTransformation)
-                        {
-                            val.Value = 1 / val.Value;
-                        }
+                        //if (inverseTransformation)
+                        //{
+                        //    val.Value = 1 / val.Value;
+                        //}
 
                         // Put it in the output structure.
                         readyMarketData.Add(val);
