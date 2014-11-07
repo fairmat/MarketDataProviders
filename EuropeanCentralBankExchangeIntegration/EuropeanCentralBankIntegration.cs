@@ -31,7 +31,7 @@ namespace EuropeanCentralBankIntegration
     /// This Data Market Provider supports only Scalar requests.
     /// </remarks>
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
-    public class EuropeanCentralBankIntegration : IMarketDataProvider, IDescription, ITickersInfo, IMarketDataProviderInfo
+    public class EuropeanCentralBankIntegration : IMarketDataProvider, IDescription, ITickersInfo, IMarketDataProviderInfo, IMarketDataIdentifierInfoProvider
     {
         static string[] currencyPostfixs = { " Curncy", " Index" };//enumerate the two possible postfixs
 
@@ -439,5 +439,56 @@ namespace EuropeanCentralBankIntegration
         }
 
         #endregion IMarketDataProviderInfo Implementation
+
+        #region IMarketDataIdentifierInfoProvider Members
+
+        public IList<MarketDataIdentifierInfo> GetMarketDataIdentifierInfo()
+        {
+            IList<MarketDataIdentifierInfo> list = new List<MarketDataIdentifierInfo>();
+
+            string[] foreignCurrencies = new string[] { "CAD", "CHF", "GBP", "HKD", "JPY", "USD", "SEK", "DKK", "NOK", "KRW", "RUB", "TRY", "BRL", "ZAR" };
+
+            // ECB format
+            foreach (string currency in foreignCurrencies)
+            {
+                MarketDataIdentifierInfo info = new MarketDataIdentifierInfo();
+                info.Category = DVPLI.Enums.IdentifierCategory.EquityAndIndex;
+                info.Code = string.Format("EUCF{0} Index", currency);
+                info.Currency = currency;
+                info.Description = string.Format("EUR to {0} Exchange Rate", currency);
+                info.Identifier = info.Code;
+                info.Name = info.Code;
+                info.Visibility = false;
+                list.Add(info);
+            }
+
+            // Bloomberg format
+            foreach (string currency in foreignCurrencies)
+            {
+                MarketDataIdentifierInfo info = new MarketDataIdentifierInfo();
+                info.Category = DVPLI.Enums.IdentifierCategory.EquityAndIndex;
+                info.Code = string.Format("EUR{0} Curncy", currency);
+                info.Currency = currency;
+                info.Description = string.Format("EUR to {0} Exchange Rate", currency);
+                info.Identifier = info.Code;
+                info.Name = info.Code;
+                info.Visibility = false;
+                list.Add(info);
+
+                info = new MarketDataIdentifierInfo();
+                info.Category = DVPLI.Enums.IdentifierCategory.EquityAndIndex;
+                info.Code = string.Format("{0}EUR Curncy", currency);
+                info.Currency = "EUR";
+                info.Description = string.Format("{0} to EUR Exchange Rate", currency);
+                info.Identifier = info.Code;
+                info.Name = info.Code;
+                info.Visibility = false;
+                list.Add(info);
+            }
+
+            return list;
+        }
+
+        #endregion
     }
 }
