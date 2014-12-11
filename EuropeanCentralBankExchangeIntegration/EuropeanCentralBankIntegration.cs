@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using DVPLI;
 using DVPLI.Interfaces;
 using DVPLI.MarketDataTypes;
+using Fairmat.MarketData;
 
 namespace EuropeanCentralBankIntegration
 {
@@ -469,7 +470,7 @@ namespace EuropeanCentralBankIntegration
                 info.Category = DVPLI.Enums.IdentifierCategory.EquityAndIndex;
                 info.Code = string.Format("EUR{0} Curncy", currency);
                 info.Currency = currency;
-                info.Description = string.Format("EUR to {0} Exchange Rate", currency);
+                info.Description = string.Format("{1}-{0} Exchange Rate", CurrencyTickerBuilder.GetDescription("EUR"), CurrencyTickerBuilder.GetDescription(currency));
                 info.Identifier = info.Code;
                 info.Name = info.Code;
                 info.Visibility = false;
@@ -479,7 +480,7 @@ namespace EuropeanCentralBankIntegration
                 info.Category = DVPLI.Enums.IdentifierCategory.EquityAndIndex;
                 info.Code = string.Format("{0}EUR Curncy", currency);
                 info.Currency = "EUR";
-                info.Description = string.Format("{0} to EUR Exchange Rate", currency);
+                info.Description = string.Format("{0}-{1} Exchange Rate", CurrencyTickerBuilder.GetDescription(currency), CurrencyTickerBuilder.GetDescription("EUR"));
                 info.Identifier = info.Code;
                 info.Name = info.Code;
                 info.Visibility = false;
