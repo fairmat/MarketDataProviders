@@ -360,7 +360,7 @@ namespace MEFFIntegration
                 Console.WriteLine(q.ContractCode + "\t" + q.StrikePrice + "\t" + q.MaturityDate.ToShortDateString() + "\t" + q.SettlPrice);
             }
 
-            var status = OptionQuotesUtility.GetCallPriceMarketData(this, mdq, options.ConvertAll(x => (OptionQuotes.IOptionQuote)x), data);
+            var status = OptionQuotesUtility.GetCallPriceMarketData(this, mdq, options.ConvertAll(x => (IOptionQuote)x), data);
             if (status.HasErrors)
             {
                 return status;

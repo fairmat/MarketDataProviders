@@ -19,6 +19,8 @@ using System;
 using System.Globalization;
 using System.IO;
 using OptionQuotes;
+using DVPLI.Interfaces;
+using DVPLI.Enums;
 
 namespace MEFFIntegration
 {
@@ -169,6 +171,34 @@ namespace MEFFIntegration
         public int OpenInterest { get; private set; }
 
         #endregion Properties
+
+        #region IOptionQuote implementation
+
+        public OptionQuoteStyle Style
+        {
+            get
+            {
+                return OptionQuoteStyle.European;
+            }
+        }
+
+        public double Volatility
+        {
+            get
+            {
+                return this.SettlVolatility;
+            }
+        }
+
+        public double Volume
+        {
+            get
+            {
+                return this.TotalRegVolume;
+            }
+        }
+
+        #endregion IOptionQuote implementation
 
         /// <summary>
         /// Populates the data starting from a provided line from a MEFF Historical csv

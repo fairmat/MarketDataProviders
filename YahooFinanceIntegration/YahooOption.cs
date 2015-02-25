@@ -21,6 +21,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OptionQuotes;
+using DVPLI.Interfaces;
+using DVPLI.Enums;
 
 namespace YahooFinanceIntegration
 {
@@ -144,6 +146,30 @@ namespace YahooFinanceIntegration
                 }
 
                 throw new NotImplementedException();
+            }
+        }
+
+        public OptionQuoteStyle Style
+        {
+            get
+            {
+                return OptionQuoteStyle.European;
+            }
+        }
+
+        public double Volatility
+        {
+            get
+            {
+                return Double.NaN;
+            }
+        }
+
+        public double Volume
+        {
+            get
+            {
+                return this.Vol;
             }
         }
 

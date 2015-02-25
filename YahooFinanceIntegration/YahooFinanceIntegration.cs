@@ -579,7 +579,7 @@ namespace YahooFinanceIntegration
             }
 
             // Populate the CallPriceMarketData data structure
-            var status = OptionQuotesUtility.GetCallPriceMarketData(this, mdq, options.ConvertAll(x => (OptionQuotes.IOptionQuote)x), data);
+            var status = OptionQuotesUtility.GetCallPriceMarketData(this, mdq, options.ConvertAll(x => (IOptionQuote)x), data);
             if (status.HasErrors)
             {
                 return status;

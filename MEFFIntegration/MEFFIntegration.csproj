@@ -54,11 +54,8 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="OptionQuoteType.cs" />
-    <Compile Include="IOptionQuote.cs" />
     <Compile Include="MEFFAPI.cs" />
     <Compile Include="MEFFIntegration.cs" />
-    <Compile Include="OptionQuotesUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MEFFHistoricalQuote.cs" />
     <Compile Include="TickerUtility.cs" />

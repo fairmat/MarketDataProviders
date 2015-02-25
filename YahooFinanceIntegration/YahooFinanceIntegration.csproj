@@ -53,15 +53,6 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\MEFFIntegration\IOptionQuote.cs">
-      <Link>IOptionQuote.cs</Link>
-    </Compile>
-    <Compile Include="..\MEFFIntegration\OptionQuotesUtility.cs">
-      <Link>OptionQuotesUtility.cs</Link>
-    </Compile>
-    <Compile Include="..\MEFFIntegration\OptionQuoteType.cs">
-      <Link>OptionQuoteType.cs</Link>
-    </Compile>
     <Compile Include="..\MEFFIntegration\TickerUtility.cs">
       <Link>TickerUtility.cs</Link>
     </Compile>
