@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 using Mono.Addins;
 
 // The following lines tell that the assembly is an addin.
-[assembly: Addin("MEFF Integration", "1.0.1", Category = "Market Data Provider")]
+[assembly: Addin("MEFF Integration", "1.0.2", Category = "Market Data Provider")]
 [assembly: AddinDependency("Fairmat", "1.0")]
 [assembly: AddinAuthor("Fairmat SRL")]
 [assembly: AddinDescription("Provides access to MEFF Market Data.")]
@@ -34,7 +34,7 @@ using Mono.Addins;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Fairmat SRL")]
 [assembly: AssemblyProduct("MEFF Integration")]
-[assembly: AssemblyCopyright("Copyright © Fairmat SRL 2013")]
+[assembly: AssemblyCopyright("Copyright © Fairmat SRL 2013-2015")]
 [assembly: AssemblyTrademark("Fairmat")]
 [assembly: AssemblyCulture("")]
 
@@ -56,6 +56,6 @@ using Mono.Addins;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.1")]
-[assembly: AssemblyFileVersion("1.0.1")]
+[assembly: AssemblyVersion("1.0.2")]
+[assembly: AssemblyFileVersion("1.0.2")]
 [assembly: InternalsVisibleTo("MarketDataProviders.Tests")]
