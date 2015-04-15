@@ -34,7 +34,7 @@ namespace EuropeanCentralBankIntegration
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
     public class EuropeanCentralBankIntegration : IMarketDataProvider, IDescription, ITickersInfo, IMarketDataProviderInfo, IMarketDataIdentifierInfoProvider
     {
-        static string[] currencyPostfixs = { " Curncy", " Index" };//enumerate the two possible postfixs
+        static string[] currencyPostfixs = { " Curncy", " Index", " ECB Curncy" };//enumerate the two possible postfixs
 
         #region IDescription Implementation
 
@@ -454,9 +454,9 @@ namespace EuropeanCentralBankIntegration
             {
                 MarketDataIdentifierInfo info = new MarketDataIdentifierInfo();
                 info.Category = DVPLI.Enums.IdentifierCategory.EquityAndIndex;
-                info.Code = string.Format("EUCF{0} Index", currency);
+                info.Code = string.Format("EUR{0} ECB Curncy", currency);
                 info.Currency = currency;
-                info.Description = string.Format("EUR to {0} Exchange Rate", currency);
+                info.Description = string.Format("{0}-{1} Exchange Rate", CurrencyTickerBuilder.GetDescription("EUR"), CurrencyTickerBuilder.GetDescription(currency));
                 info.Identifier = info.Code;
                 info.Name = info.Code;
                 info.Visibility = false;
@@ -470,7 +470,7 @@ namespace EuropeanCentralBankIntegration
                 info.Category = DVPLI.Enums.IdentifierCategory.EquityAndIndex;
                 info.Code = string.Format("EUR{0} Curncy", currency);
                 info.Currency = currency;
-                info.Description = string.Format("{1}-{0} Exchange Rate", CurrencyTickerBuilder.GetDescription("EUR"), CurrencyTickerBuilder.GetDescription(currency));
+                info.Description = string.Format("{0}-{1} Exchange Rate", CurrencyTickerBuilder.GetDescription("EUR"), CurrencyTickerBuilder.GetDescription(currency));
                 info.Identifier = info.Code;
                 info.Name = info.Code;
                 info.Visibility = false;
