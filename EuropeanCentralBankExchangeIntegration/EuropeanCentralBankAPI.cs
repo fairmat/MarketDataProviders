@@ -116,8 +116,9 @@ namespace EuropeanCentralBankIntegration
         private static XmlReader MakeRequest(string ticker, DateTime startDate, DateTime endDate)
         {
             // Generate the request to be sent to the European Central Bank site.
-            string request = string.Format("http://www.ecb.int/stats/exchange/eurofxref/html/{0}.xml",
+            string request = string.Format("https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/{0}.xml",
                                             ticker.ToLower());
+
             return MakeRequest(request);
         }
 
