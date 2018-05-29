@@ -375,8 +375,7 @@ namespace EuropeanCentralBankIntegration
                                                  "SGD",
                                                  "THB",
                                                  "ZAR",
-                                                 "MXN",
-                                                 "CNH", };
+                                                 "MXN", };
 
             List<ISymbolDefinition> tickers = new List<ISymbolDefinition>();
             string[] eurBasis = { "EUR", "EUCF" };//enumerate the two version of the exchange rate name 
@@ -449,7 +448,7 @@ namespace EuropeanCentralBankIntegration
         {
             IList<MarketDataIdentifierInfo> list = new List<MarketDataIdentifierInfo>();
 
-            string[] foreignCurrencies = new string[] { "CAD", "CHF", "GBP", "HKD", "JPY", "USD", "SEK", "DKK", "NOK", "KRW", "RUB", "TRY", "BRL", "ZAR", "AUD", "PLN", "MXN", "NZD", "CZK", "HUF", "CNY", "INR", "RON", "CNH" };
+            string[] foreignCurrencies = new string[] { "CAD", "CHF", "GBP", "HKD", "JPY", "USD", "SEK", "DKK", "NOK", "KRW", "RUB", "TRY", "BRL", "ZAR", "AUD", "PLN", "MXN", "NZD", "CZK", "HUF", "CNY", "INR", "RON" };
 
             // ECB format
             foreach (string currency in foreignCurrencies)
