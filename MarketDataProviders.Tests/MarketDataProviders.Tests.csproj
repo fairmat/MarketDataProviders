@@ -45,8 +45,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\DVPLReferences\Mono.Addins.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\..\DVPLReferences\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.5.0\lib\net40\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -64,7 +64,9 @@
     <Compile Include="EuropeanCentralBankIntegration\TestEuropeanCentralBankAPI.cs" />
     <Compile Include="EuropeanCentralBankIntegration\TestEuropeanCentralBankQuote.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EuropeanCentralBankExchangeIntegration\EuropeanCentralBankIntegration.csproj">
       <Project>{5c33ef9a-97ac-4a6e-93b2-212046a7e0ea}</Project>
