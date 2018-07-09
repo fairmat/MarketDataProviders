@@ -27,6 +27,7 @@ namespace MarketDataProviders.Tests.MEFFIntegration
     /// by <see cref="MEFFAPI"/>.
     /// </summary>
     [TestFixture]
+    [Ignore("MEEF doesn't have these things anymore")]
     public class TestMEFFAPI
     {
         /// <summary>

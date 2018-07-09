@@ -26,6 +26,7 @@ namespace MarketDataProviders.Tests.MEFFIntegration
     /// Primarily it's construction and parsing are tested.
     /// </summary>
     [TestFixture]
+    [Ignore("MEEF doesn't have these things anymore")]
     public class TestMEFFHistoricalQuote
     {
         /// <summary>
