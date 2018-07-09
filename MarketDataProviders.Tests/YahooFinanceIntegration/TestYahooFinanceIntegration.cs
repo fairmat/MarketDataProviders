@@ -28,6 +28,7 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
     /// <see cref="YahooFinanceIntegration"/>.
     /// </summary>
     [TestFixture]
+    [Ignore("Yahoo! doesn't have these things anymore")]
     public class TestYahooFinanceIntegration
     {
         /// <summary>

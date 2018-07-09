@@ -27,6 +27,7 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
     /// by <see cref="YahooFinanceAPI"/>.
     /// </summary>
     [TestFixture]
+    [Ignore("Yahoo doesn't have these things anymore")]
     public class TestYahooFinanceAPI
     {
         /// <summary>

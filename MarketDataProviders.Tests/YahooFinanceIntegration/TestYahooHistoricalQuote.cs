@@ -26,6 +26,7 @@ namespace MarketDataProviders.Tests.YahooFinanceIntegration
     /// Primarily it's construction and parsing are tested.
     /// </summary>
     [TestFixture]
+    [Ignore("Yahoo! doesn't have these things anymore")]
     public class TestYahooHistoricalQuote
     {
         /// <summary>
