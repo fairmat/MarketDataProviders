@@ -450,7 +450,7 @@ namespace EuropeanCentralBankIntegration
         {
             IList<MarketDataIdentifierInfo> list = new List<MarketDataIdentifierInfo>();
 
-            string[] foreignCurrencies = new string[] { "CAD", "CHF", "GBP", "HKD", "JPY", "USD", "SEK", "DKK", "NOK", "KRW", "RUB", "TRY", "BRL", "ZAR", "AUD", "PLN", "MXN", "NZD", "CZK", "HUF", "CNY", "INR", "RON" };
+            string[] foreignCurrencies = new string[] { "CAD", "CHF", "GBP", "HKD", "JPY", "USD", "SEK", "DKK", "NOK", "KRW", "RUB", "TRY", "BRL", "ZAR", "AUD", "PLN", "MXN", "NZD", "CZK", "HUF", "CNY", "INR", "RON", "SGD", "THB" };
 
             // ECB format
             foreach (string currency in foreignCurrencies)
