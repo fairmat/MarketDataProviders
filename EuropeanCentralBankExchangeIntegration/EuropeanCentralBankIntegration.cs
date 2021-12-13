@@ -375,7 +375,9 @@ namespace EuropeanCentralBankIntegration
                                                  "SGD",
                                                  "THB",
                                                  "ZAR",
-                                                 "MXN", };
+                                                 "MXN",
+                                                 "THB"
+            };
 
             List<ISymbolDefinition> tickers = new List<ISymbolDefinition>();
             string[] eurBasis = { "EUR", "EUCF" };//enumerate the two version of the exchange rate name 
