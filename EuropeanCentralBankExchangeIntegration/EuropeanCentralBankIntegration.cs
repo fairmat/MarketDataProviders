@@ -34,7 +34,41 @@ namespace EuropeanCentralBankIntegration
     [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
     public class EuropeanCentralBankIntegration : IMarketDataProvider, IDescription, ITickersInfo, IMarketDataProviderInfo, IMarketDataIdentifierInfoProvider
     {
-        static string[] currencyPostfixs = { " Curncy", " Index", " ECB Curncy" };//enumerate the two possible postfixs
+        static readonly string[] currencyPostfixs = { " Curncy", " Index", " ECB Curncy" };//enumerate the two possible postfixs
+        static readonly string[] supportedCurrencies = { "AUD",
+                                                "BGN",
+                                                "BRL",
+                                                "CAD",
+                                                "CHF",
+                                                "CNY",
+                                                "CZK",
+                                                "DKK",
+                                                "GBP",
+                                                "HKD",
+                                                "HRK",
+                                                "HUF",
+                                                "IDR",
+                                                "ILS",
+                                                "INR",
+                                                "JPY",
+                                                "KRW",
+                                                "LTL",
+                                                "LVL",
+                                                "MXN",
+                                                "MYR",
+                                                "NOK",
+                                                "NZD",
+                                                "PHP",
+                                                "PLN",
+                                                "RON",
+                                                "RUB",
+                                                "SEK",
+                                                "SGD",
+                                                "THB",
+                                                "TRY",
+                                                "USD",
+                                                "ZAR",
+            };
 
         #region IDescription Implementation
 
@@ -326,10 +360,10 @@ namespace EuropeanCentralBankIntegration
         /// <returns>The shortened ticker (i.e. 'EURCHF').</returns>
         string RemoveTrailers(string ticker)
         {
-           string t=ticker;
-           foreach (string trailer in currencyPostfixs)
-               t = t.Replace(trailer, "");
-           return t;
+            string t = ticker;
+            foreach (string trailer in currencyPostfixs)
+                t = t.Replace(trailer, "");
+            return t;
         }
 
         #endregion IMarketDataProvider Implementation
@@ -342,49 +376,12 @@ namespace EuropeanCentralBankIntegration
         /// <returns>The list of supported tickers, if requested filtered.</returns>
         public ISymbolDefinition[] SupportedTickers(string filter = null)
         {
-            string[] currencies = new string[] { "USD",
-                                                 "JPY",
-                                                 "BGN",
-                                                 "CZK",
-                                                 "DKK",
-                                                 "GBP",
-                                                 "HUF",
-                                                 "LTL",
-                                                 "LVL",
-                                                 "PLN",
-                                                 "RON",
-                                                 "SEK",
-                                                 "CHF",
-                                                 "NOK",
-                                                 "HRK",
-                                                 "RUB",
-                                                 "TRY",
-                                                 "AUD",
-                                                 "BRL",
-                                                 "CAD",
-                                                 "CNY",
-                                                 "HKD",
-                                                 "IDR",
-                                                 "ILS",
-                                                 "INR",
-                                                 "KRW",
-                                                 "MXN",
-                                                 "MYR",
-                                                 "NZD",
-                                                 "PHP",
-                                                 "SGD",
-                                                 "THB",
-                                                 "ZAR",
-                                                 "MXN",
-                                                 "THB"
-            };
-
             List<ISymbolDefinition> tickers = new List<ISymbolDefinition>();
             string[] eurBasis = { "EUR", "EUCF" };//enumerate the two version of the exchange rate name 
             bool[] allowInverse = { true, false };
             for (int b = 0; b < eurBasis.Length; b++)
             {
-                foreach (string currency in currencies)
+                foreach (string currency in supportedCurrencies)
                 {
                     string basis = eurBasis[b];
                     string postFix = currencyPostfixs[b];
@@ -450,10 +447,8 @@ namespace EuropeanCentralBankIntegration
         {
             IList<MarketDataIdentifierInfo> list = new List<MarketDataIdentifierInfo>();
 
-            string[] foreignCurrencies = new string[] { "CAD", "CHF", "GBP", "HKD", "JPY", "USD", "SEK", "DKK", "NOK", "KRW", "RUB", "TRY", "BRL", "ZAR", "AUD", "PLN", "MXN", "NZD", "CZK", "HUF", "CNY", "INR", "RON", "SGD", "THB" };
-
             // ECB format
-            foreach (string currency in foreignCurrencies)
+            foreach (string currency in supportedCurrencies)
             {
                 MarketDataIdentifierInfo info = new MarketDataIdentifierInfo();
                 info.Category = DVPLI.Enums.IdentifierCategory.EquityAndIndex;
@@ -467,7 +462,7 @@ namespace EuropeanCentralBankIntegration
             }
 
             // Bloomberg format
-            foreach (string currency in foreignCurrencies)
+            foreach (string currency in supportedCurrencies)
             {
                 MarketDataIdentifierInfo info = new MarketDataIdentifierInfo();
                 info.Category = DVPLI.Enums.IdentifierCategory.EquityAndIndex;
