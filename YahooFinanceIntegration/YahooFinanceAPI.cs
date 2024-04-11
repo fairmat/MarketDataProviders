@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Web.Script.Serialization;
+using System.Text.Json;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -167,7 +167,6 @@ namespace YahooFinanceIntegration
         /// <returns>A list with all the tickers passing the filter.</returns>
         public static List<Dictionary<string, object>> GetTickersWithFilter(string filter)
         {
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
             List<Dictionary<string, object>> tickers = new List<Dictionary<string, object>>();
 
             // Prepares the request url to be used to search for the autocompletion choices.
@@ -202,7 +201,7 @@ namespace YahooFinanceIntegration
                             jsontxt = jsontxt.Substring(jsontxt.IndexOf("(") + 1, jsontxt.LastIndexOf(")") - jsontxt.IndexOf("(") - 1);
 
                             // Deserialize the JSON string and get the result list.
-                            ArrayList resultList = serializer.Deserialize<Dictionary<string, dynamic>>(jsontxt)["ResultSet"]["Result"];
+                            ArrayList resultList = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(jsontxt)["ResultSet"]["Result"];
 
                             // For each entry interpret the symbol entry and check if it is
                             // ok for our filter (Yahoo! returns also matches from other fields

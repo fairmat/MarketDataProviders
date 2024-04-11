@@ -1,7 +1,7 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YahooFinanceIntegration", "YahooFinanceIntegration\YahooFinanceIntegration.csproj", "{E0244626-5862-4246-B326-8D75F97FA2C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YahooFinanceIntegration", "YahooFinanceIntegration\YahooFinanceIntegration.csproj", "{E0244626-5862-4246-B326-8D75F97FA2C0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarketDataProviders.Tests", "MarketDataProviders.Tests\MarketDataProviders.Tests.csproj", "{1A698143-E225-4507-A71D-9A65E96B2FC4}"
 EndProject
