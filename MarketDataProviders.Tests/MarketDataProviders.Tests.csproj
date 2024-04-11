@@ -19,19 +19,11 @@
     <ProjectReference Include="..\YahooFinanceIntegration\YahooFinanceIntegration.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Mono.Addins">
-      <Version>1.4.1</Version>
-    </PackageReference>
     <PackageReference Include="NUnit">
       <Version>3.13.3</Version>
     </PackageReference>
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
-    <PackageReference Include="System.Buffers" Version="4.5.1" />
-    <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
-    <PackageReference Include="System.Memory" Version="4.5.5" />
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="CoreExtensions">
