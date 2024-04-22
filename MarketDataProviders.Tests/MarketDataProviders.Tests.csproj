@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworks>net8;net48</TargetFrameworks>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyTitle>MarketDataProviders.Tests</AssemblyTitle>
@@ -18,10 +18,11 @@
     <ProjectReference Include="..\MEFFIntegration\MEFFIntegration.csproj" />
     <ProjectReference Include="..\YahooFinanceIntegration\YahooFinanceIntegration.csproj" />
   </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='net8'">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+  </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NUnit">
-      <Version>3.13.3</Version>
-    </PackageReference>
+    <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
   </ItemGroup>
