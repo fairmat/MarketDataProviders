@@ -17,7 +17,6 @@
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using Mono.Addins;
 
 // The following lines tell that the assembly is an addin.
@@ -26,14 +25,8 @@ using Mono.Addins;
 [assembly: AddinAuthor("Fairmat SRL")]
 [assembly: AddinDescription("Provides access to Yahoo! Finance Market Data.")]
 [assembly: AddinDescription("Provides access to Yahoo! Finance Market Data.")]
+
 [assembly: AssemblyTrademark("Fairmat")]
 [assembly: AssemblyCulture("")]
 
-// Setting ComVisible to false makes the types in this assembly not visible
-// to COM components.  If you need to access a type in this assembly from
-// COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
-
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("8178efb4-cd71-47a5-8f32-d6b3fca75b18")]
 [assembly: InternalsVisibleTo("MarketDataProviders.Tests")]
