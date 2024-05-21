@@ -61,7 +61,6 @@ namespace EuropeanCentralBankIntegration
                                                 "PHP",
                                                 "PLN",
                                                 "RON",
-                                                "RUB",
                                                 "SEK",
                                                 "SGD",
                                                 "THB",
