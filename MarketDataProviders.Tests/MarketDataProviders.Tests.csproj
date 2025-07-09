@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8;net48</TargetFrameworks>
+    <TargetFrameworks>net8</TargetFrameworks>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyTitle>MarketDataProviders.Tests</AssemblyTitle>
@@ -14,26 +14,18 @@
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CoreExtensions">
-      <HintPath>..\..\DVPLReferences\CoreExtensions.dll</HintPath>
-    </Reference>
-    <Reference Include="DVPLI">
-      <HintPath>..\..\DVPLReferences\DVPLI.dll</HintPath>
-    </Reference>
-    <Reference Include="DVPLInterfaces">
-      <HintPath>..\..\DVPLReferences\DVPLInterfaces.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\EuropeanCentralBankExchangeIntegration\EuropeanCentralBankIntegration.csproj" />
     <ProjectReference Include="..\MEFFIntegration\MEFFIntegration.csproj" />
     <ProjectReference Include="..\YahooFinanceIntegration\YahooFinanceIntegration.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
-    <PackageReference Include="NUnit" Version="3.14.0"/>
-    <PackageReference Include="NUnit.Analyzers" Version="3.9.0"/>
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0"/>
-    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+    <PackageReference Include="Fairmat.Dvpl.CoreExtensions" />
+    <PackageReference Include="Fairmat.Dvpl.DVPLI" />
+    <PackageReference Include="Fairmat.Dvpl.DVPLInterfaces" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit.Analyzers" />
+    <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="System.Reflection.Emit" />
   </ItemGroup>
 </Project>

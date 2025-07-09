@@ -1,0 +1,33 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <IncludeLatestPreRelease>true</IncludeLatestPreRelease>
+    <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
+    <FairmatDepsVersion>*-build*</FairmatDepsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <FairmatDepsVersion>*</FairmatDepsVersion>
+  </PropertyGroup>
+
+  <ItemGroup Label="FairmatDeps">
+    <PackageVersion Include="Fairmat.Dvpl.CoreExtensions" Version="$(FairmatDepsVersion)" />
+    <PackageVersion Include="Fairmat.Dvpl.DVPLI" Version="$(FairmatDepsVersion)" />
+    <PackageVersion Include="Fairmat.Dvpl.DVPLInterfaces" Version="$(FairmatDepsVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
+    <PackageVersion Include="Mono.Addins" Version="1.4.1" />
+    <PackageVersion Include="NUnit" Version="3.14.0"/>
+    <PackageVersion Include="NUnit.Analyzers" Version="3.9.0"/>
+    <PackageVersion Include="NUnit3TestAdapter" Version="4.5.0"/>
+    <PackageVersion Include="SharpZipLib" Version="1.4.2" />
+    <PackageVersion Include="System.Collections.Immutable" Version="8.0.0" />
+    <PackageVersion Include="System.Memory" Version="4.5.5" />
+    <PackageVersion Include="System.Numerics.Vectors" Version="4.5.0" />
+    <PackageVersion Include="System.Reflection.Emit" Version="4.7.0" />
+    <PackageVersion Include="System.Text.Json" Version="8.0.3" />
+  </ItemGroup>
+
+</Project>
