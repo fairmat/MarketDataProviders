@@ -15,8 +15,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\EuropeanCentralBankExchangeIntegration\EuropeanCentralBankIntegration.csproj" />
-    <ProjectReference Include="..\MEFFIntegration\MEFFIntegration.csproj" />
-    <ProjectReference Include="..\YahooFinanceIntegration\YahooFinanceIntegration.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Fairmat.Dvpl.CoreExtensions" />
