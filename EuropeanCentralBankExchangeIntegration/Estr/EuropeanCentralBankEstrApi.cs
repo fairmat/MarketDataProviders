@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using DVPLI.MarketDataTypes;
+using EuropeanCentralBankIntegration.Estr.Dto;
 
 namespace EuropeanCentralBankIntegration.Estr
 {
@@ -33,6 +34,7 @@ namespace EuropeanCentralBankIntegration.Estr
     {
         private const string BaseUrl = "https://data-api.ecb.europa.eu/service/data/EST/";
         private const string RequestQuery = "?format=csvdata&detail=dataonly";
+        private readonly EstrParser _estrParser = new EstrParser();
 
         private static readonly HttpClient SharedHttpClient = new HttpClient()
         {
@@ -93,7 +95,7 @@ namespace EuropeanCentralBankIntegration.Estr
 
                 string csvContent = response.Content.ReadAsStringAsync().Result;
                 byte[] responseFileBytes = Encoding.UTF8.GetBytes(csvContent);
-                IEnumerable<string> result = EstrParser.ReadCSvContent(responseFileBytes);
+                IEnumerable<string> result = EstrParser.ReadCsvContent(responseFileBytes);
                 return result;
             }
             catch (Exception e)

@@ -16,23 +16,56 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using EuropeanCentralBankIntegration.Estr.Dto;
+using EuropeanCentralBankIntegration.Estr.exceptions;
 
 namespace EuropeanCentralBankIntegration.Estr
 {
-    public abstract class EstrParser
+    public class EstrParser
     {
         /// <summary>
         /// Serialize an ESTR CSV from the REST API response into its intermediate DTO representation
         /// </summary>
-        /// <param name="csv"></param>
+        /// <param name="csvLines"></param>
         /// <returns>Enumerable containing intermediate representation for the returned CSV</returns>
-        /// <exception cref="NotImplementedException"></exception>
-        private IEnumerable<EstrQuoteDto> ParseEstrCsv(string[] csv)
+        public IEnumerable<EstrQuoteDto> ParseEstrCsv(IEnumerable<string> csvLines)
         {
-            throw new NotImplementedException();
+            NumberFormatInfo numberFormatInfo = new NumberFormatInfo()
+            {
+                NumberDecimalSeparator = ".",
+            };
+            bool isFirstLine = true;
+            
+            foreach (string line in csvLines)
+            {
+                if (isFirstLine)
+                {
+                    isFirstLine = false;
+                    continue;
+                }
+                
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+                
+                string[] parts = line.Split(',');
+                
+                EstrQuoteDto quote = new EstrQuoteDto
+                {
+                    Key = parts[0].Trim(),
+                    Freq = string.IsNullOrEmpty(parts[1])
+                        ? throw new CsvParsingException("Value for FREQ column was missing")
+                        : parts[1].Trim()[0],
+                    BenchmarkItem = parts[2].Trim(),
+                    DataTypeTest = parts[3].Trim(),
+                    TimePeriod = DateTime.Parse(parts[4].Trim()),
+                    ObsValue = decimal.Parse(parts[5].Trim(), numberFormatInfo)
+                };
+                
+                yield return quote;
+            }
         }
         
         /// <summary>
@@ -41,7 +74,7 @@ namespace EuropeanCentralBankIntegration.Estr
         /// </summary>
         /// <param name="fileContent">Byte array containing the raw CSV file content from the API GET request</param>
         /// <returns>Enumerable containing the line-by-line representation of the CSV</returns>
-        public static IEnumerable<string> ReadCSvContent(byte[] fileContent)
+        public static IEnumerable<string> ReadCsvContent(byte[] fileContent)
         {
             List<string> lines = new List<string>();
 
