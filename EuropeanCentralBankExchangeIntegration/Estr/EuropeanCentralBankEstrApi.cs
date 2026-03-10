@@ -16,11 +16,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using System.Text;
 using DVPLI.MarketDataTypes;
-using EuropeanCentralBankIntegration.Estr.Dto;
 
 namespace EuropeanCentralBankIntegration.Estr
 {
@@ -64,11 +62,6 @@ namespace EuropeanCentralBankIntegration.Estr
             return $"{BaseUrl}{dataPortal.Value}{RequestQuery}";
         }
 
-        private IEnumerable<EstrQuoteDto> ParseEstrCsv(string[] csv)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// WIP - this will probably get removed
         /// Get the CSV representation as a string enumerable for the "Euro short-term rate, Daily - businessweek"
@@ -100,7 +93,7 @@ namespace EuropeanCentralBankIntegration.Estr
 
                 string csvContent = response.Content.ReadAsStringAsync().Result;
                 byte[] responseFileBytes = Encoding.UTF8.GetBytes(csvContent);
-                IEnumerable<string> result = ReadCSvContent(responseFileBytes);
+                IEnumerable<string> result = EstrParser.ReadCSvContent(responseFileBytes);
                 return result;
             }
             catch (Exception e)
@@ -108,30 +101,6 @@ namespace EuropeanCentralBankIntegration.Estr
                 Console.WriteLine("Error calling ESTR API: " + e.Message);
                 throw;
             }
-        }
-
-        /// <summary>
-        /// Reads the raw CSV from the REST API and separates it line by line, so that individual
-        /// lines can be parsed later in the execution
-        /// </summary>
-        /// <param name="fileContent">Byte array containing the raw CSV file content from the API GET request</param>
-        /// <returns>Enumerable containing the line-by-line representation of the CSV</returns>
-        private static IEnumerable<string> ReadCSvContent(byte[] fileContent)
-        {
-            List<string> lines = new List<string>();
-
-            using (StreamReader reader = new StreamReader(new MemoryStream(fileContent), Encoding.UTF8))
-            {
-                string line;
-                do
-                {
-                    line = reader.ReadLine();
-                    if (!string.IsNullOrEmpty(line))
-                        lines.AddRange(line.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
-                } while (!string.IsNullOrEmpty(line));
-            }
-
-            return lines;
         }
     }
 }
