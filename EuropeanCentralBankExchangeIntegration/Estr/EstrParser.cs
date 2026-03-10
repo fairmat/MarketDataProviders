@@ -27,9 +27,13 @@ namespace EuropeanCentralBankIntegration.Estr
     public class EstrParser
     {
         /// <summary>
-        /// Serialize an ESTR CSV from the REST API response into its intermediate DTO representation
+        /// Serialize an ESTR CSV from the REST API response into its intermediate DTO representation.
+        /// <para>
+        /// Note: an iterator was used to minimize memory footprint in case of very large CSVs.
+        /// Behave accordingly if you are trying to debug this logic.
+        /// </para>
         /// </summary>
-        /// <param name="csvLines"></param>
+        /// <param name="csvLines">Line-by-line representation of the CSV from ECB API</param>
         /// <returns>Enumerable containing intermediate representation for the returned CSV</returns>
         public IEnumerable<EstrQuoteDto> ParseEstrCsv(IEnumerable<string> csvLines)
         {
@@ -61,7 +65,15 @@ namespace EuropeanCentralBankIntegration.Estr
                     BenchmarkItem = parts[2].Trim(),
                     DataTypeTest = parts[3].Trim(),
                     TimePeriod = DateTime.Parse(parts[4].Trim()),
-                    ObsValue = decimal.Parse(parts[5].Trim(), numberFormatInfo)
+                    
+                    // FIXME: Known lossy conversion from decimal to double. However, DVPLI's Scalar type
+                    //  wants a double, so I have no choice.
+                    //  If you are an external user and using a double is not a constraint, change to
+                    //  decimal.Parse(...) and propagate this change to the DTO.
+                    // NOTE: Value is divided by 100 because Fairmat needs percentages to be expressed in
+                    //  0.0NNN format. Do not blindly trust this and adapt to how you handle percentages
+                    //  if you are an external user.
+                    ObsValue = double.Parse(parts[5].Trim(), numberFormatInfo) / 100
                 };
                 
                 yield return quote;
