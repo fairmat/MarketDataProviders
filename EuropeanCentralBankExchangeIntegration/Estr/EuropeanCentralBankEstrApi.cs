@@ -42,40 +42,37 @@ namespace EuropeanCentralBankIntegration.Estr
         };
 
         /// <summary>
+        /// Get the Scalar representation of an ESTR Daily - businessweek
+        /// </summary>
+        /// <returns>Enumerable of scalar values representing the ECB ESTR reading requested</returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public IEnumerable<Scalar> GetDailyBusinessWeekEstr()
+        {
+            return GetEstrMarketDataBy(DataPortal.DailyBusinessWeek);
+        }
+
+        /// <summary>
         /// Get the Scalar representation of an ECB ESTR reading for a given DataPortal
         /// (eg: Daily, Total Volume, 75th percentile...)
         /// </summary>
-        /// <param name="dataPortal"></param>
-        /// <returns>Enumerable of scalar values representing the ECB ESTR reading requested</returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public IEnumerable<Scalar> GetDailyBusinessWeekEstr(DataPortal dataPortal)
+        /// <param name="dataPortal">Data Portal to get on the ECB website</param>
+        /// <returns>Collection of Scalar values representing the extracted market data</returns>
+        private IEnumerable<Scalar> GetEstrMarketDataBy(DataPortal dataPortal)
         {
-            throw new NotImplementedException();
+            IEnumerable<EstrQuoteDto> quotes = SerializeCsvToDto(GetEstrMarketDataCsvBy(dataPortal));
+            throw new NotImplementedException("WIP");
         }
+        
 
         /// <summary>
-        /// Construct the GET URL to request to the ECB REST API to get an ESTR reading
-        /// for a given DataPortal (eg: Daily, Total Volume, 75th percentile...)
+        /// Parse and serialize the CSV obtained from the API and split by lines into
+        /// a collection of <see cref="EstrQuoteDto"/> objects
         /// </summary>
-        /// <param name="dataPortal"></param>
-        /// <returns>URL to request to ECB REST API endpoint</returns>
-        private static string ConstructGetRequestUrl(DataPortal dataPortal)
+        /// <param name="csvLines">Line-by-line representation of the fetched CSV</param>
+        /// <returns>Collection of Scalar values representing the extracted market data</returns>
+        protected internal IEnumerable<EstrQuoteDto> SerializeCsvToDto(IEnumerable<string> csvLines)
         {
-            return $"{BaseUrl}{dataPortal.Value}{RequestQuery}";
-        }
-
-        /// <summary>
-        /// WIP - this will probably get removed
-        /// Get the CSV representation as a string enumerable for the "Euro short-term rate, Daily - businessweek"
-        /// data point
-        /// </summary>
-        /// <returns>
-        /// Enumerable representing the resulting CSV response containing the ESTR Daily-businessweek
-        /// data-point split by lines
-        /// </returns>
-        public IEnumerable<string> GetEstrQuoteCsvDailyBusinessWeek()
-        {
-            return GetEstrQuoteCsv(DataPortal.DailyBusinessWeek);
+            return _estrParser.ParseEstrCsv(csvLines);
         }
 
         /// <summary>
@@ -84,9 +81,9 @@ namespace EuropeanCentralBankIntegration.Estr
         /// </summary>
         /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
         /// <returns>string containing the raw CSV returned by the service</returns>
-        private IEnumerable<string> GetEstrQuoteCsv(DataPortal dataPortal)
+        protected internal IEnumerable<string> GetEstrMarketDataCsvBy(DataPortal dataPortal)
         {
-            string requestUrl = ConstructGetRequestUrl(dataPortal);
+            string requestUrl = ConstructGetRequestUrlBy(dataPortal);
 
             try
             {
@@ -98,11 +95,25 @@ namespace EuropeanCentralBankIntegration.Estr
                 IEnumerable<string> result = EstrParser.ReadCsvContent(responseFileBytes);
                 return result;
             }
+            catch (HttpRequestException e)
+            {
+                throw new InvalidOperationException("Error while calling ECB API: response result was not 2XX OK", e);
+            }
             catch (Exception e)
             {
-                Console.WriteLine("Error calling ESTR API: " + e.Message);
-                throw;
+                throw new InvalidOperationException("A generic error was encountered while calling the ECB API", e);
             }
+        }
+        
+        /// <summary>
+        /// Construct the GET URL to request to the ECB REST API to get an ESTR reading
+        /// for a given DataPortal (eg: Daily, Total Volume, 75th percentile...)
+        /// </summary>
+        /// <param name="dataPortal"></param>
+        /// <returns>URL to request to ECB REST API endpoint</returns>
+        private static string ConstructGetRequestUrlBy(DataPortal dataPortal)
+        {
+            return $"{BaseUrl}{dataPortal.Value}{RequestQuery}";
         }
     }
 }
