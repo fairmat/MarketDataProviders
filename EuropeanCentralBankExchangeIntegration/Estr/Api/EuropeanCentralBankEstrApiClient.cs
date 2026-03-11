@@ -19,6 +19,8 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using DVPLI.MarketDataTypes;
 using EuropeanCentralBankIntegration.Estr.Constants;
 using EuropeanCentralBankIntegration.Estr.Dto;
@@ -44,12 +46,10 @@ namespace EuropeanCentralBankIntegration.Estr.Api
             BaseAddress = new Uri(BaseUrl)
         };
 
-
         /// <summary>
         /// Get the Scalar representation of an ESTR Daily - businessweek
         /// </summary>
         /// <returns>Enumerable of scalar values representing the ECB ESTR reading requested</returns>
-        /// <exception cref="NotImplementedException"></exception>
         public IEnumerable<Scalar> GetDailyBusinessWeekEstr()
         {
             return GetEstrMarketDataBy(DataPortal.DailyBusinessWeek);
@@ -67,6 +67,25 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         }
 
         /// <summary>
+        /// Get the Scalar representation of an ECB ESTR reading for a given DataPortal (async version)
+        /// </summary>
+        /// <param name="dataPortal">Data Portal to get on the ECB website</param>
+        /// <param name="cancellationToken">Cancellation token to cancel the operation</param>
+        /// <returns>Collection of Scalar values representing the extracted market data</returns>
+        public async Task<IEnumerable<Scalar>> GetEstrMarketDataByAsync(DataPortal dataPortal, CancellationToken cancellationToken = default)
+        {
+            IEnumerable<EstrQuoteDto> quotes = await GetEstrMarketDataCsvDtoAsync(dataPortal, cancellationToken);
+            List<Scalar> scalars = new List<Scalar>();
+
+            foreach (EstrQuoteDto dto in quotes)
+            {
+                scalars.Add(new Scalar(p_Value: dto.ObsValue, p_Date: dto.TimePeriod));
+            }
+
+            return scalars;
+        }
+
+        /// <summary>
         /// Parse and serialize the CSV obtained from the API and split by lines into
         /// a collection of <see cref="EstrQuoteDto"/> objects
         /// </summary>
@@ -74,6 +93,18 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         /// <returns>Collection of Scalar values representing the extracted market data</returns>
         protected internal IEnumerable<EstrQuoteDto> SerializeCsvToDto(IEnumerable<string> csvLines)
         {
+            return _estrParser.ParseEstrCsv(csvLines);
+        }
+
+        /// <summary>
+        /// Gets the CSV DTO representation for an ESTR quote (async version)
+        /// </summary>
+        /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
+        /// <param name="cancellationToken">Cancellation token to cancel the operation</param>
+        /// <returns>Collection of parsed EstrQuoteDto objects</returns>
+        private async Task<IEnumerable<EstrQuoteDto>> GetEstrMarketDataCsvDtoAsync(DataPortal dataPortal, CancellationToken cancellationToken)
+        {
+            IEnumerable<string> csvLines = await GetEstrMarketDataCsvByAsync(dataPortal, cancellationToken);
             return _estrParser.ParseEstrCsv(csvLines);
         }
 
@@ -99,11 +130,60 @@ namespace EuropeanCentralBankIntegration.Estr.Api
             }
             catch (HttpRequestException e)
             {
-                throw new InvalidOperationException("Error while calling ECB API: response result was not 2XX OK", e);
+                throw new InvalidOperationException(
+                    $"Failed to retrieve ESTR data from ECB API. URL: {requestUrl}. HTTP Error: {e.Message}", 
+                    e);
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException("A generic error was encountered while calling the ECB API", e);
+                throw new InvalidOperationException(
+                    $"An unexpected error occurred while calling the ECB API. URL: {requestUrl}", 
+                    e);
+            }
+        }
+
+        /// <summary>
+        /// Gets the CSV representation for an ESTR quote (async version with proper exception handling)
+        /// </summary>
+        /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
+        /// <param name="cancellationToken">Cancellation token to cancel the operation</param>
+        /// <returns>Enumerable of CSV lines as strings</returns>
+        private async Task<IEnumerable<string>> GetEstrMarketDataCsvByAsync(DataPortal dataPortal, CancellationToken cancellationToken = default)
+        {
+            string requestUrl = ConstructGetRequestUrlBy(dataPortal);
+
+            try
+            {
+                using (HttpResponseMessage response = await SharedHttpClient.GetAsync(requestUrl, cancellationToken))
+                {
+                    response.EnsureSuccessStatusCode();
+
+                    byte[] csvBytes = await response.Content.ReadAsByteArrayAsync();
+                    IEnumerable<string> result = EstrParser.ReadCsvContent(csvBytes);
+                    return result;
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new InvalidOperationException(
+                    $"Failed to retrieve ESTR data from ECB API. URL: {requestUrl}. HTTP Error: {ex.Message}", 
+                    ex);
+            }
+            catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
+            {
+                throw new TimeoutException(
+                    $"Request to ECB ESTR API timed out. URL: {requestUrl}", 
+                    ex);
+            }
+            catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw new OperationCanceledException("The operation was cancelled by user request.", cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    $"An unexpected error occurred while calling the ECB API. URL: {requestUrl}", 
+                    ex);
             }
         }
 

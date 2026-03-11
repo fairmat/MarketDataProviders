@@ -88,17 +88,12 @@ namespace EuropeanCentralBankIntegration.Estr
         /// <summary>
         /// Unused since the API endpoint we are calling is public, and it does not require
         /// any authentication. Field is compulsory to implement DVPLI interfaces.
+        /// Any set will be ignored.
         /// user and password would be represented as "user;pwd"
         /// </summary>
-        /// <exception cref="InvalidOperationException">
-        /// Getting or reading this field _WILL_ throw
-        /// </exception>
         public string Credentials
         {
-            // TODO: I think it would be nice to keep this logic, but remove it and fail silently
-            //  if the automation automatically triggers this throw
-            get => throw new InvalidOperationException("ESTR API does not require any authentication");
-            set => throw new InvalidOperationException("ESTR API does not require any authentication");
+            set { }
         }
 
         /// <summary>
