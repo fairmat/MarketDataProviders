@@ -17,9 +17,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DVPLI;
 using DVPLI.Interfaces;
 using EuropeanCentralBankIntegration.Estr.Api;
+using EuropeanCentralBankIntegration.Estr.Constants;
 
 namespace EuropeanCentralBankIntegration.Estr
 {
@@ -39,7 +41,32 @@ namespace EuropeanCentralBankIntegration.Estr
         /// <exception cref="NotImplementedException"></exception>
         public Status TestConnectivity()
         {
-            throw new NotImplementedException();
+            try
+            {
+                IEnumerable<string> responseLines = _apiClient.TestConnectivity(DataPortal.DailyBusinessWeek);
+
+                if (responseLines == null || !responseLines.Any())
+                {
+                    return new Status()
+                    {
+                        HasErrors = true,
+                        ErrorMessage = "API call returned 2XX OK, but payload is either missing or degraded"
+                    };
+                }
+            }
+            catch (Exception e)
+            {
+                return new Status()
+                {
+                    HasErrors = true,
+                    ErrorMessage = "API call threw exception with message: " + e.Message
+                };
+            }
+            
+            return new Status()
+            {
+                HasErrors = false
+            };
         }
 
         /// <summary>
@@ -108,6 +135,7 @@ namespace EuropeanCentralBankIntegration.Estr
 
         /// <summary>
         /// Gets the information about the market data handled by the market data provider.
+        /// This is the entry point for the importer.
         /// </summary>
         /// <returns>A list containing the information about the market data handled.</returns>
         public MarketDataAccessType GetDataAvailabilityInfo(MarketDataCategory category)

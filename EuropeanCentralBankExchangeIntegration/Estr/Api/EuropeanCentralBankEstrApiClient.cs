@@ -38,7 +38,7 @@ namespace EuropeanCentralBankIntegration.Estr.Api
     {
         private const string BaseUrl = "https://data-api.ecb.europa.eu/service/data/EST/";
         private const string RequestQuery = "?format=csvdata&detail=dataonly";
-        
+
         private readonly EstrParser _estrParser = new EstrParser();
 
         private static readonly HttpClient SharedHttpClient = new HttpClient()
@@ -72,7 +72,8 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         /// <param name="dataPortal">Data Portal to get on the ECB website</param>
         /// <param name="cancellationToken">Cancellation token to cancel the operation</param>
         /// <returns>Collection of Scalar values representing the extracted market data</returns>
-        public async Task<IEnumerable<Scalar>> GetEstrMarketDataByAsync(DataPortal dataPortal, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Scalar>> GetEstrMarketDataByAsync(DataPortal dataPortal,
+            CancellationToken cancellationToken = default)
         {
             IEnumerable<EstrQuoteDto> quotes = await GetEstrMarketDataCsvDtoAsync(dataPortal, cancellationToken);
             List<Scalar> scalars = new List<Scalar>();
@@ -102,7 +103,8 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
         /// <param name="cancellationToken">Cancellation token to cancel the operation</param>
         /// <returns>Collection of parsed EstrQuoteDto objects</returns>
-        private async Task<IEnumerable<EstrQuoteDto>> GetEstrMarketDataCsvDtoAsync(DataPortal dataPortal, CancellationToken cancellationToken)
+        private async Task<IEnumerable<EstrQuoteDto>> GetEstrMarketDataCsvDtoAsync(DataPortal dataPortal,
+            CancellationToken cancellationToken)
         {
             IEnumerable<string> csvLines = await GetEstrMarketDataCsvByAsync(dataPortal, cancellationToken);
             return _estrParser.ParseEstrCsv(csvLines);
@@ -131,13 +133,13 @@ namespace EuropeanCentralBankIntegration.Estr.Api
             catch (HttpRequestException e)
             {
                 throw new InvalidOperationException(
-                    $"Failed to retrieve ESTR data from ECB API. URL: {requestUrl}. HTTP Error: {e.Message}", 
+                    $"Failed to retrieve ESTR data from ECB API. URL: {requestUrl}. HTTP Error: {e.Message}",
                     e);
             }
             catch (Exception e)
             {
                 throw new InvalidOperationException(
-                    $"An unexpected error occurred while calling the ECB API. URL: {requestUrl}", 
+                    $"An unexpected error occurred while calling the ECB API. URL: {requestUrl}",
                     e);
             }
         }
@@ -148,7 +150,8 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
         /// <param name="cancellationToken">Cancellation token to cancel the operation</param>
         /// <returns>Enumerable of CSV lines as strings</returns>
-        private async Task<IEnumerable<string>> GetEstrMarketDataCsvByAsync(DataPortal dataPortal, CancellationToken cancellationToken = default)
+        private async Task<IEnumerable<string>> GetEstrMarketDataCsvByAsync(DataPortal dataPortal,
+            CancellationToken cancellationToken = default)
         {
             string requestUrl = ConstructGetRequestUrlBy(dataPortal);
 
@@ -166,13 +169,13 @@ namespace EuropeanCentralBankIntegration.Estr.Api
             catch (HttpRequestException ex)
             {
                 throw new InvalidOperationException(
-                    $"Failed to retrieve ESTR data from ECB API. URL: {requestUrl}. HTTP Error: {ex.Message}", 
+                    $"Failed to retrieve ESTR data from ECB API. URL: {requestUrl}. HTTP Error: {ex.Message}",
                     ex);
             }
             catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
             {
                 throw new TimeoutException(
-                    $"Request to ECB ESTR API timed out. URL: {requestUrl}", 
+                    $"Request to ECB ESTR API timed out. URL: {requestUrl}",
                     ex);
             }
             catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -182,9 +185,35 @@ namespace EuropeanCentralBankIntegration.Estr.Api
             catch (Exception ex)
             {
                 throw new InvalidOperationException(
-                    $"An unexpected error occurred while calling the ECB API. URL: {requestUrl}", 
+                    $"An unexpected error occurred while calling the ECB API. URL: {requestUrl}",
                     ex);
             }
+        }
+
+        /// <summary>
+        /// Does the same as <see cref="GetEstrMarketDataCsvByAsync"/>, but synchronous and blocking.
+        /// This is to comply to DVPLI interfaces which, unfortunately, do not allow us to check for
+        /// connectivity asynchronously.
+        /// This method is duplicated because it is an antipattern to rely on blocking API calls, and
+        /// it exists only because of DVPLI constraints.
+        /// </summary>
+        /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
+        /// <returns>Enumerable of CSV lines as strings</returns>
+        /// <exception cref="HttpRequestException">Thrown on HTTP failure</exception>
+        /// <exception cref="InvalidOperationException">Thrown on other failures</exception>
+        public IEnumerable<string> TestConnectivity(DataPortal dataPortal)
+        {
+            string requestUrl = ConstructGetRequestUrlBy(dataPortal);
+
+            HttpResponseMessage response = SharedHttpClient.GetAsync(requestUrl).Result;
+            response.EnsureSuccessStatusCode();
+
+            byte[] csvBytes = response.Content.ReadAsByteArrayAsync().Result;
+            IEnumerable<string> result = EstrParser.ReadCsvContent(csvBytes);
+            
+            response.Dispose();
+            
+            return result;
         }
 
         /// <summary>
