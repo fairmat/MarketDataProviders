@@ -1,4 +1,5 @@
 ﻿/* Copyright (C) 2026 Fairmat SRL (info@fairmat.com, http://www.fairmat.com/)
+ * Author(s): Luca Bramè (luca.brame@fairmat.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -14,11 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-namespace EuropeanCentralBankIntegration.Estr
+namespace EuropeanCentralBankIntegration.Estr.Constants
 {
     /// <summary>
-    /// Enumerates the possible Data Portals that can be requested by the API
+    /// Enumerates the possible Data Portals that can be requested by the API.
+    /// Currently only shows the main Key data point, but modularizing the logic
+    /// is useful for future developments
     /// </summary>
     public sealed class DataPortal
     {
@@ -29,6 +31,7 @@ namespace EuropeanCentralBankIntegration.Estr
             Value = value;
         }
 
+        // Euro short-term, Daily - businessweek, marked "Key Data"
         public static readonly DataPortal DailyBusinessWeek = new DataPortal("B.EU000A2X2A25.WT");
     }
 }

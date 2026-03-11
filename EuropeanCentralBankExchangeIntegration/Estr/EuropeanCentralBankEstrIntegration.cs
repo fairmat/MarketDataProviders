@@ -1,0 +1,132 @@
+﻿/* Copyright (C) 2026 Fairmat SRL (info@fairmat.com, http://www.fairmat.com/)
+ * Author(s): Luca Bramè (luca.brame@fairmat.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using System;
+using System.Collections.Generic;
+using DVPLI;
+using DVPLI.Interfaces;
+using EuropeanCentralBankIntegration.Estr.Api;
+
+namespace EuropeanCentralBankIntegration.Estr
+{
+    [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
+    public class EuropeanCentralBankEstrIntegration : IMarketDataProvider, IDescription, ITickersInfo,
+        IMarketDataProviderInfo, IMarketDataIdentifierInfoProvider
+    {
+        /// <summary>
+        /// Client to contact the ECB API to get ESTR quotes
+        /// </summary>
+        private readonly EuropeanCentralBankEstrApiClient _apiClient = new EuropeanCentralBankEstrApiClient();
+
+        /// <summary>
+        /// Test whether the connection to the ECB API is functional
+        /// </summary>
+        /// <returns>A Status type object (DVPLI type) representing whether the connection is usable</returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public Status TestConnectivity()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Gets the market data from a single day.
+        /// </summary>
+        /// <param name="mdq">
+        /// A <see cref="MarketDataQuery"/> with the data request.
+        /// </param>
+        /// <param name="marketData">
+        /// In case of success, the requested market data as <see cref="IMarketData"/>.
+        /// </param>
+        /// <returns>
+        /// A <see cref="RefreshStatus"/> indicating if the query was successful.
+        /// </returns>
+        public RefreshStatus GetMarketData(MarketDataQuery mdq, out IMarketData marketData)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Gets a series of Historical Market Data from the starting date
+        /// to the end date.
+        /// </summary>
+        /// <param name="mdq">
+        /// A <see cref="MarketDataQuery"/> with the data request.
+        /// </param>
+        /// <param name="end">
+        /// A <see cref="DateTime"/> with the ending date of the period to fetch data from.
+        /// </param>
+        /// <param name="dates">
+        /// In case of success, a list of the dates data was fetched from in the requested period.
+        /// </param>
+        /// <param name="marketData">
+        /// In case of success, a list of the fetched market data day
+        /// by day corresponding to <see cref="dates"/>.
+        /// </param>
+        /// <returns>
+        /// A <see cref="RefreshStatus"/> indicating if the query was successful.
+        /// </returns>
+        public RefreshStatus GetTimeSeries(MarketDataQuery mdq, DateTime end, out DateTime[] dates,
+            out IMarketData[] marketData)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Unused since the API endpoint we are calling is public, and it does not require
+        /// any authentication. Field is compulsory to implement DVPLI interfaces.
+        /// user and password would be represented as "user;pwd"
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// Getting or reading this field _WILL_ throw
+        /// </exception>
+        public string Credentials
+        {
+            // TODO: I think it would be nice to keep this logic, but remove it and fail silently
+            //  if the automation automatically triggers this throw
+            get => throw new InvalidOperationException("ESTR API does not require any authentication");
+            set => throw new InvalidOperationException("ESTR API does not require any authentication");
+        }
+
+        /// <summary>
+        /// The name that will appear in the menu item
+        /// </summary>
+        public string Description => "European Central Bank ESTR (Euro short-term rate)";
+
+        public ISymbolDefinition[] SupportedTickers(string filter = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Gets the information about the market data handled by the market data provider.
+        /// </summary>
+        /// <returns>A list containing the information about the market data handled.</returns>
+        public MarketDataAccessType GetDataAvailabilityInfo(MarketDataCategory category)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Gets the information about the market data handled by the market data provider.
+        /// </summary>
+        /// <returns>A list containing the information about the market data handled.</returns>
+        public IList<MarketDataIdentifierInfo> GetMarketDataIdentifierInfo()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

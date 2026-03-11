@@ -1,4 +1,5 @@
 ﻿/* Copyright (C) 2026 Fairmat SRL (info@fairmat.com, http://www.fairmat.com/)
+ * Author(s): Luca Bramè (luca.brame@fairmat.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -20,10 +21,14 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using EuropeanCentralBankIntegration.Estr.Dto;
-using EuropeanCentralBankIntegration.Estr.exceptions;
+using EuropeanCentralBankIntegration.Estr.Exceptions;
 
-namespace EuropeanCentralBankIntegration.Estr
+namespace EuropeanCentralBankIntegration.Estr.Parsing
 {
+    /// <summary>
+    /// Parser that serializes the CSV from the ESTR API into
+    /// <see cref="EstrQuoteDto"/> objects
+    /// </summary>
     public class EstrParser
     {
         /// <summary>
@@ -31,6 +36,10 @@ namespace EuropeanCentralBankIntegration.Estr
         /// <para>
         /// Note: an iterator was used to minimize memory footprint in case of very large CSVs.
         /// Behave accordingly if you are trying to debug this logic.
+        /// </para>
+        /// <para>
+        /// Note: in the future, replacing this brittle custom logic with a 3P library that handles
+        /// edge-cases better might be a good idea.
         /// </para>
         /// </summary>
         /// <param name="csvLines">Line-by-line representation of the CSV from ECB API</param>

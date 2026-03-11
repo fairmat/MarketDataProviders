@@ -1,4 +1,5 @@
 ﻿/* Copyright (C) 2026 Fairmat SRL (info@fairmat.com, http://www.fairmat.com/)
+ * Author(s): Luca Bramè (luca.brame@fairmat.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -19,27 +20,30 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using DVPLI.MarketDataTypes;
+using EuropeanCentralBankIntegration.Estr.Constants;
 using EuropeanCentralBankIntegration.Estr.Dto;
+using EuropeanCentralBankIntegration.Estr.Parsing;
 
-namespace EuropeanCentralBankIntegration.Estr
+namespace EuropeanCentralBankIntegration.Estr.Api
 {
     /// <summary>
     /// <para>
-    /// This component provides the integration with the ECB API for the purpose of importing
-    /// data related to the ESTR (Euro Short Term Rate).
+    /// Abstracted client to interact with the ECB API for ESTR retrieval
     /// </para>
     /// Refer to SDMX REST API documentation for further info: <see href="https://github.com/sdmx-twg/sdmx-rest"></see>
     /// </summary>
-    public class EuropeanCentralBankEstrApi
+    public class EuropeanCentralBankEstrApiClient
     {
         private const string BaseUrl = "https://data-api.ecb.europa.eu/service/data/EST/";
         private const string RequestQuery = "?format=csvdata&detail=dataonly";
+        
         private readonly EstrParser _estrParser = new EstrParser();
 
         private static readonly HttpClient SharedHttpClient = new HttpClient()
         {
             BaseAddress = new Uri(BaseUrl)
         };
+
 
         /// <summary>
         /// Get the Scalar representation of an ESTR Daily - businessweek
@@ -57,12 +61,10 @@ namespace EuropeanCentralBankIntegration.Estr
         /// </summary>
         /// <param name="dataPortal">Data Portal to get on the ECB website</param>
         /// <returns>Collection of Scalar values representing the extracted market data</returns>
-        private IEnumerable<Scalar> GetEstrMarketDataBy(DataPortal dataPortal)
+        public IEnumerable<Scalar> GetEstrMarketDataBy(DataPortal dataPortal)
         {
-            IEnumerable<EstrQuoteDto> quotes = SerializeCsvToDto(GetEstrMarketDataCsvBy(dataPortal));
             throw new NotImplementedException("WIP");
         }
-        
 
         /// <summary>
         /// Parse and serialize the CSV obtained from the API and split by lines into
@@ -104,7 +106,7 @@ namespace EuropeanCentralBankIntegration.Estr
                 throw new InvalidOperationException("A generic error was encountered while calling the ECB API", e);
             }
         }
-        
+
         /// <summary>
         /// Construct the GET URL to request to the ECB REST API to get an ESTR reading
         /// for a given DataPortal (eg: Daily, Total Volume, 75th percentile...)

@@ -1,4 +1,5 @@
 ﻿/* Copyright (C) 2026 Fairmat SRL (info@fairmat.com, http://www.fairmat.com/)
+ * Author(s): Luca Bramè (luca.brame@fairmat.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
