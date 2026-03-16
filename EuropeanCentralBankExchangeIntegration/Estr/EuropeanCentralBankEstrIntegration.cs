@@ -19,9 +19,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DVPLI;
+using DVPLI.Enums;
 using DVPLI.Interfaces;
+using DVPLI.MarketDataTypes;
 using EuropeanCentralBankIntegration.Estr.Api;
 using EuropeanCentralBankIntegration.Estr.Constants;
+using EuropeanCentralBankIntegration.Estr.Dto;
+using EuropeanCentralBankIntegration.Estr.Enums;
 
 namespace EuropeanCentralBankIntegration.Estr
 {
@@ -43,7 +47,8 @@ namespace EuropeanCentralBankIntegration.Estr
         {
             try
             {
-                IEnumerable<string> responseLines = _apiClient.GetEstrMarketDataCsvByBlocking(DataPortal.DailyBusinessWeek);
+                IEnumerable<string> responseLines =
+                    EuropeanCentralBankEstrApiClient.GetEstrMarketDataCsvByBlocking(DataPortal.DailyBusinessWeek);
 
                 if (responseLines == null || !responseLines.Any())
                 {
@@ -62,7 +67,7 @@ namespace EuropeanCentralBankIntegration.Estr
                     ErrorMessage = "API call threw exception with message: " + e.Message
                 };
             }
-            
+
             return new Status()
             {
                 HasErrors = false
@@ -83,12 +88,45 @@ namespace EuropeanCentralBankIntegration.Estr
         /// </returns>
         public RefreshStatus GetMarketData(MarketDataQuery mdq, out IMarketData marketData)
         {
-            throw new NotImplementedException();
+            RefreshStatus status =
+                GetTimeSeries(mdq, mdq.Date, out DateTime[] dates, out IMarketData[] marketDataArray);
+
+            if (status.HasErrors)
+            {
+                marketData = null;
+                return new RefreshStatus()
+                {
+                    HasErrors = true,
+                    ErrorMessage = status.ErrorMessage
+                };
+            }
+
+            if (marketDataArray.Length != 1 && dates.Length != 1 && dates[0] != mdq.Date)
+            {
+                marketData = null;
+                return new RefreshStatus()
+                {
+                    HasErrors = true,
+                    ErrorMessage = "GetMarketData: Requested date or Market Data not available."
+                };
+            }
+
+            marketData = marketDataArray[0];
+            return new RefreshStatus()
+            {
+                HasErrors = false,
+                ErrorMessage = status.ErrorMessage
+            };
         }
 
         /// <summary>
         /// Gets a series of Historical Market Data from the starting date
         /// to the end date.
+        /// <para>
+        /// Note about the return type: info about dates and market data gets passed through
+        /// <c>out</c> parameters and side effects. Types are not nullable? because of DVPLI
+        /// constraints.
+        /// </para>
         /// </summary>
         /// <param name="mdq">
         /// A <see cref="MarketDataQuery"/> with the data request.
@@ -109,7 +147,82 @@ namespace EuropeanCentralBankIntegration.Estr
         public RefreshStatus GetTimeSeries(MarketDataQuery mdq, DateTime end, out DateTime[] dates,
             out IMarketData[] marketData)
         {
-            throw new NotImplementedException();
+            if (mdq is null)
+            {
+                throw new ArgumentNullException(nameof(mdq));
+            }
+
+            if (mdq.Field != "close")
+            {
+                dates = null;
+                marketData = null;
+
+                return new RefreshStatus()
+                {
+                    HasErrors = true,
+                    ErrorMessage =
+                        $"GetTimeSeries: Market data not available (only close values are available, {mdq.Field} was requested)"
+                };
+            }
+
+            if (mdq.MarketDataType != nameof(Scalar))
+            {
+                dates = null;
+                marketData = null;
+
+                return new RefreshStatus()
+                {
+                    HasErrors = true,
+                    ErrorMessage =
+                        $"Only Scalar requests are supported. Your request was of unsupported type {mdq.MarketDataType}"
+                };
+            }
+
+            IEnumerable<EstrQuoteDto> quotes;
+            try
+            {
+                quotes = _apiClient.GetEstrMarketDataInRangeBlocking(
+                    dataPortal: DataPortal.DailyBusinessWeek,
+                    startDate: mdq.Date,
+                    endDate: end);
+            }
+            catch (Exception e)
+            {
+                marketData = null;
+                dates = null;
+
+                return new RefreshStatus()
+                {
+                    HasErrors = true,
+                    ErrorMessage =
+                        $"GetTimeSeries: Market data not available due to problems with the European Central Bank service. Exception: {e}"
+                };
+            }
+
+            // Avoid multiple enumeration: converting to List<T> to speed up lookups
+            // (assuming .NET 10 CoreCLR auto devirtualization does not work here)
+            List<EstrQuoteDto> quotesList = quotes.ToList();
+
+            if (!quotesList.Any())
+            {
+                marketData = null;
+                dates = null;
+
+                return new RefreshStatus()
+                {
+                    HasErrors = true,
+                    ErrorMessage =
+                        $"GetTimeSeries: Market data not available due to problems with the European Central Bank service. Returned data was null or empty"
+                };
+            }
+
+            dates = quotesList.Select(q => q.TimePeriod).ToArray();
+            marketData = quotesList.Select(q => (IMarketData)new Scalar { Value = q.ObsValue }).ToArray();
+
+            return new RefreshStatus()
+            {
+                HasErrors = false
+            };
         }
 
         /// <summary>
@@ -128,9 +241,21 @@ namespace EuropeanCentralBankIntegration.Estr
         /// </summary>
         public string Description => "European Central Bank ESTR (Euro short-term rate)";
 
+        /// <summary>
+        /// Enumerate the tickers that are supported by this functionality.
+        /// </summary>
+        /// <param name="filter">Unused in this case, optional and defaulting to null</param>
+        /// <returns>Array of supported ticker</returns>
         public ISymbolDefinition[] SupportedTickers(string filter = null)
         {
-            throw new NotImplementedException();
+            List<ISymbolDefinition> tickers = new List<ISymbolDefinition>();
+
+            // Not using collection initializer yet in case this needs to be expanded
+            tickers.Add(new SymbolDefinition(
+                name: "European Central Bank Euro Short-Term Rate",
+                description: "Euro short-term rate, Daily - businessweek"));
+
+            return tickers.ToArray();
         }
 
         /// <summary>
@@ -140,16 +265,42 @@ namespace EuropeanCentralBankIntegration.Estr
         /// <returns>A list containing the information about the market data handled.</returns>
         public MarketDataAccessType GetDataAvailabilityInfo(MarketDataCategory category)
         {
-            throw new NotImplementedException();
+            // Copying implementation from EuropeanCentralBankIntegration verbatim
+            switch (category)
+            {
+                case MarketDataCategory.EquityPrice:
+                {
+                    // Exchange rate series are considered equities
+                    // because they share the same underlying type.
+                    return MarketDataAccessType.Local;
+                }
+
+                default:
+                {
+                    return MarketDataAccessType.NotAvailable;
+                }
+            }
         }
 
         /// <summary>
-        /// Gets the information about the market data handled by the market data provider.
+        /// Provides the information about the market data handled by the market data provider.
         /// </summary>
         /// <returns>A list containing the information about the market data handled.</returns>
         public IList<MarketDataIdentifierInfo> GetMarketDataIdentifierInfo()
         {
-            throw new NotImplementedException();
+            IList<MarketDataIdentifierInfo> identifiers = new List<MarketDataIdentifierInfo>();
+
+            identifiers.Add(new MarketDataIdentifierInfo()
+            {
+                Category = IdentifierCategory.EquityAndIndex,
+                Code = "Euro Short-Term Rate",
+                Name = "Euro Short-Term Rate",
+                Description = "Euro short-term rate, Daily - businessweek",
+                Currency = nameof(SupportedCurrencies.EUR),
+                Visibility = false
+            });
+
+            return identifiers;
         }
     }
 }
