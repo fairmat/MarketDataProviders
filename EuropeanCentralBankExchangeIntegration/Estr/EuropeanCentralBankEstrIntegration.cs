@@ -43,7 +43,7 @@ namespace EuropeanCentralBankIntegration.Estr
         {
             try
             {
-                IEnumerable<string> responseLines = _apiClient.TestConnectivity(DataPortal.DailyBusinessWeek);
+                IEnumerable<string> responseLines = _apiClient.GetEstrMarketDataCsvByBlocking(DataPortal.DailyBusinessWeek);
 
                 if (responseLines == null || !responseLines.Any())
                 {

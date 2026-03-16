@@ -98,7 +98,7 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         }
 
         /// <summary>
-        /// Gets the CSV DTO representation for an ESTR quote (async version)
+        /// Gets the CSV DTO representation for an ESTR quote, asynchronously
         /// </summary>
         /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
         /// <param name="cancellationToken">Cancellation token to cancel the operation</param>
@@ -111,12 +111,14 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         }
 
         /// <summary>
-        /// Gets the CSV representation for an ESTR quote. This is the pre-serialization representation
+        /// Gets the CSV representation for an ESTR quote.
+        /// Blocking version, only meant for the TestConnection() method from <c>DVPLI</c>, which
+        /// does not support async calls.
         /// of the response result
         /// </summary>
         /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
         /// <returns>string containing the raw CSV returned by the service</returns>
-        protected internal IEnumerable<string> GetEstrMarketDataCsvBy(DataPortal dataPortal)
+        protected internal IEnumerable<string> GetEstrMarketDataCsvByBlocking(DataPortal dataPortal)
         {
             string requestUrl = ConstructGetRequestUrlBy(dataPortal);
 
@@ -188,32 +190,6 @@ namespace EuropeanCentralBankIntegration.Estr.Api
                     $"An unexpected error occurred while calling the ECB API. URL: {requestUrl}",
                     ex);
             }
-        }
-
-        /// <summary>
-        /// Does the same as <see cref="GetEstrMarketDataCsvByAsync"/>, but synchronous and blocking.
-        /// This is to comply to DVPLI interfaces which, unfortunately, do not allow us to check for
-        /// connectivity asynchronously.
-        /// This method is duplicated because it is an antipattern to rely on blocking API calls, and
-        /// it exists only because of DVPLI constraints.
-        /// </summary>
-        /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
-        /// <returns>Enumerable of CSV lines as strings</returns>
-        /// <exception cref="HttpRequestException">Thrown on HTTP failure</exception>
-        /// <exception cref="InvalidOperationException">Thrown on other failures</exception>
-        public IEnumerable<string> TestConnectivity(DataPortal dataPortal)
-        {
-            string requestUrl = ConstructGetRequestUrlBy(dataPortal);
-
-            HttpResponseMessage response = SharedHttpClient.GetAsync(requestUrl).Result;
-            response.EnsureSuccessStatusCode();
-
-            byte[] csvBytes = response.Content.ReadAsByteArrayAsync().Result;
-            IEnumerable<string> result = EstrParser.ReadCsvContent(csvBytes);
-            
-            response.Dispose();
-            
-            return result;
         }
 
         /// <summary>
