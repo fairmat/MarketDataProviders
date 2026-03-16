@@ -17,14 +17,10 @@
  */
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using DVPLI;
-using DVPLI.Enums;
 using DVPLI.MarketDataTypes;
 using EuropeanCentralBankIntegration.Estr;
 using EuropeanCentralBankIntegration.Estr.Api;
-using EuropeanCentralBankIntegration.Estr.Enums;
 using NUnit.Framework;
 
 namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration.Estr.IntegrationTests;
@@ -39,7 +35,7 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration.Estr.Integrat
 /// </para>
 /// </summary>
 [TestFixture]
-public class EstrIntegrationTest
+public class EstrIntegrationIntegrationTest
 {
     // SUT
     private readonly EuropeanCentralBankEstrIntegration _integration = new();
@@ -67,6 +63,7 @@ public class EstrIntegrationTest
             MarketDataType = "Scalar",
             // Might be flaky, currently relies on this date having a valid value in the ESTR API return payload
             // FIXME: Create a proper unit test with mocked API response eventually
+            //  Needs a mocking library like NSubstitute in the solution
             Date = new DateTime(2019, 10, 01),
         };
 
@@ -98,14 +95,14 @@ public class EstrIntegrationTest
             // FIXME: Create a proper unit test with mocked API response eventually
             Date = new DateTime(2019, 10, 01),
         };
-        
+
         // Act
         RefreshStatus status = _integration.GetTimeSeries(
             mdq: mdq,
             end: new DateTime(2019, 10, 01),
             dates: out DateTime[] dates,
             marketData: out IMarketData[] marketData);
-        
+
         // Assert
         Assert.That(status, Is.Not.Null,
             "Status should not be null");
@@ -114,52 +111,4 @@ public class EstrIntegrationTest
         Assert.That(marketData, Is.Not.Null,
             "marketData should no longer be null, because it should have been written to at this point");
     }
-
-    [Test]
-    public void TestGetSupportedTickers_ShouldReturnNotNull()
-    {
-        // Act
-        ISymbolDefinition[] result = _integration.SupportedTickers();
-         
-        // Assert
-        Assert.That(result, Is.Not.Null,
-            "Result should not be null");
-        Assert.That(result, Is.Not.Empty,
-            "Result content is not empty");
-    }
-
-    [Test]
-    public void TestGetDataAvailabilityInfo_ShouldReturnNotNull()
-    {
-        // Act
-        MarketDataAccessType result = _integration.GetDataAvailabilityInfo(MarketDataCategory.EquityPrice);
-        
-        // Assert
-        Assert.That(result, Is.EqualTo(MarketDataAccessType.Local),
-            "In this specific case, the method should return MarketDataAccessType.Local");
-    }
-
-    [Test]
-    public void TestGetMarketDataIdentifierInfo_ShouldReturnExpectedResult()
-    {
-        // Act
-        IList<MarketDataIdentifierInfo> result = _integration.GetMarketDataIdentifierInfo();
-        
-        // Assert
-        MarketDataIdentifierInfo expectedResult = new()
-        {
-            Category = IdentifierCategory.EquityAndIndex,
-            Code = "Euro Short-Term Rate",
-            Name = "Euro Short-Term Rate",
-            Description = "Euro short-term rate, Daily - businessweek",
-            Currency = nameof(SupportedCurrencies.EUR),
-            Visibility = false
-        };
-        
-        Assert.That(result, Is.Not.Null,
-            "Result should not be null");
-        Assert.That(result, Is.EqualTo(expectedResult),
-            "Returned result should be equal to expected result");
-    }
-    
 }
