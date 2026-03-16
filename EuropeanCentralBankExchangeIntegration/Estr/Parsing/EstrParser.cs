@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using EuropeanCentralBankIntegration.Estr.Dto;
 using EuropeanCentralBankIntegration.Estr.Exceptions;
@@ -32,14 +33,25 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
     public class EstrParser
     {
         /// <summary>
+        /// Parse and serialize the CSV obtained from the API and split by lines into
+        /// a collection of <see cref="EstrQuoteDto"/> objects
+        /// </summary>
+        /// <param name="csvLines">Line-by-line representation of the fetched CSV</param>
+        /// <returns>Collection of Scalar values representing the extracted market data</returns>
+        protected internal IEnumerable<EstrQuoteDto> SerializeCsvToDto(IEnumerable<string> csvLines)
+        {
+            return ParseEstrCsv(csvLines);
+        }
+        
+        /// <summary>
         /// Serialize an ESTR CSV from the REST API response into its intermediate DTO representation.
         /// <para>
         /// Note: an iterator was used to minimize memory footprint in case of very large CSVs.
-        /// Behave accordingly if you are trying to debug this logic.
+        /// Deferred execution. Behave accordingly if you are trying to debug this logic.
         /// </para>
         /// <para>
         /// Note: in the future, replacing this brittle custom logic with a 3P library that handles
-        /// edge-cases better might be a good idea.
+        /// edge-cases better like SmallestCsvParser or CsvHelper might be a good idea.
         /// </para>
         /// </summary>
         /// <param name="csvLines">Line-by-line representation of the CSV from ECB API</param>
@@ -51,7 +63,7 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
                 NumberDecimalSeparator = ".",
             };
             bool isFirstLine = true;
-            
+
             foreach (string line in csvLines)
             {
                 if (isFirstLine)
@@ -59,12 +71,12 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
                     isFirstLine = false;
                     continue;
                 }
-                
+
                 if (string.IsNullOrWhiteSpace(line))
                     continue;
-                
+
                 string[] parts = line.Split(',');
-                
+
                 EstrQuoteDto quote = new EstrQuoteDto
                 {
                     Key = parts[0].Trim(),
@@ -74,7 +86,7 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
                     BenchmarkItem = parts[2].Trim(),
                     DataTypeTest = parts[3].Trim(),
                     TimePeriod = DateTime.Parse(parts[4].Trim()),
-                    
+
                     // FIXME: Known lossy conversion from decimal to double. However, DVPLI's Scalar type
                     //  wants a double, so I have no choice.
                     //  If you are an external user and using a double is not a constraint, change to
@@ -84,11 +96,41 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
                     //  if you are an external user.
                     ObsValue = double.Parse(parts[5].Trim(), numberFormatInfo) / 100
                 };
-                
+
                 yield return quote;
             }
         }
-        
+
+        /// <summary>
+        /// Filters parsed ESTR quotes by a date range (inclusive).
+        /// <para>
+        /// Note: Uses deferred execution via LINQ. The filter will be applied
+        /// as quotes are enumerated, maintaining memory efficiency for large datasets.
+        /// </para>
+        /// </summary>
+        /// <param name="quotes">Collection of ESTR quotes to filter</param>
+        /// <param name="startDate">Start date (inclusive). If null, no lower bound is applied.</param>
+        /// <param name="endDate">End date (inclusive). If null, no upper bound is applied.</param>
+        /// <returns>Filtered enumerable of quotes within the specified date range</returns>
+        public IEnumerable<EstrQuoteDto> FilterByDateRange(
+            IEnumerable<EstrQuoteDto> quotes,
+            DateTime? startDate = null,
+            DateTime? endDate = null)
+        {
+            if (startDate.HasValue && endDate.HasValue && startDate.Value > endDate.Value)
+                throw new ArgumentException(
+                    $"Start date ({startDate.Value:yyyy-MM-dd}) cannot be after end date ({endDate.Value:yyyy-MM-dd})",
+                    nameof(startDate));
+
+            return quotes.Where(quote =>
+            {
+                bool matchesStartDate = !startDate.HasValue || quote.TimePeriod >= startDate.Value;
+                bool matchesEndDate = !endDate.HasValue || quote.TimePeriod <= endDate.Value;
+
+                return matchesStartDate && matchesEndDate;
+            });
+        }
+
         /// <summary>
         /// Reads the raw CSV from the REST API and separates it line by line, so that individual
         /// lines can be parsed later in the execution

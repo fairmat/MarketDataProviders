@@ -21,7 +21,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using DVPLI.MarketDataTypes;
 using EuropeanCentralBankIntegration.Estr.Constants;
 using EuropeanCentralBankIntegration.Estr.Dto;
 using EuropeanCentralBankIntegration.Estr.Parsing;
@@ -47,67 +46,62 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         };
 
         /// <summary>
-        /// Get the Scalar representation of an ESTR Daily - businessweek
-        /// </summary>
-        /// <returns>Enumerable of scalar values representing the ECB ESTR reading requested</returns>
-        public IEnumerable<Scalar> GetDailyBusinessWeekEstr()
-        {
-            return GetEstrMarketDataBy(DataPortal.DailyBusinessWeek);
-        }
-
-        /// <summary>
-        /// Get the Scalar representation of an ECB ESTR reading for a given DataPortal
-        /// (eg: Daily, Total Volume, 75th percentile...)
-        /// </summary>
-        /// <param name="dataPortal">Data Portal to get on the ECB website</param>
-        /// <returns>Collection of Scalar values representing the extracted market data</returns>
-        public IEnumerable<Scalar> GetEstrMarketDataBy(DataPortal dataPortal)
-        {
-            throw new NotImplementedException("WIP");
-        }
-
-        /// <summary>
-        /// Get the Scalar representation of an ECB ESTR reading for a given DataPortal (async version)
-        /// </summary>
-        /// <param name="dataPortal">Data Portal to get on the ECB website</param>
-        /// <param name="cancellationToken">Cancellation token to cancel the operation</param>
-        /// <returns>Collection of Scalar values representing the extracted market data</returns>
-        public async Task<IEnumerable<Scalar>> GetEstrMarketDataByAsync(DataPortal dataPortal,
-            CancellationToken cancellationToken = default)
-        {
-            IEnumerable<EstrQuoteDto> quotes = await GetEstrMarketDataCsvDtoAsync(dataPortal, cancellationToken);
-            List<Scalar> scalars = new List<Scalar>();
-
-            foreach (EstrQuoteDto dto in quotes)
-            {
-                scalars.Add(new Scalar(p_Value: dto.ObsValue, p_Date: dto.TimePeriod));
-            }
-
-            return scalars;
-        }
-
-        /// <summary>
-        /// Parse and serialize the CSV obtained from the API and split by lines into
-        /// a collection of <see cref="EstrQuoteDto"/> objects
-        /// </summary>
-        /// <param name="csvLines">Line-by-line representation of the fetched CSV</param>
-        /// <returns>Collection of Scalar values representing the extracted market data</returns>
-        protected internal IEnumerable<EstrQuoteDto> SerializeCsvToDto(IEnumerable<string> csvLines)
-        {
-            return _estrParser.ParseEstrCsv(csvLines);
-        }
-
-        /// <summary>
-        /// Gets the CSV DTO representation for an ESTR quote, asynchronously
+        /// Gets the DTO representation for all the ESTR quotes available from the service
+        /// Async API, recommended for external users
         /// </summary>
         /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
         /// <param name="cancellationToken">Cancellation token to cancel the operation</param>
-        /// <returns>Collection of parsed EstrQuoteDto objects</returns>
-        private async Task<IEnumerable<EstrQuoteDto>> GetEstrMarketDataCsvDtoAsync(DataPortal dataPortal,
-            CancellationToken cancellationToken)
+        /// <returns>Collection of DTOs representing ESTR quotes</returns>
+        public async Task<IEnumerable<EstrQuoteDto>> GetEstrMarketData(DataPortal dataPortal,
+            CancellationToken cancellationToken = default)
         {
-            IEnumerable<string> csvLines = await GetEstrMarketDataCsvByAsync(dataPortal, cancellationToken);
+            IEnumerable<string> csvLines = await GetEstrMarketDataCsvBy(dataPortal, cancellationToken);
             return _estrParser.ParseEstrCsv(csvLines);
+        }
+
+        /// <summary>
+        /// Gets the DTO representation for all the ESTR quotes available from the service
+        /// Blocking, synchronous API for DVPLI
+        /// </summary>
+        /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
+        /// <returns>Collection of DTOs representing ESTR quotes</returns>
+        public IEnumerable<EstrQuoteDto> GetEstrMarketDataBlocking(DataPortal dataPortal)
+        {
+            IEnumerable<string> csvLines = GetEstrMarketDataCsvByBlocking(dataPortal);
+            return _estrParser.ParseEstrCsv(csvLines);
+        }
+
+        /// <summary>
+        /// Gets the DTO representation for all the ESTR quotes within the given range
+        /// Async API, recommended for external users
+        /// </summary>
+        /// <param name="dataPortal">Data portal identifier to request to ECB API</param>
+        /// <param name="cancellationToken">Cancellation token to cancel the operation</param>
+        /// <param name="startDate">Start date to filter by (no lower bound if null)</param>
+        /// <param name="endDate">End date to filter by (no upper bound if null)</param>
+        /// <returns>Collection of DTOs representing ESTR quotes</returns>
+        public async Task<IEnumerable<EstrQuoteDto>> GetEstrMarketDataInRange(DataPortal dataPortal,
+            DateTime? startDate = null, DateTime? endDate = null, CancellationToken cancellationToken = default)
+        {
+            IEnumerable<string> csvLines = await GetEstrMarketDataCsvBy(dataPortal, cancellationToken);
+            IEnumerable<EstrQuoteDto> quotes = _estrParser.ParseEstrCsv(csvLines);
+            return _estrParser.FilterByDateRange(quotes, startDate, endDate);
+        }
+
+        /// <summary>
+        /// Gets the DTO representation for all the ESTR quotes within the given range
+        /// Blocking, synchronous API for DVPLI
+        /// </summary>
+        /// <param name="dataPortal">Data portal identifier to request to ECB API</param>
+        /// <param name="startDate">Start date to filter by (no lower bound if null)</param>
+        /// <param name="endDate">End date to filter by (no upper bound if null)</param>
+        /// <returns>Collection of DTOs representing ESTR quotes</returns>
+        public IEnumerable<EstrQuoteDto> GetEstrMarketDataInRangeBlocking(DataPortal dataPortal,
+            DateTime? startDate = null, DateTime? endDate = null)
+        {
+            IEnumerable<string> csvLines = GetEstrMarketDataCsvByBlocking(dataPortal);
+            IEnumerable<EstrQuoteDto> quotes = _estrParser.ParseEstrCsv(csvLines);
+            return _estrParser.FilterByDateRange(quotes, startDate, endDate);
         }
 
         /// <summary>
@@ -118,7 +112,7 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         /// </summary>
         /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
         /// <returns>string containing the raw CSV returned by the service</returns>
-        protected internal IEnumerable<string> GetEstrMarketDataCsvByBlocking(DataPortal dataPortal)
+        protected internal static IEnumerable<string> GetEstrMarketDataCsvByBlocking(DataPortal dataPortal)
         {
             string requestUrl = ConstructGetRequestUrlBy(dataPortal);
 
@@ -147,12 +141,12 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         }
 
         /// <summary>
-        /// Gets the CSV representation for an ESTR quote (async version with proper exception handling)
+        /// Gets the CSV representation for an ESTR quote
         /// </summary>
         /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
         /// <param name="cancellationToken">Cancellation token to cancel the operation</param>
         /// <returns>Enumerable of CSV lines as strings</returns>
-        private async Task<IEnumerable<string>> GetEstrMarketDataCsvByAsync(DataPortal dataPortal,
+        private static async Task<IEnumerable<string>> GetEstrMarketDataCsvBy(DataPortal dataPortal,
             CancellationToken cancellationToken = default)
         {
             string requestUrl = ConstructGetRequestUrlBy(dataPortal);
