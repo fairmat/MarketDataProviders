@@ -58,10 +58,6 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
         /// <returns>Enumerable containing intermediate representation for the returned CSV</returns>
         public IEnumerable<EstrQuoteDto> ParseEstrCsv(IEnumerable<string> csvLines)
         {
-            NumberFormatInfo numberFormatInfo = new NumberFormatInfo()
-            {
-                NumberDecimalSeparator = ".",
-            };
             bool isFirstLine = true;
 
             foreach (string line in csvLines)
@@ -94,7 +90,7 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
                     // NOTE: Value is divided by 100 because Fairmat needs percentages to be expressed in
                     //  0.0NNN format. Do not blindly trust this and adapt to how you handle percentages
                     //  if you are an external user.
-                    ObsValue = double.Parse(parts[5].Trim(), numberFormatInfo) / 100
+                    ObsValue = double.Parse(parts[5].Trim(), CultureInfo.InvariantCulture) / 100
                 };
 
                 yield return quote;
