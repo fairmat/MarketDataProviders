@@ -90,13 +90,15 @@ namespace EuropeanCentralBankIntegration.Estr.Api
 
             try
             {
-                HttpResponseMessage response = SharedHttpClient.GetAsync(requestUrl).Result;
-                response.EnsureSuccessStatusCode();
+                using (HttpResponseMessage response = SharedHttpClient.GetAsync(requestUrl).Result)
+                {
+                    response.EnsureSuccessStatusCode();
 
-                string csvContent = response.Content.ReadAsStringAsync().Result;
-                byte[] responseFileBytes = Encoding.UTF8.GetBytes(csvContent);
-                IEnumerable<string> result = EstrParser.ReadCsvContent(responseFileBytes);
-                return result;
+                    string csvContent = response.Content.ReadAsStringAsync().Result;
+                    byte[] responseFileBytes = Encoding.UTF8.GetBytes(csvContent);
+                    IEnumerable<string> result = EstrParser.ReadCsvContent(responseFileBytes);
+                    return result;
+                }
             }
             catch (HttpRequestException e)
             {
