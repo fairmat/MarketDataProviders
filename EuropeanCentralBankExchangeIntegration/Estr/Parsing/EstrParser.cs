@@ -27,7 +27,7 @@ using EuropeanCentralBankIntegration.Estr.Exceptions;
 namespace EuropeanCentralBankIntegration.Estr.Parsing
 {
     /// <summary>
-    /// Parser that serializes the CSV from the ESTR API into
+    /// Parser that deserializes the CSV from the ESTR API into
     /// <see cref="EstrQuoteDto"/> objects
     /// </summary>
     public class EstrParser
