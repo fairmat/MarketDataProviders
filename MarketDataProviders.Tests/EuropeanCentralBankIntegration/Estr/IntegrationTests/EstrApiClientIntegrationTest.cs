@@ -88,7 +88,7 @@ public class EstrApiClientIntegrationTest
                 "Second quote: Freq should not be null/default char");
             Assert.That(resultList[1].BenchmarkItem, Is.Not.Null.And.Not.Empty,
                 "Second quote: BenchmarkItem should not be null or empty");
-            Assert.That(resultList[1].DataTypeTest, Is.Not.Null.And.Not.Empty,
+            Assert.That(resultList[1].DataTypeEst, Is.Not.Null.And.Not.Empty,
                 "Second quote: DataTypeTest should not be null or empty");
         });
     }
