@@ -48,7 +48,8 @@ namespace EuropeanCentralBankIntegration.Estr
             try
             {
                 IEnumerable<string> responseLines =
-                    EuropeanCentralBankEstrApiClient.GetEstrMarketDataCsvByBlocking(DataPortal.DailyBusinessWeek);
+                    EuropeanCentralBankEstrApiClient.GetEstrMarketDataCsvBy(DataPortal.DailyBusinessWeek)
+                        .GetAwaiter().GetResult();
 
                 if (responseLines == null || !responseLines.Any())
                 {
@@ -181,10 +182,11 @@ namespace EuropeanCentralBankIntegration.Estr
             IEnumerable<EstrQuoteDto> quotes;
             try
             {
-                quotes = _apiClient.GetEstrMarketDataInRangeBlocking(
-                    dataPortal: DataPortal.DailyBusinessWeek,
-                    startDate: mdq.Date,
-                    endDate: end);
+                quotes = _apiClient.GetEstrMarketDataInRange(
+                        dataPortal: DataPortal.DailyBusinessWeek,
+                        startDate: mdq.Date,
+                        endDate: end)
+                    .GetAwaiter().GetResult();
             }
             catch (Exception e)
             {

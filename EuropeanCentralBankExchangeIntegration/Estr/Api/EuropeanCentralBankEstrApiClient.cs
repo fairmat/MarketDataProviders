@@ -60,18 +60,6 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         }
 
         /// <summary>
-        /// Gets the DTO representation for all the ESTR quotes available from the service
-        /// Blocking, synchronous API for DVPLI
-        /// </summary>
-        /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
-        /// <returns>Collection of DTOs representing ESTR quotes</returns>
-        public IEnumerable<EstrQuoteDto> GetEstrMarketDataBlocking(DataPortal dataPortal)
-        {
-            IEnumerable<string> csvLines = GetEstrMarketDataCsvByBlocking(dataPortal);
-            return _estrParser.ParseEstrCsv(csvLines);
-        }
-
-        /// <summary>
         /// Gets the DTO representation for all the ESTR quotes within the given range
         /// Async API, recommended for external users
         /// </summary>
@@ -84,22 +72,6 @@ namespace EuropeanCentralBankIntegration.Estr.Api
             DateTime? startDate = null, DateTime? endDate = null, CancellationToken cancellationToken = default)
         {
             IEnumerable<string> csvLines = await GetEstrMarketDataCsvBy(dataPortal, cancellationToken);
-            IEnumerable<EstrQuoteDto> quotes = _estrParser.ParseEstrCsv(csvLines);
-            return _estrParser.FilterByDateRange(quotes, startDate, endDate);
-        }
-
-        /// <summary>
-        /// Gets the DTO representation for all the ESTR quotes within the given range
-        /// Blocking, synchronous API for DVPLI
-        /// </summary>
-        /// <param name="dataPortal">Data portal identifier to request to ECB API</param>
-        /// <param name="startDate">Start date to filter by (no lower bound if null)</param>
-        /// <param name="endDate">End date to filter by (no upper bound if null)</param>
-        /// <returns>Collection of DTOs representing ESTR quotes</returns>
-        public IEnumerable<EstrQuoteDto> GetEstrMarketDataInRangeBlocking(DataPortal dataPortal,
-            DateTime? startDate = null, DateTime? endDate = null)
-        {
-            IEnumerable<string> csvLines = GetEstrMarketDataCsvByBlocking(dataPortal);
             IEnumerable<EstrQuoteDto> quotes = _estrParser.ParseEstrCsv(csvLines);
             return _estrParser.FilterByDateRange(quotes, startDate, endDate);
         }
@@ -146,7 +118,7 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
         /// <param name="cancellationToken">Cancellation token to cancel the operation</param>
         /// <returns>Enumerable of CSV lines as strings</returns>
-        private static async Task<IEnumerable<string>> GetEstrMarketDataCsvBy(DataPortal dataPortal,
+        public static async Task<IEnumerable<string>> GetEstrMarketDataCsvBy(DataPortal dataPortal,
             CancellationToken cancellationToken = default)
         {
             string requestUrl = ConstructGetRequestUrlBy(dataPortal);
