@@ -28,7 +28,7 @@ namespace EuropeanCentralBankIntegration.Estr.Dto
         public string Key { get; set; }
         public char Freq { get; set; }
         public string BenchmarkItem { get; set; }
-        public string DataTypeTest { get; set; }
+        public string DataTypeEst { get; set; }
         public DateTime TimePeriod { get; set; }
         public double ObsValue { get; set; }
     }

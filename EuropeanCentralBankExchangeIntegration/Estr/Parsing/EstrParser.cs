@@ -84,7 +84,7 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
                         ? throw new CsvParsingException("Value for FREQ column was missing")
                         : parts[1].Trim()[0],
                     BenchmarkItem = parts[2].Trim(),
-                    DataTypeTest = parts[3].Trim(),
+                    DataTypeEst = parts[3].Trim(),
                     TimePeriod = DateTime.Parse(parts[4].Trim()),
 
                     // FIXME: Known lossy conversion from decimal to double. However, DVPLI's Scalar type
