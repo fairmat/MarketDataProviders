@@ -33,7 +33,6 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration.Estr.Integrat
 public class EstrApiClientIntegrationTest
 {
     private readonly EuropeanCentralBankEstrApiClient _estrApiClient = new();
-    private readonly EstrParser _parser = new();
 
     [SetUp]
     public void Init()
@@ -69,7 +68,7 @@ public class EstrApiClientIntegrationTest
         // Act
         IEnumerable<string> csvLines =
             EuropeanCentralBankEstrApiClient.GetEstrMarketDataCsvByBlocking(DataPortal.DailyBusinessWeek);
-        IEnumerable<EstrQuoteDto> result = _parser.SerializeCsvToDto(csvLines);
+        IEnumerable<EstrQuoteDto> result = EstrParser.SerializeCsvToDto(csvLines);
         List<EstrQuoteDto> resultList = result.ToList();
 
         // Assert

@@ -38,8 +38,6 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         private const string BaseUrl = "https://data-api.ecb.europa.eu/service/data/EST/";
         private const string RequestQuery = "?format=csvdata&detail=dataonly";
 
-        private readonly EstrParser _estrParser = new EstrParser();
-
         private static readonly HttpClient SharedHttpClient = new HttpClient()
         {
             BaseAddress = new Uri(BaseUrl)
@@ -56,7 +54,7 @@ namespace EuropeanCentralBankIntegration.Estr.Api
             CancellationToken cancellationToken = default)
         {
             IEnumerable<string> csvLines = await GetEstrMarketDataCsvBy(dataPortal, cancellationToken);
-            return _estrParser.ParseEstrCsv(csvLines);
+            return EstrParser.ParseEstrCsv(csvLines);
         }
 
         /// <summary>
@@ -72,8 +70,8 @@ namespace EuropeanCentralBankIntegration.Estr.Api
             DateTime? startDate = null, DateTime? endDate = null, CancellationToken cancellationToken = default)
         {
             IEnumerable<string> csvLines = await GetEstrMarketDataCsvBy(dataPortal, cancellationToken);
-            IEnumerable<EstrQuoteDto> quotes = _estrParser.ParseEstrCsv(csvLines);
-            return _estrParser.FilterByDateRange(quotes, startDate, endDate);
+            IEnumerable<EstrQuoteDto> quotes = EstrParser.ParseEstrCsv(csvLines);
+            return EstrParser.FilterByDateRange(quotes, startDate, endDate);
         }
 
         /// <summary>

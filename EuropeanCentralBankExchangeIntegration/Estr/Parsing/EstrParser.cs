@@ -30,7 +30,7 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
     /// Parser that deserializes the CSV from the ESTR API into
     /// <see cref="EstrQuoteDto"/> objects
     /// </summary>
-    public class EstrParser
+    public static class EstrParser
     {
         /// <summary>
         /// Parse and serialize the CSV obtained from the API and split by lines into
@@ -38,25 +38,17 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
         /// </summary>
         /// <param name="csvLines">Line-by-line representation of the fetched CSV</param>
         /// <returns>Collection of Scalar values representing the extracted market data</returns>
-        protected internal IEnumerable<EstrQuoteDto> SerializeCsvToDto(IEnumerable<string> csvLines)
+        internal static IEnumerable<EstrQuoteDto> SerializeCsvToDto(IEnumerable<string> csvLines)
         {
             return ParseEstrCsv(csvLines);
         }
-        
+
         /// <summary>
         /// Serialize an ESTR CSV from the REST API response into its intermediate DTO representation.
-        /// <para>
-        /// Note: an iterator was used to minimize memory footprint in case of very large CSVs.
-        /// Deferred execution. Behave accordingly if you are trying to debug this logic.
-        /// </para>
-        /// <para>
-        /// Note: in the future, replacing this brittle custom logic with a 3P library that handles
-        /// edge-cases better like SmallestCsvParser or CsvHelper might be a good idea.
-        /// </para>
         /// </summary>
         /// <param name="csvLines">Line-by-line representation of the CSV from ECB API</param>
         /// <returns>Enumerable containing intermediate representation for the returned CSV</returns>
-        public IEnumerable<EstrQuoteDto> ParseEstrCsv(IEnumerable<string> csvLines)
+        public static IEnumerable<EstrQuoteDto> ParseEstrCsv(IEnumerable<string> csvLines)
         {
             bool isFirstLine = true;
 
@@ -72,6 +64,12 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
                     continue;
 
                 string[] parts = line.Split(',');
+
+                (bool, string) isLineValid = ValidateCsvLine(parts);
+                if (!isLineValid.Item1)
+                {
+                    throw new CsvParsingException($"Invalid csv line. Error: {isLineValid.Item2}");
+                }
 
                 EstrQuoteDto quote = new EstrQuoteDto
                 {
@@ -98,6 +96,45 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
         }
 
         /// <summary>
+        /// Validates that a ESTR CSV line respects the expected schema to avoid out of bound accesses
+        /// </summary>
+        /// <param name="parts">CSV line, split by <c>,</c></param>
+        /// <returns>
+        /// Tuple containing:
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// <c>true</c> if the CSV line is valid and respects the schema, <c>false</c> otherwise
+        /// </description>
+        /// </item>
+        /// <item>
+        /// <description>
+        /// An error message if validation failed, <c>string.Empty</c> otherwise
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </returns>
+        private static (bool, string) ValidateCsvLine(string[] parts)
+        {
+            if (parts.Length != 6)
+            {
+                return (false, $"Invalid column count: Expected 6 columns, found {parts.Length}");
+            }
+
+            if (!DateTime.TryParse(parts[4], out _))
+            {
+                return (false, $"Field {parts[4]} is not a valid DateTime");
+            }
+
+            if (!double.TryParse(parts[5], NumberStyles.Any, CultureInfo.InvariantCulture, out _))
+            {
+                return (false, $"Field {parts[5]} is not a valid double");
+            }
+
+            return (true, string.Empty);
+        }
+
+        /// <summary>
         /// Filters parsed ESTR quotes by a date range (inclusive).
         /// <para>
         /// Note: Uses deferred execution via LINQ. The filter will be applied
@@ -108,7 +145,7 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
         /// <param name="startDate">Start date (inclusive). If null, no lower bound is applied.</param>
         /// <param name="endDate">End date (inclusive). If null, no upper bound is applied.</param>
         /// <returns>Filtered enumerable of quotes within the specified date range</returns>
-        public IEnumerable<EstrQuoteDto> FilterByDateRange(
+        public static IEnumerable<EstrQuoteDto> FilterByDateRange(
             IEnumerable<EstrQuoteDto> quotes,
             DateTime? startDate = null,
             DateTime? endDate = null)
@@ -129,26 +166,20 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
 
         /// <summary>
         /// Reads the raw CSV from the REST API and separates it line by line, so that individual
-        /// lines can be parsed later in the execution
+        /// lines can be parsed later in the execution.
         /// </summary>
         /// <param name="fileContent">Byte array containing the raw CSV file content from the API GET request</param>
         /// <returns>Enumerable containing the line-by-line representation of the CSV</returns>
         public static IEnumerable<string> ReadCsvContent(byte[] fileContent)
         {
-            List<string> lines = new List<string>();
-
             using (StreamReader reader = new StreamReader(new MemoryStream(fileContent), Encoding.UTF8))
             {
                 string line;
-                do
+                while ((line = reader.ReadLine()) != null)
                 {
-                    line = reader.ReadLine();
-                    if (!string.IsNullOrEmpty(line))
-                        lines.AddRange(line.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
-                } while (!string.IsNullOrEmpty(line));
+                    yield return line;
+                }
             }
-
-            return lines;
         }
     }
 }

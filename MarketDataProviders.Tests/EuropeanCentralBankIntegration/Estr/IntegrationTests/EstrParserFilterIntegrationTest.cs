@@ -31,14 +31,11 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration.Estr.Integrat
 public class EstrParserFilterIntegrationTest
 {
     // SUT
-    private EstrParser _parser;
     private List<EstrQuoteDto> _testQuotes;
 
     [SetUp]
     public void Setup()
     {
-        _parser = new EstrParser();
-            
         _testQuotes =
         [
             new EstrQuoteDto { TimePeriod = new DateTime(2024, 1, 1), ObsValue = 0.01 },
@@ -62,7 +59,7 @@ public class EstrParserFilterIntegrationTest
         DateTime endDate = new(2024, 1, 7);
 
         // Act
-        List<EstrQuoteDto> result = _parser.FilterByDateRange(_testQuotes, startDate, endDate).ToList();
+        List<EstrQuoteDto> result = EstrParser.FilterByDateRange(_testQuotes, startDate, endDate).ToList();
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(5), 
@@ -87,7 +84,7 @@ public class EstrParserFilterIntegrationTest
         DateTime startDate = new DateTime(2024, 1, 8);
 
         // Act
-        List<EstrQuoteDto> result = _parser.FilterByDateRange(_testQuotes, startDate: startDate).ToList();
+        List<EstrQuoteDto> result = EstrParser.FilterByDateRange(_testQuotes, startDate: startDate).ToList();
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(3), 
@@ -109,7 +106,7 @@ public class EstrParserFilterIntegrationTest
         DateTime endDate = new(2024, 1, 3);
 
         // Act
-        List<EstrQuoteDto> result = _parser.FilterByDateRange(_testQuotes, endDate: endDate).ToList();
+        List<EstrQuoteDto> result = EstrParser.FilterByDateRange(_testQuotes, endDate: endDate).ToList();
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(3), 
@@ -128,7 +125,7 @@ public class EstrParserFilterIntegrationTest
     public void FilterByDateRange_WithNullDates_ReturnsAllQuotes()
     {
         // Act
-        List<EstrQuoteDto> result = _parser.FilterByDateRange(_testQuotes).ToList();
+        List<EstrQuoteDto> result = EstrParser.FilterByDateRange(_testQuotes).ToList();
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(10), 
