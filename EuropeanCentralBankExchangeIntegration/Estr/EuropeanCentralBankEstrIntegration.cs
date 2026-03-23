@@ -50,7 +50,7 @@ namespace EuropeanCentralBankIntegration.Estr
                     return new Status()
                     {
                         HasErrors = true,
-                        ErrorMessage = "API call returned 2XX OK, but payload is either missing or degraded"
+                        ErrorMessage = "ESTR API call returned 2XX OK, but payload is either missing or degraded"
                     };
                 }
             }
@@ -59,7 +59,7 @@ namespace EuropeanCentralBankIntegration.Estr
                 return new Status()
                 {
                     HasErrors = true,
-                    ErrorMessage = "API call threw exception with message: " + e.Message
+                    ErrorMessage = "ESTR API call threw exception with message: " + e.Message
                 };
             }
 
@@ -142,6 +142,7 @@ namespace EuropeanCentralBankIntegration.Estr
         public RefreshStatus GetTimeSeries(MarketDataQuery mdq, DateTime end, out DateTime[] dates,
             out IMarketData[] marketData)
         {
+            // Should never happen, but better safe than sorry
             if (mdq is null)
             {
                 throw new ArgumentNullException(nameof(mdq));
@@ -244,12 +245,12 @@ namespace EuropeanCentralBankIntegration.Estr
         /// <returns>Array of supported ticker</returns>
         public ISymbolDefinition[] SupportedTickers(string filter = null)
         {
-            List<ISymbolDefinition> tickers = new List<ISymbolDefinition>();
-
-            // Not using collection initializer yet in case this needs to be expanded
-            tickers.Add(new SymbolDefinition(
-                name: "European Central Bank Euro Short-Term Rate",
-                description: "Euro short-term rate, Daily - businessweek"));
+            List<ISymbolDefinition> tickers = new List<ISymbolDefinition>
+            {
+                new SymbolDefinition(
+                    name: "European Central Bank Euro Short-Term Rate",
+                    description: "Euro short-term rate, Daily - businessweek")
+            };
 
             return tickers.ToArray();
         }
@@ -289,8 +290,8 @@ namespace EuropeanCentralBankIntegration.Estr
             identifiers.Add(new MarketDataIdentifierInfo()
             {
                 Category = IdentifierCategory.EquityAndIndex,
-                Code = "Euro Short-Term Rate",
-                Name = "Euro Short-Term Rate",
+                Code = "ESTR",
+                Name = "ESTR",
                 Description = "Euro short-term rate, Daily - businessweek",
                 Currency = nameof(SupportedCurrencies.EUR),
                 Visibility = false

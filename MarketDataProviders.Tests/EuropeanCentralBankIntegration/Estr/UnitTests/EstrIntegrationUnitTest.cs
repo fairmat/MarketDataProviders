@@ -71,8 +71,8 @@ public class EstrIntegrationUnitTest
         MarketDataIdentifierInfo expectedResult = new()
         {
             Category = IdentifierCategory.EquityAndIndex,
-            Code = "Euro Short-Term Rate",
-            Name = "Euro Short-Term Rate",
+            Code = "ESTR",
+            Name = "ESTR",
             Description = "Euro short-term rate, Daily - businessweek",
             Exported = true,
             Identifier = null,
