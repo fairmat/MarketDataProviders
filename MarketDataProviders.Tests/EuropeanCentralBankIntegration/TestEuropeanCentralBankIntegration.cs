@@ -45,7 +45,8 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
         [Test]
         public void TestConnectivity()
         {
-            global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration wrapper = new global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration();
+            global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration wrapper =
+                new global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration();
             Status status = wrapper.TestConnectivity();
             Assert.That(!status.HasErrors, status.ErrorMessage);
         }
@@ -56,7 +57,8 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
         [Test]
         public void TestRequestOneEntry()
         {
-            global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration wrapper = new global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration();
+            global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration wrapper =
+                new global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration();
             IMarketData data;
             MarketDataQuery query = new MarketDataQuery();
             query.Ticker = "EUCFZAR";
@@ -87,7 +89,8 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
         [Test]
         public void TestRequestMultipleEntry()
         {
-            global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration wrapper = new global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration();
+            global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration wrapper =
+                new global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration();
             IMarketData[] data;
             DateTime[] dates;
             MarketDataQuery query = new MarketDataQuery();
@@ -125,6 +128,64 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration
 
             Assert.AreEqual(9.8480, (data[0] as Scalar).Value, 0.0001);
             Assert.AreEqual(9.8458, (data[1] as Scalar).Value, 0.0001);
+        }
+
+        /// <summary>
+        /// Passing a MarketDataQuery to GetMarketData() will run
+        /// EuropeanCentralBankExchangeIntegration/Estr/EuropeanCentralBankEstrIntegration.cs:GetMarketData()
+        /// instead. Therefore, this test ensures that market data is correctly retrieved for ESTR data
+        /// as well.
+        /// </summary>
+        [Test]
+        public void TestEstrGetMarketData_ShouldCorrectlyReturnEstrData()
+        {
+            // Arrange
+            global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration integration = new();
+
+            // Act
+            MarketDataQuery mdq = new()
+            {
+                Ticker = "ESTR",
+                Field = "close",
+                Date = new DateTime(2022, 1, 31),
+                MarketDataType = typeof(Scalar).ToString(),
+            };
+            RefreshStatus result = integration.GetMarketData(mdq, out IMarketData marketData);
+
+            // Assert
+            Assert.That(result, Is.Not.Null,
+                "Result should not be null");
+            Assert.That(result.HasErrors, Is.False,
+                $"Result should not have errors. Errors: {result.ErrorMessage}");
+        }
+
+        [Test]
+        public void TestEstrGetTimeSeries_ShouldCorrectlyReturnTimeSeries()
+        {
+            // Arrange
+            global::EuropeanCentralBankIntegration.EuropeanCentralBankIntegration integration = new();
+
+            // Act
+            MarketDataQuery mdq = new()
+            {
+                Ticker = "ESTR",
+                Field = "close",
+                Date = new DateTime(2022, 1, 31),
+                MarketDataType = typeof(Scalar).ToString(),
+            };
+            DateTime endDate = new(2022, 3, 31);
+            RefreshStatus result = integration.GetTimeSeries(mdq, endDate, out DateTime[] dates,
+                out IMarketData[] marketData);
+
+            // Assert
+            Assert.That(result, Is.Not.Null,
+                "Result should not be null");
+            Assert.That(result.HasErrors, Is.False,
+                $"Result should not have errors. Errors: {result.ErrorMessage}");
+            Assert.That(marketData, Is.Not.Null,
+                "Retrieved market data should not be null");
+            Assert.That(marketData, Has.Length.GreaterThan(1),
+                "Market Data should have at least one element");
         }
     }
 }
