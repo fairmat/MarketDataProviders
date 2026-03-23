@@ -34,11 +34,6 @@ namespace EuropeanCentralBankIntegration.Estr
         IMarketDataProviderInfo, IMarketDataIdentifierInfoProvider
     {
         /// <summary>
-        /// Client to contact the ECB API to get ESTR quotes
-        /// </summary>
-        private readonly EuropeanCentralBankEstrApiClient _apiClient = new EuropeanCentralBankEstrApiClient();
-
-        /// <summary>
         /// Test whether the connection to the ECB API is functional
         /// </summary>
         /// <returns>A Status type object (DVPLI type) representing whether the connection is usable</returns>
@@ -182,7 +177,7 @@ namespace EuropeanCentralBankIntegration.Estr
             IEnumerable<EstrQuoteDto> quotes;
             try
             {
-                quotes = _apiClient.GetEstrMarketDataInRange(
+                quotes = EuropeanCentralBankEstrApiClient.GetEstrMarketDataInRange(
                         dataPortal: DataPortal.DailyBusinessWeek,
                         startDate: mdq.Date,
                         endDate: end)

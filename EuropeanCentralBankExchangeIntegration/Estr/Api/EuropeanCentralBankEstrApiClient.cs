@@ -50,7 +50,7 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
         /// <param name="cancellationToken">Cancellation token to cancel the operation</param>
         /// <returns>Collection of DTOs representing ESTR quotes</returns>
-        public async Task<IEnumerable<EstrQuoteDto>> GetEstrMarketData(DataPortal dataPortal,
+        public static async Task<IEnumerable<EstrQuoteDto>> GetEstrMarketData(DataPortal dataPortal,
             CancellationToken cancellationToken = default)
         {
             IEnumerable<string> csvLines = await GetEstrMarketDataCsvBy(dataPortal, cancellationToken);
