@@ -292,7 +292,7 @@ namespace EuropeanCentralBankIntegration.Estr
                     Category = IdentifierCategory.EquityAndIndex,
                     Code = "ESTR",
                     Name = "ESTR",
-                    Description = "Euro short-term rate, Daily - businessweek",
+                    Description = "Compounded ESTR",
                     Currency = nameof(SupportedCurrencies.EUR),
                     Visibility = false
                 }
