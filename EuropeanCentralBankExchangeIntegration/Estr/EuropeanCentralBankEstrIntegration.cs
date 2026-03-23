@@ -96,7 +96,7 @@ namespace EuropeanCentralBankIntegration.Estr
                 };
             }
 
-            if (marketDataArray.Length != 1 && dates.Length != 1 && dates[0] != mdq.Date)
+            if (marketDataArray.Length != 1 || dates.Length != 1 || dates[0] != mdq.Date)
             {
                 marketData = null;
                 return new RefreshStatus()
