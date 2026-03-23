@@ -161,7 +161,7 @@ namespace EuropeanCentralBankIntegration.Estr
                 };
             }
 
-            if (mdq.MarketDataType != nameof(Scalar))
+            if (mdq.MarketDataType != typeof(Scalar).ToString())
             {
                 dates = null;
                 marketData = null;
