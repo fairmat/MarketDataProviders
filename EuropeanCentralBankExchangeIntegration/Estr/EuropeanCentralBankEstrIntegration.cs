@@ -29,7 +29,6 @@ using EuropeanCentralBankIntegration.Estr.Enums;
 
 namespace EuropeanCentralBankIntegration.Estr
 {
-    [Mono.Addins.Extension("/Fairmat/MarketDataProvider")]
     public class EuropeanCentralBankEstrIntegration : IMarketDataProvider, IDescription, ITickersInfo,
         IMarketDataProviderInfo, IMarketDataIdentifierInfoProvider
     {
