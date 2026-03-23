@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using EuropeanCentralBankIntegration.Estr.Constants;
@@ -66,50 +65,12 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         /// <param name="startDate">Start date to filter by (no lower bound if null)</param>
         /// <param name="endDate">End date to filter by (no upper bound if null)</param>
         /// <returns>Collection of DTOs representing ESTR quotes</returns>
-        public async Task<IEnumerable<EstrQuoteDto>> GetEstrMarketDataInRange(DataPortal dataPortal,
+        public static async Task<IEnumerable<EstrQuoteDto>> GetEstrMarketDataInRange(DataPortal dataPortal,
             DateTime? startDate = null, DateTime? endDate = null, CancellationToken cancellationToken = default)
         {
             IEnumerable<string> csvLines = await GetEstrMarketDataCsvBy(dataPortal, cancellationToken);
             IEnumerable<EstrQuoteDto> quotes = EstrParser.ParseEstrCsv(csvLines);
             return EstrParser.FilterByDateRange(quotes, startDate, endDate);
-        }
-
-        /// <summary>
-        /// Gets the CSV representation for an ESTR quote.
-        /// Blocking version, only meant for the TestConnection() method from <c>DVPLI</c>, which
-        /// does not support async calls.
-        /// of the response result
-        /// </summary>
-        /// <param name="dataPortal">Data Portal identifier to request to ECB API</param>
-        /// <returns>string containing the raw CSV returned by the service</returns>
-        protected internal static IEnumerable<string> GetEstrMarketDataCsvByBlocking(DataPortal dataPortal)
-        {
-            string requestUrl = ConstructGetRequestUrlBy(dataPortal);
-
-            try
-            {
-                using (HttpResponseMessage response = SharedHttpClient.GetAsync(requestUrl).Result)
-                {
-                    response.EnsureSuccessStatusCode();
-
-                    string csvContent = response.Content.ReadAsStringAsync().Result;
-                    byte[] responseFileBytes = Encoding.UTF8.GetBytes(csvContent);
-                    IEnumerable<string> result = EstrParser.ReadCsvContent(responseFileBytes);
-                    return result;
-                }
-            }
-            catch (HttpRequestException e)
-            {
-                throw new InvalidOperationException(
-                    $"Failed to retrieve ESTR data from ECB API. URL: {requestUrl}. HTTP Error: {e.Message}",
-                    e);
-            }
-            catch (Exception e)
-            {
-                throw new InvalidOperationException(
-                    $"An unexpected error occurred while calling the ECB API. URL: {requestUrl}",
-                    e);
-            }
         }
 
         /// <summary>

@@ -41,11 +41,11 @@ public class EstrApiClientIntegrationTest
     }
 
     [Test]
-    public void TestGetCsvToEnumerable_ShouldCorrectlyCreateEnumerable()
+    public async Task TestGetCsvToEnumerable_ShouldCorrectlyCreateEnumerable()
     {
         // Act
         IEnumerable<string> result =
-            EuropeanCentralBankEstrApiClient.GetEstrMarketDataCsvByBlocking(DataPortal.DailyBusinessWeek);
+            await EuropeanCentralBankEstrApiClient.GetEstrMarketDataCsvBy(DataPortal.DailyBusinessWeek);
         IEnumerable<string> resultList = result.ToList();
 
         // Assert
@@ -63,11 +63,48 @@ public class EstrApiClientIntegrationTest
     }
 
     [Test]
-    public void TestCsvGetAndParse_ShouldCorrectlyGetAndParseCsv()
+    public async Task TestCsvGetAndParse_ShouldCorrectlyGetAndParseCsv()
     {
         // Act
         IEnumerable<string> csvLines =
-            EuropeanCentralBankEstrApiClient.GetEstrMarketDataCsvByBlocking(DataPortal.DailyBusinessWeek);
+            await EuropeanCentralBankEstrApiClient.GetEstrMarketDataCsvBy(DataPortal.DailyBusinessWeek);
+        IEnumerable<EstrQuoteDto> result = EstrParser.SerializeCsvToDto(csvLines);
+        List<EstrQuoteDto> resultList = result.ToList();
+
+        // Assert
+        Assert.That(resultList, Is.Not.Null,
+            "Result from the parser should not be null");
+        Assert.That(resultList, Is.Not.Empty,
+            "Result from the parser should not be empty");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(resultList[1], Is.Not.Null,
+                "Second quote should not be null");
+            Assert.That(resultList[1].Key, Is.Not.Null.And.Not.Empty,
+                "Second quote: Key should not be null or empty");
+            Assert.That(resultList[1].Freq, Is.Not.EqualTo('\0'),
+                "Second quote: Freq should not be null/default char");
+            Assert.That(resultList[1].BenchmarkItem, Is.Not.Null.And.Not.Empty,
+                "Second quote: BenchmarkItem should not be null or empty");
+            Assert.That(resultList[1].DataTypeEst, Is.Not.Null.And.Not.Empty,
+                "Second quote: DataTypeTest should not be null or empty");
+        });
+    }
+
+    /// <summary>
+    /// DVPLI integration currently does not support <c>async</c> methods, so we are going
+    /// to have to call those APIs in a synchronous way with <c>.GetAwaiter().GetResult()</c>
+    /// instead. This test checks if the process still completes successfully when it is called
+    /// in this manner.
+    /// </summary>
+    [Test]
+    public void TestCsvGetAndParseBlocking_ShouldCompleteSuccessfullyWithoutAsyncAwait()
+    {
+        // Act
+        IEnumerable<string> csvLines =
+            EuropeanCentralBankEstrApiClient.GetEstrMarketDataCsvBy(DataPortal.DailyBusinessWeek)
+                .GetAwaiter().GetResult();
         IEnumerable<EstrQuoteDto> result = EstrParser.SerializeCsvToDto(csvLines);
         List<EstrQuoteDto> resultList = result.ToList();
 
@@ -96,7 +133,8 @@ public class EstrApiClientIntegrationTest
     public async Task TestGetMarketData_ShouldCorrectlyObtainMarketData()
     {
         // Act
-        IEnumerable<EstrQuoteDto> result = await _estrApiClient.GetEstrMarketData(DataPortal.DailyBusinessWeek);
+        IEnumerable<EstrQuoteDto> result =
+            await EuropeanCentralBankEstrApiClient.GetEstrMarketData(DataPortal.DailyBusinessWeek);
 
         // Assert
         IEnumerable<EstrQuoteDto> resultList = result.ToList();
@@ -112,7 +150,7 @@ public class EstrApiClientIntegrationTest
         // Act
         DateTime startDate = new(2024, 1, 6);
         DateTime endDate = new(2024, 12, 31);
-        IEnumerable<EstrQuoteDto> result = await _estrApiClient.GetEstrMarketDataInRange(
+        IEnumerable<EstrQuoteDto> result = await EuropeanCentralBankEstrApiClient.GetEstrMarketDataInRange(
             dataPortal: DataPortal.DailyBusinessWeek,
             startDate: startDate,
             endDate: endDate);
