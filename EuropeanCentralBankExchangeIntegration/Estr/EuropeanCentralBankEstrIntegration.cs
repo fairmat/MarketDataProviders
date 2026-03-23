@@ -285,17 +285,18 @@ namespace EuropeanCentralBankIntegration.Estr
         /// <returns>A list containing the information about the market data handled.</returns>
         public IList<MarketDataIdentifierInfo> GetMarketDataIdentifierInfo()
         {
-            IList<MarketDataIdentifierInfo> identifiers = new List<MarketDataIdentifierInfo>();
-
-            identifiers.Add(new MarketDataIdentifierInfo()
+            IList<MarketDataIdentifierInfo> identifiers = new List<MarketDataIdentifierInfo>()
             {
-                Category = IdentifierCategory.EquityAndIndex,
-                Code = "ESTR",
-                Name = "ESTR",
-                Description = "Euro short-term rate, Daily - businessweek",
-                Currency = nameof(SupportedCurrencies.EUR),
-                Visibility = false
-            });
+                new MarketDataIdentifierInfo()
+                {
+                    Category = IdentifierCategory.EquityAndIndex,
+                    Code = "ESTR",
+                    Name = "ESTR",
+                    Description = "Euro short-term rate, Daily - businessweek",
+                    Currency = nameof(SupportedCurrencies.EUR),
+                    Visibility = false
+                }
+            };
 
             return identifiers;
         }
