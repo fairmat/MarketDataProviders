@@ -65,10 +65,10 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
 
                 string[] parts = line.Split(',');
 
-                (bool, string) isLineValid = ValidateCsvLine(parts);
-                if (!isLineValid.Item1)
+                (bool validationResult, string validationError) = ValidateCsvLine(parts);
+                if (!validationResult)
                 {
-                    throw new CsvParsingException($"Invalid csv line. Error: {isLineValid.Item2}");
+                    throw new CsvParsingException($"Invalid csv line. Error: {validationError}");
                 }
 
                 EstrQuoteDto quote = new EstrQuoteDto
@@ -119,6 +119,17 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
             if (parts.Length != 6)
             {
                 return (false, $"Invalid column count: Expected 6 columns, found {parts.Length}");
+            }
+
+            if (parts.All(string.IsNullOrWhiteSpace))
+            {
+                return (false,
+                    "Received empty string, but empty strings should have been detected and skipped before reaching this method");
+            }
+
+            if (parts.Any(string.IsNullOrWhiteSpace))
+            {
+                return (false, "One or more fields is null or whitespace");
             }
 
             if (!DateTime.TryParse(parts[4], out _))
