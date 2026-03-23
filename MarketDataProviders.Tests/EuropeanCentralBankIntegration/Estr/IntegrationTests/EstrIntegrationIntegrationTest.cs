@@ -90,7 +90,7 @@ public class EstrIntegrationIntegrationTest
         MarketDataQuery mdq = new()
         {
             Field = "close",
-            MarketDataType = "Scalar",
+            MarketDataType = typeof(Scalar).ToString(),
             // Might be flaky, currently relies on this date having a valid value in the ESTR API return payload
             // FIXME: Create a proper unit test with mocked API response eventually
             Date = new DateTime(2019, 10, 01),
