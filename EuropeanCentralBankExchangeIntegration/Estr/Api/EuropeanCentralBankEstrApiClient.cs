@@ -32,7 +32,7 @@ namespace EuropeanCentralBankIntegration.Estr.Api
     /// </para>
     /// Refer to SDMX REST API documentation for further info: <see href="https://github.com/sdmx-twg/sdmx-rest"></see>
     /// </summary>
-    public class EuropeanCentralBankEstrApiClient
+    public static class EuropeanCentralBankEstrApiClient
     {
         private const string BaseUrl = "https://data-api.ecb.europa.eu/service/data/EST/";
         private const string RequestQuery = "?format=csvdata&detail=dataonly";
