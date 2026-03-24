@@ -37,10 +37,7 @@ namespace EuropeanCentralBankIntegration.Estr.Api
         private const string BaseUrl = "https://data-api.ecb.europa.eu/service/data/EST/";
         private const string RequestQuery = "?format=csvdata&detail=dataonly";
 
-        private static readonly HttpClient SharedHttpClient = new HttpClient()
-        {
-            BaseAddress = new Uri(BaseUrl)
-        };
+        private static readonly HttpClient SharedHttpClient = new HttpClient();
 
         /// <summary>
         /// Gets the DTO representation for all the ESTR quotes available from the service
