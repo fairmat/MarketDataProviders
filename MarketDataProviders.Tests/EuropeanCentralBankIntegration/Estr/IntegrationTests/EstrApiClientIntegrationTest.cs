@@ -66,7 +66,7 @@ public class EstrApiClientIntegrationTest
         // Act
         IEnumerable<string> csvLines =
             await EuropeanCentralBankEstrApiClient.GetEstrMarketDataCsvBy(DataPortal.DailyBusinessWeek);
-        IEnumerable<EstrQuoteDto> result = EstrParser.SerializeCsvToDto(csvLines);
+        IEnumerable<EstrQuoteDto> result = EstrParser.DeserializeCsvToDto(csvLines);
         List<EstrQuoteDto> resultList = result.ToList();
 
         // Assert
@@ -103,7 +103,7 @@ public class EstrApiClientIntegrationTest
         IEnumerable<string> csvLines =
             EuropeanCentralBankEstrApiClient.GetEstrMarketDataCsvBy(DataPortal.DailyBusinessWeek)
                 .GetAwaiter().GetResult();
-        IEnumerable<EstrQuoteDto> result = EstrParser.SerializeCsvToDto(csvLines);
+        IEnumerable<EstrQuoteDto> result = EstrParser.DeserializeCsvToDto(csvLines);
         List<EstrQuoteDto> resultList = result.ToList();
 
         // Assert

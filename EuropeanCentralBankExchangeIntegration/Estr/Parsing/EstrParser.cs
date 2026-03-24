@@ -38,7 +38,7 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
         /// </summary>
         /// <param name="csvLines">Line-by-line representation of the fetched CSV</param>
         /// <returns>Collection of Scalar values representing the extracted market data</returns>
-        internal static IEnumerable<EstrQuoteDto> SerializeCsvToDto(IEnumerable<string> csvLines)
+        internal static IEnumerable<EstrQuoteDto> DeserializeCsvToDto(IEnumerable<string> csvLines)
         {
             return ParseEstrCsv(csvLines);
         }
