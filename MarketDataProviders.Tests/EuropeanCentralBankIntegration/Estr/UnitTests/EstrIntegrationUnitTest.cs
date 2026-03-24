@@ -75,7 +75,7 @@ public class EstrIntegrationUnitTest
             Name = "ESTR",
             Description = "Euro short-term rate, Daily - businessweek",
             Exported = true,
-            Identifier = null,
+            Identifier = nameof(IdentifierCategory.EquityAndIndex),
             Currency = nameof(SupportedCurrencies.EUR),
             Visibility = false
         };
