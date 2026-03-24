@@ -60,7 +60,7 @@ public class EstrIntegrationUnitTest
         MarketDataIdentifierInfo expectedResult = new()
         {
             Category = IdentifierCategory.EquityAndIndex,
-            Identifier = nameof(IdentifierCategory.EquityAndIndex),
+            Identifier = "ESTR",
             Code = "ESTR",
             Name = "ESTR",
             Description = "Compounded ESTR",
