@@ -32,8 +32,6 @@ namespace MarketDataProviders.Tests.EuropeanCentralBankIntegration.Estr.Integrat
 [TestFixture]
 public class EstrApiClientIntegrationTest
 {
-    private readonly EuropeanCentralBankEstrApiClient _estrApiClient = new();
-
     [SetUp]
     public void Init()
     {
