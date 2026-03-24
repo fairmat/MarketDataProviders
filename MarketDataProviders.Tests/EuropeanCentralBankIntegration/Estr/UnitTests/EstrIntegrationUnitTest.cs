@@ -60,11 +60,10 @@ public class EstrIntegrationUnitTest
         MarketDataIdentifierInfo expectedResult = new()
         {
             Category = IdentifierCategory.EquityAndIndex,
+            Identifier = nameof(IdentifierCategory.EquityAndIndex),
             Code = "ESTR",
             Name = "ESTR",
-            Description = "Euro short-term rate, Daily - businessweek",
-            Exported = true,
-            Identifier = nameof(IdentifierCategory.EquityAndIndex),
+            Description = "Compounded ESTR",
             Currency = nameof(SupportedCurrencies.EUR),
             Visibility = false
         };

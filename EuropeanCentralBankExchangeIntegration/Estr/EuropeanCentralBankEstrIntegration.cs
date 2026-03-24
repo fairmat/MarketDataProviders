@@ -266,6 +266,7 @@ namespace EuropeanCentralBankIntegration.Estr
                 new MarketDataIdentifierInfo()
                 {
                     Category = IdentifierCategory.EquityAndIndex,
+                    Identifier = nameof(IdentifierCategory.EquityAndIndex),
                     Code = "ESTR",
                     Name = "ESTR",
                     Description = "Compounded ESTR",
