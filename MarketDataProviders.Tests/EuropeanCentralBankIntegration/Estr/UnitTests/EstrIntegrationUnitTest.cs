@@ -51,17 +51,6 @@ public class EstrIntegrationUnitTest
     }
 
     [Test]
-    public void TestGetDataAvailabilityInfo_ShouldReturnNotNull()
-    {
-        // Act
-        MarketDataAccessType result = _integration.GetDataAvailabilityInfo(MarketDataCategory.EquityPrice);
-
-        // Assert
-        Assert.That(result, Is.EqualTo(MarketDataAccessType.Local),
-            "In this specific case, the method should return MarketDataAccessType.Local");
-    }
-
-    [Test]
     public void TestGetMarketDataIdentifierInfo_ShouldReturnExpectedResult()
     {
         // Act

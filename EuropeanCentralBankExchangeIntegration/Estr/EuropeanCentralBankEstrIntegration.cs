@@ -30,7 +30,7 @@ using EuropeanCentralBankIntegration.Estr.Enums;
 namespace EuropeanCentralBankIntegration.Estr
 {
     public class EuropeanCentralBankEstrIntegration : IMarketDataProvider, IDescription, ITickersInfo,
-        IMarketDataProviderInfo, IMarketDataIdentifierInfoProvider
+        IMarketDataIdentifierInfoProvider
     {
         /// <summary>
         /// Test whether the connection to the ECB API is functional
@@ -253,30 +253,6 @@ namespace EuropeanCentralBankIntegration.Estr
             };
 
             return tickers.ToArray();
-        }
-
-        /// <summary>
-        /// Gets the information about the market data handled by the market data provider.
-        /// This is the entry point for the importer.
-        /// </summary>
-        /// <returns>A list containing the information about the market data handled.</returns>
-        public MarketDataAccessType GetDataAvailabilityInfo(MarketDataCategory category)
-        {
-            // Copying implementation from EuropeanCentralBankIntegration verbatim
-            switch (category)
-            {
-                case MarketDataCategory.EquityPrice:
-                {
-                    // Exchange rate series are considered equities
-                    // because they share the same underlying type.
-                    return MarketDataAccessType.Local;
-                }
-
-                default:
-                {
-                    return MarketDataAccessType.NotAvailable;
-                }
-            }
         }
 
         /// <summary>
