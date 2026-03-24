@@ -79,7 +79,7 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
                         : parts[1].Trim()[0],
                     BenchmarkItem = parts[2].Trim(),
                     DataTypeEst = parts[3].Trim(),
-                    TimePeriod = DateTime.Parse(parts[4].Trim()),
+                    TimePeriod = DateTime.Parse(parts[4].Trim(), CultureInfo.InvariantCulture),
 
                     // FIXME: Known lossy conversion from decimal to double. However, DVPLI's Scalar type
                     //  wants a double, so I have no choice.
