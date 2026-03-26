@@ -132,7 +132,7 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
                 return (false, "One or more fields is null or whitespace");
             }
 
-            if (!DateTime.TryParse(parts[4], out _))
+            if (!DateTime.TryParse(parts[4], CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
             {
                 return (false, $"Field {parts[4]} is not a valid DateTime");
             }
