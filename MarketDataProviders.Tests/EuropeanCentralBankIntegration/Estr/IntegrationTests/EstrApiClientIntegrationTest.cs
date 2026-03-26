@@ -52,7 +52,7 @@ public class EstrApiClientIntegrationTest
 
         const string expectedHeaderLine = "KEY,FREQ,BENCHMARK_ITEM,DATA_TYPE_EST,TIME_PERIOD,OBS_VALUE";
         Assert.That(resultList, Is.Not.Empty,
-            "Result from the API client should be empty.");
+            "Result from the API client should not be empty.");
         Assert.That(!string.IsNullOrWhiteSpace(resultList.First()),
             "The row corresponding to the CSV header should not be empty. This likely means the CSV was not" +
             "correctly downloaded or parsed at all");
@@ -86,7 +86,7 @@ public class EstrApiClientIntegrationTest
             Assert.That(resultList[1].BenchmarkItem, Is.Not.Null.And.Not.Empty,
                 "Second quote: BenchmarkItem should not be null or empty");
             Assert.That(resultList[1].DataTypeEst, Is.Not.Null.And.Not.Empty,
-                "Second quote: DataTypeTest should not be null or empty");
+                "Second quote: DataTypeEst should not be null or empty");
         });
     }
 
