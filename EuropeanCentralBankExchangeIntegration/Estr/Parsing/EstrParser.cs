@@ -26,17 +26,8 @@ using EuropeanCentralBankIntegration.Estr.Exceptions;
 
 namespace EuropeanCentralBankIntegration.Estr.Parsing
 {
-    /// <summary>
-    /// Parser that deserializes the CSV from the ESTR API into
-    /// <see cref="EstrQuoteDto"/> objects
-    /// </summary>
     public static class EstrParser
     {
-        /// <summary>
-        /// Serialize an ESTR CSV from the REST API response into its intermediate DTO representation.
-        /// </summary>
-        /// <param name="csvLines">Line-by-line representation of the CSV from ECB API</param>
-        /// <returns>Enumerable containing intermediate representation for the returned CSV</returns>
         public static IEnumerable<EstrQuoteDto> ParseEstrCsv(IEnumerable<string> csvLines)
         {
             bool isFirstLine = true;
