@@ -75,25 +75,6 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
             }
         }
 
-        /// <summary>
-        /// Validates that a ESTR CSV line respects the expected schema to avoid out of bound accesses
-        /// </summary>
-        /// <param name="parts">CSV line, split by <c>,</c></param>
-        /// <returns>
-        /// Tuple containing:
-        /// <list type="bullet">
-        /// <item>
-        /// <description>
-        /// <c>true</c> if the CSV line is valid and respects the schema, <c>false</c> otherwise
-        /// </description>
-        /// </item>
-        /// <item>
-        /// <description>
-        /// An error message if validation failed, <c>string.Empty</c> otherwise
-        /// </description>
-        /// </item>
-        /// </list>
-        /// </returns>
         private static (bool, string) ValidateCsvLine(string[] parts)
         {
             if (parts.Length != 6)
