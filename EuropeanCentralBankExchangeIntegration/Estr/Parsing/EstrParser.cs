@@ -33,17 +33,6 @@ namespace EuropeanCentralBankIntegration.Estr.Parsing
     public static class EstrParser
     {
         /// <summary>
-        /// Parse and serialize the CSV obtained from the API and split by lines into
-        /// a collection of <see cref="EstrQuoteDto"/> objects
-        /// </summary>
-        /// <param name="csvLines">Line-by-line representation of the fetched CSV</param>
-        /// <returns>Collection of Scalar values representing the extracted market data</returns>
-        internal static IEnumerable<EstrQuoteDto> DeserializeCsvToDto(IEnumerable<string> csvLines)
-        {
-            return ParseEstrCsv(csvLines);
-        }
-
-        /// <summary>
         /// Serialize an ESTR CSV from the REST API response into its intermediate DTO representation.
         /// </summary>
         /// <param name="csvLines">Line-by-line representation of the CSV from ECB API</param>
