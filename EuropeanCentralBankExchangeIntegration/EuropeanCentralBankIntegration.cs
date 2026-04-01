@@ -20,7 +20,9 @@ using System.Collections.Generic;
 using DVPLI;
 using DVPLI.Interfaces;
 using DVPLI.MarketDataTypes;
+using EuropeanCentralBankIntegration.Estr;
 using Fairmat.MarketData;
+using KGySoft.CoreLibraries;
 
 namespace EuropeanCentralBankIntegration
 {
@@ -68,6 +70,10 @@ namespace EuropeanCentralBankIntegration
                                                 "USD",
                                                 "ZAR",
             };
+        
+        // Integration extension for ESTR-related queries
+        private readonly EuropeanCentralBankEstrIntegration _estrIntegration = new EuropeanCentralBankEstrIntegration();
+        private const string EstrTickerName = "ESTR";
 
         #region IDescription Implementation
 
@@ -116,6 +122,13 @@ namespace EuropeanCentralBankIntegration
         /// </returns>
         public RefreshStatus GetMarketData(MarketDataQuery mdq, out IMarketData marketData)
         {
+            // If we are trying to get ESTR-related market data, fall back to
+            // the separate ESTR GetMarketData() implementation
+            if (mdq.Ticker == EstrTickerName)
+            {
+                return _estrIntegration.GetMarketData(mdq, out marketData);
+            }
+            
             // Reuse the Historical time series to get the single quote
             // (Equal start/end date = get the quote of the day).
             DateTime[] dates;
@@ -173,6 +186,13 @@ namespace EuropeanCentralBankIntegration
         /// </returns>
         public RefreshStatus GetTimeSeries(MarketDataQuery mdq, DateTime end, out DateTime[] dates, out IMarketData[] marketData)
         {
+            // If we are trying to get ESTR-related Time Series, fall back to
+            // the separate ESTR GetTimeSeries() implementation
+            if (mdq.Ticker == EstrTickerName)
+            {
+                return _estrIntegration.GetTimeSeries(mdq, end, out dates, out marketData);
+            }
+            
             RefreshStatus status = new RefreshStatus();
 
             string currency;
@@ -316,6 +336,13 @@ namespace EuropeanCentralBankIntegration
         /// </returns>
         public Status TestConnectivity()
         {
+            // Check if we are able to get ESTR data first (it's a separate API)
+            Status estrConnectivityStatus = _estrIntegration.TestConnectivity();
+            if (estrConnectivityStatus.HasErrors)
+            {
+                return estrConnectivityStatus;
+            }
+            
             // Prepare the default result, in case everything will go well.
             Status state = new Status();
             state.HasErrors = false;
@@ -376,6 +403,10 @@ namespace EuropeanCentralBankIntegration
         public ISymbolDefinition[] SupportedTickers(string filter = null)
         {
             List<ISymbolDefinition> tickers = new List<ISymbolDefinition>();
+            
+            // Add ESTR tickers first, then proceed to the rest
+            tickers.AddRange(_estrIntegration.SupportedTickers(filter)); 
+            
             string[] eurBasis = { "EUR", "EUCF" };//enumerate the two version of the exchange rate name 
             bool[] allowInverse = { true, false };
             for (int b = 0; b < eurBasis.Length; b++)
@@ -445,6 +476,9 @@ namespace EuropeanCentralBankIntegration
         public IList<MarketDataIdentifierInfo> GetMarketDataIdentifierInfo()
         {
             IList<MarketDataIdentifierInfo> list = new List<MarketDataIdentifierInfo>();
+            
+            // ESTR
+            list.AddRange(_estrIntegration.GetMarketDataIdentifierInfo());
 
             // ECB format
             foreach (string currency in supportedCurrencies)
